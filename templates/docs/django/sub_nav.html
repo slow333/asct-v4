@@ -1,0 +1,26 @@
+<div class="mb-4">
+    <ul class="nav nav-tabs">
+        <li style="color:aliceblue; background: #777; height:2rem; margin:6px 6px 0 6px; padding:3px 6px 0 6px;">Django</li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'django-tips' %}active fw-bold{% endif %}" href="{% url 'django-tips' %}">Tips</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'project-intro' %}active fw-bold{% endif %}" href="{% url 'project-intro' %}">Intro</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'django-setup' %}active fw-bold{% endif %}" href="{% url 'django-setup' %}">Setup</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'django-orm' %}active fw-bold{% endif %}" href="{% url 'django-orm' %}">ORM</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'django-model' %}active fw-bold{% endif %}" href="{% url 'django-model' %}">Model</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'django-regexp' %}active fw-bold{% endif %}" href="{% url 'django-regexp' %}">Regexp</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'django-datetime' %}active fw-bold{% endif %}" href="{% url 'django-datetime' %}">Datetime</a>
+        </li>
+    </ul>
+</div>

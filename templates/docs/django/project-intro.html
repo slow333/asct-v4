@@ -1,0 +1,71 @@
+{% extends 'base/base.html' %}
+{% block title %} Project Home {% endblock %}
+
+{% block content %}
+{% include 'docs/django/sub_nav.html' %}
+<div class="doc-container">
+<h1 class="doc-title">Project 개요</h1>
+<section class="doc-section">
+  <h2 class="doc-header">시스템 체크 프로세스</h2>
+  <h3 class="doc-subheader">전체 프로젝트 설치 및 시행 기초:General Procedure for an IT System Health Check(ITSHC)</h3>
+  <p>일반적인 IT system에 대한 체크 프로세스</p>
+  <ol>
+    <li>Inventory and Documentation : 검사 대상에 대한 검토</li>
+    <li>Define Scope and Objectives : 점검대상에 대한 검검 항목 정의</li>
+    <li>Network Assessment: 네트워크 에 대한 검토</li>
+    <li>System Evaluation: 시스템 에 대한 데이터 수집</li>
+    <li>Security Analysis: 보안에 대한 검토</li>
+    <li>Data Protection Review : 데이터 보호/백업에 대한 검토</li>
+    <li>Automated Monitoring: 자동화된 모니터링에 대한 검토</li>
+    <li>Reporting and Recommendations: 보고서 생성</li>
+  </ol>
+  <h2 class="doc-header">Automated System Check Tool: ASCT</h2>
+  <ol>
+    <li>Planning</li>
+    <li>Action Plan</li>
+    <li>Implementation</li>
+    <li>Testing</li>
+    <li>Monitoring</li>
+    <li>Maintenance</li>
+    <li>Revalidation</li>
+  </ol>
+</section>
+<section class="doc-section">
+  <h2 class="doc-header">etc backup</h2>
+  <pre># backup for server info models
+ip_management = models.GenericIPAddressField(null=True, blank=True)
+ip_virtual = models.GenericIPAddressField(null=True, blank=True) # nat, vip 등 가상아이피
+# backup for network models
+network_service_2 = models.CharField(max_length=10, choices=network_type, default='10G', null=True, blank=True)
+network_service_2_inbound = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+network_service_2_outbound = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+network_nas_1 = models.CharField(max_length=10, choices=network_type, default='10G', null=True, blank=True)
+network_nas_1_inbound = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+network_nas_1_outbound = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+network_nas_2 = models.CharField(max_length=10, choices=network_type, default='10G', null=True, blank=True)
+network_nas_2_inbound = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+network_nas_2_outbound = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+
+network_san_1 = models.CharField(max_length=10, choices=network_type, default='16G', null=True, blank=True)
+network_san_1_inbound = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+network_san_1_outbound = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+network_san_2 = models.CharField(max_length=10, choices=network_type, default='16G', null=True, blank=True)
+network_san_2_inbound = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+network_san_2_outbound = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+
+
+network_mgmt_1 = models.CharField(max_length=20, choices=network_type, default='1G', null=False)
+network_mgmt_2 = models.CharField(max_length=20, choices=network_type, default='1G', null=True, blank=True)
+
+# backup for storage models
+
+storage_san_total = models.IntegerField(null=True, blank=True)
+storage_san_usage_percent = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
+
+storage_nfs_total = models.IntegerField(null=True, blank=True)
+storage_nfs_usage_percent = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
+</pre>
+</section>
+</div>
+
+{% endblock %}

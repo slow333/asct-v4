@@ -1,0 +1,53 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title %} Polls form {% endblock %}
+{% block content %}
+{% include 'blog/_nav.html' %}
+<section>
+    <form method="post">
+    {% csrf_token %}
+        <legend><h1>질문을 입력하세요</h1></legend>
+        {{ q_form.as_p }}
+        <div id="form-list">
+            {% if formset %}
+                {{ formset.management_form }}
+                {% for form in formset %}
+                    {{ form.as_p }}
+                {% endfor %}
+            {% else %}
+                {{ c_form.as_p }}
+            {% endif %}
+        </div>
+        
+        <div id="empty-form" class="d-none">
+            <div class="d-flex align-items-center gap-2 dynamic-form">
+                <div class="flex-grow-1">{{ c_form.as_p }}</div>
+                <button type="button" class="btn btn-danger btn-sm remove-form">삭제</button>
+            </div>
+        </div>
+
+        <button id="add-more" type="button" class="btn btn-outline-secondary btn-sm mt-1">항목 추가</button>
+        <br>
+        <hr>
+        <input type="submit" value="질문 저장하기" class="btn btn-primary">
+        <hr>
+        <div>
+            <a href="{% url 'polls:index' %}" class="btn btn-outline-secondary btn-sm">Polls</a>
+            <a href="javascript:history.back()" class="btn btn-secondary btn-sm">Go Back</a>
+        </div>
+    </form>
+</section>
+
+<script>
+    document.getElementById('add-more').addEventListener('click', function() {
+        const emptyForm = document.getElementById('empty-form').innerHTML;
+        document.getElementById('form-list').insertAdjacentHTML('beforeend', emptyForm);
+    });
+
+    document.getElementById('form-list').addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-form')) {
+            e.target.closest('.dynamic-form').remove();
+        }
+    });
+</script>
+{% endblock %}

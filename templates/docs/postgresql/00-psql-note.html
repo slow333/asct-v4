@@ -1,0 +1,21 @@
+{% extends 'base/base.html' %}
+{% block title %} Postgresql Notes {% endblock %}
+
+{% block content %}
+{% include 'docs/postgresql/sub_nav.html' %}
+<div class="doc-container">
+<h1 class="doc-title">Postgresql Notes</h1>
+<section class="doc-section">
+    <h2 class="doc-header">백업하기</h2>
+    <pre>
+C:\Users\slow3>pg_dump -h localhost -U postgres django_asct_v2 > django_asct_v2_backup.sql
+    </pre>
+    <h2 class="doc-header">복원하기</h2>
+    <pre>
+CREATE DATABASE new_dbname; (using psql).
+
+C:\Users\slow3>psql -h localhost -U postgres new_dbname < django_asct_v2_backup.sql
+    </pre>
+</section>
+</div>
+{% endblock %}

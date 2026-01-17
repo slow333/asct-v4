@@ -1,0 +1,29 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title %} Events Home {% endblock %}
+{% block content %}
+<div class="d-flex flex-column">
+    <div class="text-center">
+        <div class="d-flex gap-2 justify-content-center align-items-center">
+            <a href="{% url 'events:index' prev_year prev_month %}" class="page-link fs-2 pb-3"><i class="bi bi-arrow-left-circle-fill"></i> </a>
+            <h1 class="mx-3"> Events Dashoard </h1>
+            <a href="{% url 'events:index' next_year next_month %}" class="page-link fs-2 pb-3"><i class="bi bi-arrow-right-circle-fill"></i></a>
+        </div>
+        {% include 'events/_nav.html' %}
+        {{ cal|safe }}
+    </div>
+    <ul class="my-3">
+        {% for event in page_obj %}
+        <li class="py-1">
+            <span {% if event.is_completed %}class="text-decoration-line-through"{% endif %}
+            >{{ event.title }}</span>
+            <a href="{% url 'events:event-update' event.id %}"> 수정</a>
+            <small class="text-muted">on {{ event.created_at|date:"Y-m-d H:i"}} </small>
+            <small class="text-muted">by {{ event.manager.username }} </small>
+            <small class="text-muted">by {{ event.venue.name }} </small>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+<div style="position: fixed; bottom:1rem;text-align:center;width:90%;">Copyright &copy; {{ year }}</div>
+{% endblock %}

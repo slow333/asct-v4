@@ -1,0 +1,19 @@
+{% extends "base/base.html" %}
+{% block title %} 포스트 삭제 {% endblock %}
+{% block content %}
+{% include 'blog/_nav.html' %}
+    <div class="content-section">
+        <form method="post" onsubmit="return confirm('지울려고요?');">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Delete Post</legend>
+                <h2>지울려고요 ?  : {{ post.title }}</h2>
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-danger" type="submit"
+                >Yes, Delete Post</button>
+                <a class="ml-2 btn btn-outline-secondary" href="{% url 'blog:detail' post.id %}" class="text-muted">No, 취소</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

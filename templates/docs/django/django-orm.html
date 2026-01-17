@@ -1,0 +1,282 @@
+{% extends 'base/base.html' %}
+{% block title %} Django ORM {% endblock %}
+
+{% block content %}
+{% include 'docs/django/sub_nav.html' %}
+<div class="doc-container">
+<h1 class="doc-title">Django ORM</h1>
+<section class="doc-section">
+    <h2 class="doc-header">모델 정의하기</h2>
+    <pre>from django.db import models</pre>
+    <pre>class Post(models.Model):
+    title = models.CharField(max_length=200)
+</pre>
+    <h2 class="doc-header">마이그레이션 생성 및 적용</h2>
+    <pre>python manage.py makemigrations
+python manage.py migrate</pre>
+    <h2 class="doc-header">ORM으로 데이터 조작하기</h2>
+    <pre># 데이터 생성
+post = Post(title="첫 번째 포스트") # 방법 1
+post.save()
+post = Post() # 방법 2
+post.title = "첫 번째 포스트"
+post.save()
+</pre>
+<pre># 데이터 조회
+query_set = Post.objects.all()
+for post in query_set:
+print(post.title)
+</pre>
+<pre># 데이터 수정(get으로 안하면 여러개일때 오류남)
+post = Post.objects.get(id=1)
+post = Post(id=1) # 방법 2 , 여러개 일때 정의하지 않은 것은 ''로 초기화 됨
+post.title = "수정된 포스트 제목"
+post.save()
+</pre>
+<pre># 데이터 삭제
+query_set = Post.objects.filter(id__gt=7) # id가 7보다 큰 포스트 조회
+query_set.delete()
+</pre>
+    <h2 class="doc-header">one to many 관계</h2>
+    <pre>class Author(models.Model):
+    name = models.CharField(max_length=100)
+    </pre>
+    <pre>class Post(models.Model):
+    title = models.CharField(max_length=200)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    </pre>
+    <h2 class="doc-header">one to one 관계</h2>
+    <pre>class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    </pre>
+    <h2 class="doc-header">many to many 관계</h2>
+    <pre>class Student(models.Model):
+name = models.CharField(max_length=100)
+class Course(models.Model):
+title = models.CharField(max_length=200)
+students = models.ManyToManyField(Student)
+</pre>
+    <h2 class="doc-header">쿼리셋 필터링</h2>
+    <pre># 특정 조건으로 필터링
+posts = Post.objects.filter(title__contains="포스트")
+for post in posts:
+    print(post.title)
+</pre>
+    <h2 class="doc-header">관계형 데이터베이스 다루기</h2>
+    <pre>class Author(models.Model):
+    name = models.CharField(max_length=100)
+</pre>
+    <pre>class Post(models.Model):
+    title = models.CharField(max_length=200)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    </pre>
+    <pre># 관계형 데이터 조회(JOIN == select_related)
+posts = Post.objects.select_related('author').all() 
+for post in posts:
+    print(f"{post.title} by {post.author.name}")
+</pre>
+    <h2 class="doc-header">ORM 최적화 기법</h2>
+    <h3 class="doc-subheader">related를 정의하지 않으면 개별 쿼리를 수행하여 많은 쿼리를 수행함</h3>
+    <pre># select_related 사용 예시(1:N 관계에서 JOIN 수행)
+posts = Post.objects.select_related('author').all()
+for post in posts:
+    print(f"{post.title} by {post.author.name}")
+</pre>
+    <pre># prefetch_related 사용 예시(N:M 관계에서 별도의 쿼리 수행)
+posts = Post.objects.prefetch_related('comments').all()
+for post in posts:
+    print(f"{post.title} with {post.comments.count()} comments")
+</pre>
+
+<h2 class="doc-header">earliest, latest</h2>
+<pre># 가장 오래된 포스트 조회
+    earliest_post = Post.objects.earliest('date_created')
+    # 가장 최신 포스트 조회
+    latest_post = Post.objects.latest('date_created')
+</pre>
+    <h2 class="doc-header">only, defer </h2>
+    <h3 class="doc-subheader">특정 필드만 로드하거나 특정 필드를 로드하지 않음</h3>
+    <h3 class="doc-subheader">실제 object를 로드하므로 성능에 영향을 줄 수 있음, 해당 필드에 없는 값을 로드할 때 추가 쿼리가 발생</h3>
+<pre># only()를 사용하여 특정 필드만 로드
+posts = Post.objects.only('id', 'title')
+# defer()를 사용하여 특정 필드를 로드하지 않음
+posts = Post.objects.defer('content')
+</pre>
+<h2 class="doc-header">annotate</h2>
+<h3 class="doc-subheader"> annotate는 기본 값을 넣어주고 추가로 계산된 필드를 넣어줌    </h3>
+<pre>from django.db.models import Count
+# 각 저자별 포스트 수 집계
+authors = Author.objects.annotate(post_count=Count('post')).order_by('post_count')[:5]
+for author in authors:
+print(f"{author.name} has {author.post_count} posts")
+</pre>
+<h2 class="doc-header">Expression: db에 query를 적용할 때 사용</h2>
+    <h3 class="doc-subheader">Aggregate : 집계 함수</h3>
+    <pre>from django.db.models import Count, Avg
+# 포스트 수 집계
+post_count = Post.objects.count()
+</pre>
+    <pre># 평균 길이 계산
+average_title_length = Post.objects.aggregate(Avg('title__length'))
+</pre>
+    <h3 class="doc-subheader">Q and F expressions</h3>
+<pre>from django.db.models import Q, F
+filter를 casecade 하면 AND 조건이 됨
+posts = Post.objects.filter(title__contains="포스트", content__contains="Django")
+posts = Post.objects.filter(title__contains="포스트").filter(content__contains="Django")
+# Q(query) 객체를 사용한 복잡한 쿼리
+posts = Post.objects.filter(Q(title__contains="포스트") | Q(content__contains="포스트"))
+
+# F(field) 객체를 사용한 필드 간 비교(F는 필드 값을 참조해서 값을 비교할 때 사용)
+posts = Post.objects.filter(title__length__gt=F('content__length'))
+</pre>
+    <h3 class="doc-subheader">values, values_list</h3>
+    <pre># values()를 사용하여 딕셔너리 형태로 데이터 조회
+posts = Post.objects.values('id', 'title')
+# values_list()를 사용하여 튜플 형태로 데이터 조회
+posts = Post.objects.values_list('id', 'title')
+</pre>
+<h3 class="doc-subheader">Func: 데이터베이스 함수 사용</h3>
+<pre>from django.db.models import Func, Value, F
+# CONCAT 함수 사용 예시
+from django.db.models import Concat
+authors = Author.objects.annotate(
+    full_name=Concat('first_name', Value(' '), 'last_name')
+).order_by('full_name')[:5]
+for author in authors:
+    print(author.full_name)
+</pre>
+<h3 class="doc-subheader">ExpressionWrapper</h3>
+<pre>from django.db.models import ExpressionWrapper, F, FloatField
+# 가격에 세금(10%)을 더한 값을 계산
+# price는 DecimalField , 1.1은 float 타입으로 서로 타입이 맞지 않음
+# 계산시 필드 값의 type이 맞지 않으면 오류가 발생할 수 있으므로 output_field를 지정
+products = Product.objects.annotate(
+    price_with_tax=ExpressionWrapper(
+        F('price') * 1.1,
+        output_field=DecimalField()
+    )
+)</pre>
+    <h2 class="doc-header">transaction.atomic 적용하기</h2>
+    <h3 class="doc-subheader">트랜잭션 블록 내의 모든 데이터베이스 작업이 원자적으로 수행되도록 보장</h3>
+    <h3 class="doc-subheader">블록 내에서 예외가 발생하면 모든 변경 사항이 롤백됨</h3>
+    <pre>from django.db import transaction
+from myapp.models import Account
+def transfer_funds(from_account_id, to_account_id, amount):
+    with transaction.atomic():
+        from_account = Account.objects.select_for_update().get(id=from_account_id)
+        to_account = Account.objects.select_for_update().get(id=to_account_id)
+        if from_account.balance < amount:
+            raise ValueError("Insufficient funds")
+        from_account.balance -= amount
+        to_account.balance += amount
+        from_account.save()
+        to_account.save()
+</pre>
+    <h2 class="doc-header">원시 SQL 쿼리 실행하기</h2>
+    <pre>from django.db import connection
+Product.objects.raw("SELECT * FROM myapp_product WHERE unit_price > %s", [20.00])
+# OR 직접 커서 사용
+with connection.cursor() as cursor:
+    cursor.execute("SELECT * FROM myapp_post WHERE title = %s", ['첫 번째 포스트'])
+    rows = cursor.fetchall()
+for row in rows:
+    print(row)
+</pre>
+    <h2 class="doc-header">query 예제</h2>
+    <h3 class="doc-subheader">orderitem에서 product_id를 찾아서 product에서 이를 포함한 것을 검색해서 5개의 제품을 가져오는 쿼리</h3>
+    <pre>test_query_1 = Product.objects.filter(id__in=OrderItem.objects.values('product_id').distinct()).order_by('title')[:5]</pre>
+    <h3 class="doc-subheader">select_related, prefetch_related 예제</h3>
+    <pre>
+    # 이런 상태에서 relation이 있는 것을 추가하면 추가 쿼리가 발생함
+    test_query_2 = Product.objects.all()
+    test_query_3 = Product.objects.select_related('collection')
+    # order에는 customer와 orderitem_set이 있는데, orderitem_set에는 product가 있음
+    # product를 지정하지 않고, orderitem_set만 prefetch하면 orderitem_set에서 product를 접근할 때 추가 쿼리가 발생함
+    test_query_4 = Order.objects \
+        .select_related('customer')\
+        .prefetch_related('orderitem_set__product').order_by('-placed_at')[:5]</pre>
+    <h3 class="doc-subheader">집계 함수 예제</h3>
+    <pre># product의 collection__id가 2인 것들의 통계
+    test_query_5 = Product.objects \
+        .filter(collection__id=2) \
+        .aggregate(
+            total_ordered=Count('orderitem'), min_price=Min('unit_price'), max_price=Max('unit_price'), avg_price=Round(Avg('unit_price'), 2)
+        )</pre>
+    <h3 class="doc-subheader">annotate 예제</h3>
+    <pre># annotate는 기본 값을 넣어주고 추가로 계산된 필드를 넣어줌    
+    test_query_6 = Customer.objects \
+        .annotate(
+            total_orders=Count('order')) \
+        .filter(total_orders__gt=1)
+    test_query_7 = Customer.objects \
+        .annotate(
+            full_name=Func(F('first_name'), Value(' '), F('last_name'), function='CONCAT')
+        ).order_by('full_name')[:5] 
+    test_query_8 = Customer.objects \
+        .annotate(
+            full_name=Concat('first_name', Value(' '), 'last_name')
+        ).order_by('full_name')[:5]
+    test_query_9 = Product.objects \
+        .annotate(
+            discount_price=ExpressionWrapper(F('unit_price') * 0.8, output_field=DecimalField())
+        ).order_by('discount_price')[:5]
+    <h3 class="doc-subheader">content type을 이용한 generic relation 테스트(tags 앱 modles.py 참고)</h3>
+    <pre>from django.contrib.contenttypes.models import ContentType
+from tags.models import TaggedItem
+test_query = TaggedItem.objects.get_tags_for(Product, 1) </pre>
+</section>
+<section class="doc-section">
+      <h2 class="doc-header">python shell에서 직접 데이터 수정 시험하기</h2>
+  <pre>python manage.py shell
+from blog.models import Post
+from django.contrib.auth.models import User
+
+User.objects.all()
+User.objects.filter(username='admin')
+user = User.objects.filter(username='admin').first()
+user = User.objects.first()
+test = User.objects.get(id=2)
+Post.objects.all()
+post_1 = Post(title='Blog 1', content='첫번째 포스트 내용', author=user)
+p4 = Post(title='Blog 4', content='4 포스트 내용', author=user)
+Post.objects.all()
+# save해야 적용됨
+post_1.save()
+Post.objects.all()
+post_1.date_posted
+datetime.datetime(2025, 11, 15, 12, 20, 28, 529407, tzinfo=datetime.timezone.utc)
+post_1.date_updated
+datetime.datetime(2025, 11, 15, 12, 21, 41, 505496, tzinfo=datetime.timezone.utc)
+# user에서 post 참조하기
+user.post_set.all()
+user.post_set.create(title='Blog from user', content='5 포스트 내용')
+user.post_set.create(title='Blog from user admin', content='6 포스트 내용')
+user.post_set.all()
+# post 데이터 삭제하기
+post_1.delete()
+Post.objects.all()
+# post data update
+post_1.title = 'update post'
+post_1.save()
+Post.objects.all()
+  </pre>
+  <h2 class="doc-header">Django date formatting</h2>
+  <pre>
+&#123;&#123; my_datetime_object|date:"D, M d, Y H:i" &#125;&#125;
+Common format characters include: 
+Y: Year with century (e.g., 2025)
+y: Year without century, zero-padded (e.g., 25)
+F: full Month name (e.g., November)
+M: Month name, abbreviated (e.g., Nov)
+m: Month as a zero-padded decimal number (e.g., 11)
+d: Day of the month, zero-padded (e.g., 01-31)
+D: Day of the week, abbreviated (e.g., Fri)
+H: Hour (24-hour clock), zero-padded (e.g., 00-23)
+h: Hour (12-hour clock), zero-padded (e.g., 01-12)
+i: Minute, zero-padded (e.g., 00-59)
+s: Second, zero-padded (e.g., 00-59)    
+  </pre>
+</section>
+</div>
+{% endblock %}

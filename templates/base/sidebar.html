@@ -1,0 +1,124 @@
+{% load nav_tags %}
+
+<div class="d-flex flex-column sidebar-card h-100 pb-3">
+    <!-- Apps Section -->
+    <div class="px-3">
+        <div class="sidebar-section-title">Applications</div>
+        <button class="sidebar-btn" type="button" 
+            data-bs-toggle="collapse" data-bs-target="#sidebar-apps" 
+            aria-expanded="{% if '/blog/' in request.path or '/pcra/' in request.path or '/idol/' in request.path or '/aistore/' in request.path or '/library/' in request.path or '/polls/' in request.path or '/events/' in request.path %}true{% else %}false{% endif %}" 
+            aria-controls="sidebar-apps">
+            <span><i class="bi bi-grid-fill sidebar-icon text-success"></i> Apps Menu</span>
+        </button>
+
+        <div class="collapse {% if '/blog/' in request.path or '/asct/' in request.path or '/idols/' in request.path or '/aistore/' in request.path or '/library/' in request.path or '/polls/' in request.path or '/events/' in request.path %} show {% endif %}" id="sidebar-apps">
+            <div class="mt-1">
+                <a class="sidebar-link {% is_active '/asct/' %}" href="{% url 'asct:index' %}">
+                    <i class="bi bi-gear-wide-connected sidebar-icon"></i> ASCT</a>
+                <a class="sidebar-link {% is_active '/blog/' %}" href="{% url 'blog:index' %}"><i class="bi bi-blockquote-left sidebar-icon"></i> Blog</a>
+                <a class="sidebar-link {% is_active '/events/' %}" href="{% url 'events:index' %}">
+                    <i class="bi bi-calendar2-event sidebar-icon"></i> Events</a>
+                {% comment %}
+                <a class="sidebar-link {% is_active '/store/' %}" href="{% url 'store:index' %}">
+                    <i class="bi bi-shop sidebar-icon"></i> Store</a>
+                <a class="sidebar-link {% is_active '/library/' %}" href="{% url 'library:index' %}">
+                    <i class="bi bi-journals sidebar-icon"></i> Library</a>
+                {% endcomment %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Docs Section -->
+    <div class="px-3">
+        <div class="sidebar-section-title">Documentation</div>
+        
+        <!-- Django -->
+        <button class="sidebar-btn" type="button" 
+            data-bs-toggle="collapse" data-bs-target="#docs-django" 
+            aria-expanded="{% is_show 'docs/django' %}" aria-controls="docs-django">
+            <span><i class="bi bi-filetype-py sidebar-icon text-primary"></i> Django</span>
+        </button>
+        <div class="collapse {% is_show 'docs/django' %}" id="docs-django">
+            <div class="mt-1">
+                <a href="{% url 'django-tips' %}" class="sidebar-link {% is_active '/docs/django/django-tips' %}">Django Tips</a>
+                <a href="{% url 'project-intro' %}" class="sidebar-link {% is_active '/docs/django/project-intro' %}">프로젝트 소개</a>
+                <a href="{% url 'django-setup' %}" class="sidebar-link {% is_active '/docs/django/setup' %}">설치</a>
+                <a href="{% url 'django-model' %}" class="sidebar-link {% is_active '/docs/django/model' %}">Model</a>
+                <a href="{% url 'django-orm' %}" class="sidebar-link {% is_active '/docs/django/orm' %}">ORM</a>
+                <a href="{% url 'django-regexp' %}" class="sidebar-link {% is_active '/docs/django/regexp' %}">Regexp</a>
+                <a href="{% url 'django-datetime' %}" class="sidebar-link {% is_active '/docs/django/datetime' %}">Datetime</a>
+            </div>
+        </div>
+
+        <!-- PSQL -->
+        <button class="sidebar-btn" type="button" 
+            data-bs-toggle="collapse" data-bs-target="#docs-psql" 
+            aria-expanded="{% is_show 'docs/psql' %}" aria-controls="docs-psql">
+            <span><i class="bi bi-database sidebar-icon text-info"></i> PSQL</span>
+        </button>
+        <div class="collapse {% is_show 'docs/psql' %}" id="docs-psql">
+            <div class="mt-1">
+                <a href="/docs/psql/datatype" class="sidebar-link {% is_active '/docs/psql/datatype' %}">Datatype</a>
+                <a href="/docs/psql/crud" class="sidebar-link {% is_active '/docs/psql/crud' %}">CRUD</a>
+                <a href="/docs/psql/sqlalchemy" class="sidebar-link {% is_active '/docs/psql/sqlalchemy' %}">SQLAlchemy</a>
+                <a href="/docs/psql/select" class="sidebar-link {% is_active '/docs/psql/select' %}">Select</a>
+                <a href="/docs/psql/constraints" class="sidebar-link {% is_active '/docs/psql/constraints' %}">Constraints</a>
+                <a href="/docs/psql/groupby" class="sidebar-link {% is_active '/docs/psql/groupby' %}">Group By</a>
+                <a href="/docs/psql/join" class="sidebar-link {% is_active '/docs/psql/join' %}">Join</a>
+                <a href="/docs/psql/aggregate" class="sidebar-link {% is_active '/docs/psql/aggregate' %}">Aggregate</a>
+                <a href="/docs/psql/functions" class="sidebar-link {% is_active '/docs/psql/functions' %}">Functions</a>
+                <a href="/docs/psql/procedure-trigger" class="sidebar-link {% is_active '/docs/psql/procedure-trigger' %}">Trigger</a>
+            </div>
+        </div>
+
+        <!-- Python -->
+        <button class="sidebar-btn" type="button" 
+            data-bs-toggle="collapse" data-bs-target="#docs-python" 
+            aria-expanded="{% is_show 'docs/python' %}" aria-controls="docs-python">
+            <span><i class="bi bi-code-slash sidebar-icon text-warning"></i> Python</span>
+        </button>
+        <div class="collapse {% is_show 'docs/python' %}" id="docs-python">
+            <div class="mt-1">
+                <a href="/docs/python/datatype" class="sidebar-link {% is_active '/docs/python/datatype' %}">Datatype</a>
+                <a href="/docs/python/print-format" class="sidebar-link {% is_active '/docs/python/print-format' %}">Print Format</a>
+                <a href="/docs/python/loop" class="sidebar-link {% is_active '/docs/python/loop' %}">Loop</a>
+                <a href="/docs/python/def-file" class="sidebar-link {% is_active '/docs/python/def-file' %}">Def/File</a>
+                <a href="/docs/python/class-module" class="sidebar-link {% is_active '/docs/python/class-module' %}">Class/Module</a>
+                <a href="/docs/python/try-except" class="sidebar-link {% is_active '/docs/python/try-except' %}">Try/Except</a>
+                <a href="/docs/python/py-library" class="sidebar-link {% is_active '/docs/python/py-library' %}">Library</a>
+                <a href="/docs/python/decorator" class="sidebar-link {% is_active '/docs/python/decorator' %}">Decorator</a>
+                <a href="/docs/python/regexp" class="sidebar-link {% is_active '/docs/python/regexp' %}">Regexp</a>
+            </div>
+        </div>
+
+        <!-- Flask -->
+        <button class="sidebar-btn" type="button" 
+            data-bs-toggle="collapse" data-bs-target="#docs-flask" 
+            aria-expanded="{% is_show 'docs/flask' %}" aria-controls="docs-flask">
+            <span><i class="bi bi-cup-hot sidebar-icon text-dark"></i> Flask</span>
+        </button>
+        <div class="collapse {% is_show 'docs/flask' %}" id="docs-flask">
+            <div class="mt-1">
+                <a href="/docs/flask/install" class="sidebar-link {% is_active '/docs/flask/install' %}">Install</a>
+                <a href="/docs/flask/note" class="sidebar-link {% is_active '/docs/flask/note' %}">Note</a>
+                <a href="/docs/flask/core-crud" class="sidebar-link {% is_active '/docs/flask/core-crud' %}">Core CRUD</a>
+                <a href="/docs/flask/db-setup" class="sidebar-link {% is_active '/docs/flask/db-setup' %}">DB Setup</a>
+            </div>
+        </div>
+
+        <!-- Others -->
+        <button class="sidebar-btn" type="button" 
+            data-bs-toggle="collapse" data-bs-target="#docs-others" 
+            aria-expanded="{% is_show 'docs/others' %}" aria-controls="docs-others">
+            <span><i class="bi bi-tools sidebar-icon text-secondary"></i> Others</span>
+        </button>
+        <div class="collapse {% is_show 'docs/others' %}" id="docs-others">
+            <div class="mt-1">
+                <a href="/docs/others/basic-settings" class="sidebar-link {% is_active '/docs/others/basic-settings' %}">Basic Settings</a>
+                <a href="/docs/others/html-css" class="sidebar-link {% is_active '/docs/others/html-css' %}">HTML/CSS</a>
+                <a href="/docs/others/linux" class="sidebar-link {% is_active '/docs/others/linux' %}">Linux</a>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,73 @@
+{% extends 'base/base.html' %}
+{% block title %} SqlAlchemy ORM{% endblock %}
+
+{% block content %}
+{% include 'docs/flask/sub_nav.html' %}
+<div class="doc-container">
+<h1 class="doc-title">SqlAlchemy ORM</h1>
+<section class="doc-section">
+  <h2 class="doc-header"># Select</h2>
+  <pre>
+blog = Blog.query.get(1)
+blog = Blog.query.filter_by(id=1).first()
+
+blogs = Blog.query.all()
+blogs = db.session.qury(Blog).all()
+
+blog = db.session.qury(Blog).filter(Blog.author_id=1).first()</pre>
+<h2 class="doc-header"># Insert, Update, Delete</h2>
+<pre># Create
+blog = Blog(title=title, content=content, author_id=current_user.id)
+db.session.add(blog)
+db.session.commit()
+
+# Update
+blog = Blog.query.get(1)
+blog.title = title
+blog.content = content
+db.session.commit()
+
+# Delete
+db.session.delete(blog)
+db.session.commit()</pre>
+<h2 class="doc-header"># Join</h2>
+<pre># SQLAlchemy automatically knows how to join based on the relationship defined in the model.
+# This returns a list of Blog objects where the author's username is 'john'.
+blogs_by_john = db.session.query(Blog).join(Blog.author).filter(User.username == 'john').all()
+
+# Join (explicit condition)
+# You can also specify the join condition explicitly.
+# This returns tuples of (Blog, User) objects.
+blogs_with_authors = db.session.query(Blog, User).join(User, Blog.author_id == User.id).all()
+for blog, author in blogs_with_authors:
+    print(f"Blog: {blog.title}, Author: {author.username}")</pre>
+<h2 class="doc-header"># Pagination</h2>
+<pre>># limit, order_by 
+profile_page = (
+  db.session.query(Profile)
+    .order_by(Profile.id.desc())
+    .limit(per_page)
+    .offset(offset)
+    .all()
+)
+# count
+count = db.session.query(Profile).count()</pre>
+
+<h2 class="doc-header"># Aggregate Functions</h2>
+<pre># group_by example
+# To count the number of blogs each user has written.
+# We need to import `func` from sqlalchemy for aggregate functions like count().
+from sqlalchemy import func
+
+user_blog_counts = db.session.query(
+    User.username,
+    func.count(Blog.id).label('blog_count')
+  ).join(Blog, User.id == Blog.author_id).group_by(User.username).all()
+
+# The result will be a list of tuples, e.g., [('john', 5), ('jane', 3)]
+for username, count in user_blog_counts:
+    print(f"User: {username} has {count} blogs.")
+  </pre>
+</section>
+</div>
+{% endblock %}

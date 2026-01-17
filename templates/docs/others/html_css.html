@@ -1,0 +1,90 @@
+{% extends 'base/base.html' %}
+{% block title %} HTML and CSS {% endblock %}
+
+{% block content %}
+{% include 'docs/others/sub_nav.html' %}
+<div class="doc-container">
+<h1 class="doc-title">HTML and CSS</h1>
+<section class="doc-section">
+    <h2 class="doc-header">html 특수 문자</h2>
+<table class="table-doc" >
+    <thead>
+        <tr>
+            <th>표현문자</th>
+            <th>숫자표현</th>
+            <th>문자표현</th>
+            <th>설명</th>
+        </tr>
+    </thead>
+<tbody>
+    <tr>
+        <td style="width: 14%;"><span>#</span></td>
+        <td style="width: 26%;"><span>&amp;#35;</span></td>
+        <td style="width: 16%;"><span>-</span></td>
+        <td style="width: 44%;"><span>숫자기호</span></td>
+    </tr>
+    <tr>
+        <td style="width: 14%;"><span>&amp;</span></td>
+        <td style="width: 26%;"><span>&amp;#38;</span></td>
+        <td style="width: 16%;"><b><span>&amp;amp;</span></b></td>
+        <td style="width: 44%;"><span>Ampersand</span></td>
+    </tr>
+    <tr>
+    <td style="width: 14%;"><span>&lt;</span></td>
+    <td style="width: 26%;"><span>&amp;#60;</span></td>
+    <td style="width: 16%;"><b><span>&amp;lt;</span></b></td>
+    <td style="width: 44%;"><span>보다 작은</span></td>
+    </tr>
+    <tr>
+        <td style="width: 14%;"><span>&gt;</span></td>
+        <td style="width: 26%;"><span>&amp;#62;</span></td>
+        <td style="width: 16%;"><span><b>&amp;gt;</b></span></td>
+        <td style="width: 44%;"><span>보다 큰</span></td>
+    </tr>
+    <tr>
+        <td style="width: 14%;"><span>@</span></td>
+        <td style="width: 26%;"><span>&amp;#64;</span></td>
+        <td style="width: 16%;"><span>-</span></td>
+        <td style="width: 44%;"><span>Commercial at</span></td>
+    </tr>
+    <tr>
+        <td style="width: 14%;"><span>\</span></td>
+        <td style="width: 26%;"><span>&amp;#92;</span></td>
+        <td style="width: 16%;"><span>-</span></td>
+        <td style="width: 44%;"><span>역슬래쉬</span></td>
+    </tr>
+    <tr>
+        <td style="width: 14%;"><span>{</span></td>
+        <td style="width: 26%;"><span>&amp;#123;</span></td>
+        <td style="width: 16%;"><span>-</span></td>
+        <td style="width: 44%;"><span>왼쪽 중괄호</span></td>
+    </tr>
+    <tr>
+        <td style="width: 14%;"><span>}</span></td>
+        <td style="width: 26%;"><span>&amp;#125;</span></td>
+        <td style="width: 16%;"><span>-</span></td>
+        <td style="width: 44%;"><span>오른쪽 중괄호</span></td>
+    </tr>
+    <tr>
+        <td style="width: 14%;"><span>￡</span></td>
+        <td style="width: 26%;"><span>&amp;#163;</span></td>
+        <td style="width: 16%;"><span><b>&amp;pound;</b></span></td>
+        <td style="width: 44%;"><span>파운드</span></td>
+    </tr>
+    <tr>
+        <td style="width: 14%;"><span>&uml;</span></td>
+        <td style="width: 26%;"><span>&amp;#168;</span></td>
+        <td style="width: 16%;">&amp;uml;</td>
+        <td style="width: 44%;"><span>움라우트</span></td>
+    </tr>
+    <tr>
+        <td style="width: 14%;"><span>ⓒ</span></td>
+        <td style="width: 26%;"><span>&amp;#169;</span></td>
+        <td style="width: 16%;"><span><b>&amp;copy;</b></span></td>
+        <td style="width: 44%;"><span>저작권</span></td>
+    </tr>
+</tbody>
+</table>
+</section>
+</div>
+{% endblock %}

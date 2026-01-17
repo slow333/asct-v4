@@ -1,0 +1,28 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title %} Polls 결과 {% endblock %}
+{% block content %}
+{% include 'blog/_nav.html' %}
+<section>
+    <h1>Polls Result</h1>
+
+    <h2>{{ question.question_text }}</h2>
+    <ul>
+        {% for choice in question.choice_set.all %}
+        {% if choice.votes > 0 %}
+        <li>{{ choice.choice_text}} ({{ choice.votes }} vote{{ choice.votes|pluralize }})</li>
+        {% else %}
+        <li>{{ choice.choice_text}} (0 vote)</li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+    <hr>
+    <div>
+        <a href="{% url 'polls:detail' question.id %}" class="btn btn-outline-success btn-sm">다시 투표할 수 있나요?</a>
+        <hr>
+        <a href="{% url 'polls:index' %}" class="btn btn-outline-secondary btn-sm">Polls</a>
+    <a href="javascript:history.back()" class="btn btn-secondary btn-sm">Go Back</a>
+    </div>
+</section>
+
+{% endblock %}

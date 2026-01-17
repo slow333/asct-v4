@@ -1,0 +1,33 @@
+<div class="mb-4">
+    <ul class="nav nav-tabs">
+        <li style="color:aliceblue; background: #777; height:2rem; margin:6px 6px 0 6px; padding:3px 6px 0 6px;">Python</li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-python-datatype' %}active fw-bold{% endif %}" href="{% url 'docs-python-datatype' %}">DataType</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-python-print-format' %}active fw-bold{% endif %}" href="{% url 'docs-python-print-format' %}">Print</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-python-loop' %}active fw-bold{% endif %}" href="{% url 'docs-python-loop' %}">Loop</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-python-def-file' %}active fw-bold{% endif %}" href="{% url 'docs-python-def-file' %}">Def/File</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-python-class-module' %}active fw-bold{% endif %}" href="{% url 'docs-python-class-module' %}">Class</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-python-try-except' %}active fw-bold{% endif %}" href="{% url 'docs-python-try-except' %}">Try/Except</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-python-py-library' %}active fw-bold{% endif %}" href="{% url 'docs-python-py-library' %}">Library</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-python-decorator' %}active fw-bold{% endif %}" href="{% url 'docs-python-decorator' %}">Decorator</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-python-regexp' %}active fw-bold{% endif %}" href="{% url 'docs-python-regexp' %}">Regexp</a>
+        </li>
+    </ul>
+</div>
+

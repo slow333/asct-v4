@@ -1,0 +1,25 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title %} Events 검색 {% endblock %}
+{% block content %}
+{% include 'events/_nav.html' %}
+<section>
+    <h1>Event 검색</h1>
+    {% for event in events %}
+    <div class="card" style="width: 22rem;">
+        <h3 class="card-title text-center">{{ event.name }}</h3>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">{{ event.event_date }}</li>
+            <li class="list-group-item">{{ event.venue }} </li>
+            <li class="list-group-item">{{ event.manager }}</li>
+            <li class="list-group-item">{{ event.description }}</li>
+            <li class="list-group-item">{{ event.attendees }}</li>
+        </ul>
+        <img src="{% static 'images/events/bp009.jpg' %}" class="card-img-top" alt="...">
+    </div>
+    <br><br>
+    {% endfor %}
+
+</section>
+
+{% endblock %}

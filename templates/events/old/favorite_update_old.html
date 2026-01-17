@@ -1,0 +1,19 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title %} Favorite 수정 {% endblock %}
+{% block content %}
+{% include 'events/_nav.html' %}
+<section>
+    <h1>Favorite 수정 </h1>
+    <form action="{% url 'events:favorite-update' favorite.id %}" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary">Update</button>
+    </form>
+    <div class="mt-3">
+        <a href="{% url 'events:favorite-delete' favorite.id %}" class="btn btn-primary btn-sm" onclick="return confirm('삭제하게요 ?')">Favorite Delete</a>
+        <a href="javascript:history.back()" class="btn btn-secondary btn-sm">Go Back</a>
+    </div>
+</section>
+
+{% endblock %}

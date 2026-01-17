@@ -1,0 +1,126 @@
+{% extends 'base/base.html' %}
+{% block title %}Events Calendar{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h1 class="fw-bold text-primary pt-2"><i class="bi bi-calendar3 me-2"></i>Events Calendar</h1>
+    <div class="d-flex align-items-center bg-white bg-opacity-50 rounded-pill px-3 py-1 shadow-sm border">
+        <a href="{% url 'events:index' year=prev_year month=prev_month %}" class="btn btn-link text-decoration-none text-secondary"><i class="bi bi-chevron-left"></i></a>
+        <span class="fs-5 fw-bold text-dark mx-3">{{ month_name }} {{ year }}</span>
+        <a href="{% url 'events:index' year=next_year month=next_month %}" class="btn btn-link text-decoration-none text-secondary"><i class="bi bi-chevron-right"></i></a>
+    </div>
+</div>
+
+{% include 'events/_nav.html' %}
+
+<!-- Calendar Section -->
+<div class="card border-0 shadow-sm glass-card h-100 mb-3">
+    <div class="card-body p-4">
+        <div class="table-responsive calendar-wrapper">
+            {{ cal|safe }}
+        </div>
+    </div>
+</div>
+
+<!-- Monthly Events List Section -->
+<div class="card border-0 shadow-sm h-100 mb-4">
+    <div class="card-header bg-transparent border-0 pt-4 px-4">
+        <h5 class="fw-bold text-secondary mb-0"><i class="bi bi-list-check me-2"></i>
+            <a href="{% url 'events:events-list' %}">Events List</a></h5>
+    </div>
+    <div class="row px-4">
+    {% if page_obj %}
+        {% for event in page_obj %}
+        <div class="col-md-3">
+            <div class="card-body px-0">
+                <div class="d-flex flex-column">
+                    <div class="p-3 bg-white bg-opacity-50 rounded-3 border border-light shadow-sm">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="fw-bold mb-0 text-truncate">
+                                <a href="{% url 'events:event-details' event.id %}" class="text-decoration-none text-dark ">{{ event.title }}</a>
+                            </h6>
+                            {% if event.is_completed %}
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            {% else %}
+                            <i class="bi bi-circle text-warning"></i>
+                            {% endif %}
+                        </div>
+                        <div class="small text-muted mb-1">
+                            <i class="bi bi-calendar-event me-1"></i>{{ event.start_date|date:"M d" }}
+                            <i class="bi bi-clock ms-2 me-1"></i>{{ event.start_date|date:"H:i" }}
+                        </div>
+                        {% if event.venue %}
+                        <div class="small text-muted text-truncate">
+                            <i class="bi bi-geo-alt me-1"></i>{{ event.venue.name }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-md-9">
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-calendar-x fs-1 mb-2 d-block"></i>
+                <p>이번 달에는 일정이 없습니다.</p>
+            </div>
+        </div>
+    {% endif %}
+    </div>
+</div>
+    
+<style>
+    /* Calendar Customization */
+    .calendar-wrapper table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border: none;
+    }
+    .calendar-wrapper th {
+        background-color: rgba(13, 110, 253, 0.05);
+        color: #0d6efd;
+        font-weight: 600;
+        text-align: center;
+        padding: 15px;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .calendar-wrapper td {
+        height: 120px;
+        vertical-align: top;
+        padding: 10px;
+        border: 1px solid rgba(0,0,0,0.05);
+        background-color: rgba(255,255,255,0.3);
+        transition: all 0.2s;
+    }
+    .calendar-wrapper td:hover {
+        background-color: rgba(255,255,255,0.8);
+    }
+    .calendar-wrapper .noday {
+        background-color: rgba(0,0,0,0.02);
+        border: none;
+    }
+    .calendar-wrapper .fw-bold {
+        color: #495057;
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+    /* Event Badges in Calendar */
+    .calendar-wrapper a.badge {
+        text-align: left;
+        padding: 4px 8px;
+        font-weight: normal;
+        border-radius: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        background-color: rgba(13, 110, 253, 0.9) !important;
+        transition: transform 0.1s;
+    }
+    .calendar-wrapper a.badge:hover {
+        transform: scale(1.02);
+        background-color: #0d6efd !important;
+    }
+</style>
+{% endblock %}

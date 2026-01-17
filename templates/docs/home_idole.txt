@@ -1,0 +1,231 @@
+<<<<<<< HEAD
+{% extends "base/base.html" %}
+{% extends "base/base.html" %}
+{% block content %}
+    <div class="d-flex gap-3 align-items-center mb-1 me-1 justify-content-between">
+        <h1>IDOLS </h1>
+        <a href="{% url 'idol-upload' %}" class="fs-6 btn btn-outline-info">Upload Image</a>
+    </div>
+    <div class="row">
+        {% for idol in idols %} 
+            <div class="col-md-3">
+                <div class="card mb-3">
+                    <div class="card-body m-0 p-1 text-center">
+                        <div class="idol-title-container" data-idol-id="{{ idol.id }}" data-update-url="{% url 'update-idol-title' idol.id %}">
+                            <div class="idol-title-display">
+                                <h5 class="card-title d-inline-block">
+                                    <a href="{% url 'idol-detail' idol.id %}">{{ idol.title }}</a>
+                                </h5>
+                                <button class="btn btn-sm btn-link edit-idol-title-btn p-0">✏️</button>
+                            </div>
+                            <form class="idol-title-form" style="display: none;">
+                                <div class="input-group">
+                                    <input type="text" name="title" value="{{ idol.title }}" class="form-control form-control-sm">
+                                    <button type="submit" class="btn btn-sm btn-success">Save</button>
+                                    <button type="button" class="btn btn-sm btn-secondary cancel-edit">X</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <img src="{{ idol.thumbnail.url }}" class="card-img-top" alt="{{ idol.title }}">
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% if is_paginated %}
+        {% if page_obj.has_previous %}
+            <a href="?page=1" class="btn btn-outline-info mb-4"><<</a>
+            <a href="?page={{page_obj.previous_page_number}}" class="btn btn-outline-info mb-4">⇚</a>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <a href="?page={{ num }}" class="btn btn-info mb-4">{{num}}</a>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?page={{ num }}" class="btn btn-outline-info mb-4">{{num}}</a>
+            {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+            <a href="?page={{page_obj.next_page_number}}" class="btn btn-outline-info mb-4">⇛</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-outline-info mb-4">>></a>
+        {% endif %}
+    {% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.edit-idol-title-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const container = e.target.closest('.idol-title-container');
+            container.querySelector('.idol-title-display').style.display = 'none';
+            container.querySelector('.idol-title-form').style.display = 'block';
+        });
+    });
+
+    document.querySelectorAll('.cancel-edit').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const container = e.target.closest('.idol-title-container');
+            container.querySelector('.idol-title-display').style.display = 'block';
+            container.querySelector('.idol-title-form').style.display = 'none';
+        });
+    });
+
+    document.querySelectorAll('.idol-title-form').forEach(form => {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const container = e.target.closest('.idol-title-container');
+            const idolId = container.dataset.idolId;
+            const updateUrl = container.dataset.updateUrl;
+            const formData = new FormData(form);
+            const newTitle = formData.get('title');
+
+            // Add CSRF token
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]') ? document.querySelector('[name=csrfmiddlewaretoken]').value : '{{ csrf_token }}';
+            
+            try {
+                const response = await fetch(updateUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': csrfToken,
+                    },
+                    body: new URLSearchParams(formData).toString()
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const display = container.querySelector('.idol-title-display');
+                    const link = display.querySelector('a');
+                    link.textContent = data.new_title;
+                    
+                    // Toggle back to display mode
+                    display.style.display = 'block';
+                    form.style.display = 'none';
+                } else {
+                    console.error('Error updating title:', data.error);
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                console.error('An error occurred:', error);
+                alert('An unexpected error occurred. Please try again.');
+            }
+        });
+    });
+});
+</script>
+=======
+{% extends "base/base.html" %}
+{% block content %}
+    <div class="d-flex gap-3 align-items-center mb-1 me-1 justify-content-between">
+        <h1>IDOLS </h1>
+        <a href="{% url 'idol-upload' %}" class="fs-6 btn btn-outline-info">Upload Image</a>
+    </div>
+    <div class="row">
+        {% for idol in idols %} 
+            <div class="col-md-3">
+                <div class="card mb-3">
+                    <div class="card-body m-0 p-1 text-center">
+                        <div class="idol-title-container" data-idol-id="{{ idol.id }}" data-update-url="{% url 'update-idol-title' idol.id %}">
+                            <div class="idol-title-display">
+                                <h5 class="card-title d-inline-block">
+                                    <a href="{% url 'idol-detail' idol.id %}">{{ idol.title }}</a>
+                                </h5>
+                                <button class="btn btn-sm btn-link edit-idol-title-btn p-0">✏️</button>
+                            </div>
+                            <form class="idol-title-form" style="display: none;">
+                                <div class="input-group">
+                                    <input type="text" name="title" value="{{ idol.title }}" class="form-control form-control-sm">
+                                    <button type="submit" class="btn btn-sm btn-success">Save</button>
+                                    <button type="button" class="btn btn-sm btn-secondary cancel-edit">X</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <img src="{{ idol.thumbnail.url }}" class="card-img-top" alt="{{ idol.title }}">
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% if is_paginated %}
+        {% if page_obj.has_previous %}
+            <a href="?page=1" class="btn btn-outline-info mb-4"><<</a>
+            <a href="?page={{page_obj.previous_page_number}}" class="btn btn-outline-info mb-4">⇚</a>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <a href="?page={{ num }}" class="btn btn-info mb-4">{{num}}</a>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?page={{ num }}" class="btn btn-outline-info mb-4">{{num}}</a>
+            {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+            <a href="?page={{page_obj.next_page_number}}" class="btn btn-outline-info mb-4">⇛</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-outline-info mb-4">>></a>
+        {% endif %}
+    {% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.edit-idol-title-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const container = e.target.closest('.idol-title-container');
+            container.querySelector('.idol-title-display').style.display = 'none';
+            container.querySelector('.idol-title-form').style.display = 'block';
+        });
+    });
+
+    document.querySelectorAll('.cancel-edit').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const container = e.target.closest('.idol-title-container');
+            container.querySelector('.idol-title-display').style.display = 'block';
+            container.querySelector('.idol-title-form').style.display = 'none';
+        });
+    });
+
+    document.querySelectorAll('.idol-title-form').forEach(form => {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const container = e.target.closest('.idol-title-container');
+            const idolId = container.dataset.idolId;
+            const updateUrl = container.dataset.updateUrl;
+            const formData = new FormData(form);
+            const newTitle = formData.get('title');
+
+            // Add CSRF token
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]') ? document.querySelector('[name=csrfmiddlewaretoken]').value : '{{ csrf_token }}';
+            
+            try {
+                const response = await fetch(updateUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': csrfToken,
+                    },
+                    body: new URLSearchParams(formData).toString()
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const display = container.querySelector('.idol-title-display');
+                    const link = display.querySelector('a');
+                    link.textContent = data.new_title;
+                    
+                    // Toggle back to display mode
+                    display.style.display = 'block';
+                    form.style.display = 'none';
+                } else {
+                    console.error('Error updating title:', data.error);
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                console.error('An error occurred:', error);
+                alert('An unexpected error occurred. Please try again.');
+            }
+        });
+    });
+});
+</script>
+>>>>>>> 5cfd106dbc2f54bb5d33a8ff7acb54b2c0160108
+{% endblock %}

@@ -1,0 +1,18 @@
+<nav class="navbar navbar-expand-lg navbar-light mb-4 rounded-3 shadow-sm p-2" style="background-color: rgba(255, 255, 255, 0.45); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.4);">
+    <div class="container-fluid">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <a class="navbar-brand fw-bold text-primary" href="{% url 'blog:index' %}">
+                <i class="bi bi-chat-left-text-fill me-2"></i>Posts</a>
+            <a class="nav-link text-muted ms-2" href="{% url 'blog:add' %}">
+                New Posts</a>
+            <a class="nav-link text-muted ms-2" href="{% url 'polls:index' %}">
+                Polls</a>
+
+        </ul>
+        <form class="d-flex rounded-3" role="search" action="{% url 'blog:index' %}">
+            <input class="form-control me-2 py-1" type="search" placeholder="Search title, author" name='searched' aria-label="Search"/>
+            <button class="btn btn-outline-success btn-sm py-1" type="submit">Search</button>
+            <button class="btn btn-secondary btn-sm ms-2" style="width:8rem;" type="button" data-bs-toggle="collapse" data-bs-target="#filters-sidebar" >분류<i class="bi bi-arrow-bar-down"></i></button>
+        </form>
+    </div>
+</nav>

@@ -1,0 +1,15 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title %} Favorite 생성 {% endblock %}
+{% block content %}
+{% include 'events/_nav.html' %}
+<section>
+    <h1>Favorite 생성 </h1>
+    <form action="{% url 'events:favorite-create' %}" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary">Create</button>
+    </form>
+</section>
+
+{% endblock %}

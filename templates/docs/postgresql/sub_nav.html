@@ -1,0 +1,35 @@
+<div class="mb-4">
+    <ul class="nav nav-tabs">
+        <li style="color:aliceblue; background: #777; height:2rem; margin:6px 6px 0 6px; padding:3px 6px 0 6px;">PostgreSQL</li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-psql-note' %}active fw-bold{% endif %}" href="{% url 'docs-psql-note' %}">Note</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-psql-datatype' %}active fw-bold{% endif %}" href="{% url 'docs-psql-datatype' %}">DataType</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-psql-crud' %}active fw-bold{% endif %}" href="{% url 'docs-psql-crud' %}">CRUD</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-psql-select' %}active fw-bold{% endif %}" href="{% url 'docs-psql-select' %}">Select</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-psql-constraints' %}active fw-bold{% endif %}" href="{% url 'docs-psql-constraints' %}">Constraints</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-psql-groupby' %}active fw-bold{% endif %}" href="{% url 'docs-psql-groupby' %}">GroupBy</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-psql-join' %}active fw-bold{% endif %}" href="{% url 'docs-psql-join' %}">Join</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-psql-aggregate' %}active fw-bold{% endif %}" href="{% url 'docs-psql-aggregate' %}">Aggregate</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-psql-functions' %}active fw-bold{% endif %}" href="{% url 'docs-psql-functions' %}">Functions</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-psql-procedure-trigger' %}active fw-bold{% endif %}" href="{% url 'docs-psql-procedure-trigger' %}">Trigger</a>
+        </li>
+    </ul>
+</div>

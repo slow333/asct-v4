@@ -1,0 +1,54 @@
+{% extends "base/base.html" %}
+{% block title %} Login {% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center py-5">
+    <div class="col-lg-6 col-md-8">
+        <div class="card border-0 shadow-sm glass-card">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold text-primary"><i class="bi bi-box-arrow-in-right me-2"></i>Login</h2>
+                </div>
+
+                {% if next %}
+                    {% if user.is_authenticated %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-circle me-2"></i>권한이 없습니다.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>먼저 로그인 하세요.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endif %}
+                {% endif %}
+
+                <form method="post" action="{% url 'users:login' %}">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="username" class="form-label fw-medium text-muted">Username</label>
+                        <input type="text" class="form-control" name="username" id="username" required placeholder="Enter your username">
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between">
+                            <label for="password" class="form-label fw-medium text-muted">Password</label>
+                            <a href="{% url 'password_reset' %}" class="text-decoration-none small">Forgot Password?</a>
+                        </div>
+                        <input type="password" class="form-control" name="password" id="password" required placeholder="Enter your password">
+                    </div>
+
+                    <div class="d-grid gap-2 mb-4">
+                        <button type="submit" class="btn btn-glass-primary rounded-pill py-2 fw-bold">Login</button>
+                    </div>
+                </form>
+
+                <div class="text-center border-top pt-3">
+                    <small class="text-muted">Don't have an account? <a href="{% url 'users:register' %}" class="text-decoration-none fw-bold ms-1">Sign Up Now</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

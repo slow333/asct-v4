@@ -1,0 +1,20 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title %} Event 수정 {% endblock %}
+{% block content %}
+{% include 'events/_nav.html' %}
+<section>
+    <h1>Edit Event({{ event.name }})</h1>
+    <form action="{% url 'events:event-update' event.id %}" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary">Update Event</button>
+        <a href="{% url 'events:event-delete' form.instance.id %}" class="btn btn-danger ms-3" onclick="return confirm('해당 이벤트를 삭제할 까요 ? ')">Delte Event</a>
+    </form>
+</section>
+<div>
+    <a href="{% url 'events:index' %}" class="btn btn-primary btn-sm">Go List</a>
+    <a href="javascript:history.back()" class="btn btn-secondary btn-sm">Go Back</a>
+</div>
+
+{% endblock %}

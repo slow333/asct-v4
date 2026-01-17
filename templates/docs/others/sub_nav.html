@@ -1,0 +1,15 @@
+<div class="mb-4">
+    <ul class="nav nav-tabs">
+        <li style="color:aliceblue; background: #777; height:2rem; margin:6px 6px 0 6px; padding:3px 6px 0 6px;">ETC</li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-linux' %}active fw-bold{% endif %}" href="{% url 'docs-linux' %}">Linux</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-basic-settings' %}active fw-bold{% endif %}" href="{% url 'docs-basic-settings' %}">Settings</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'docs-html-css' %}active fw-bold{% endif %}" href="{% url 'docs-html-css' %}">HTML/CSS</a>
+        </li>
+    </ul>
+</div>
+

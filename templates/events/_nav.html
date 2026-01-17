@@ -1,0 +1,48 @@
+<nav class="navbar navbar-expand-lg navbar-light mb-4 rounded-3 shadow-sm p-2 position-relative z-3" style="background-color: rgba(255, 255, 255, 0.45); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.4);">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold text-primary" href="{% url 'events:index' %}">
+            <i class="bi bi-calendar-check me-2"></i>달력</a>
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Events
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'events:events-list' %}">Events List</a></li>
+                    <li><a class="dropdown-item" href="{% url 'events:event-create' %}">Create Event</a></li>
+                    <li><a class="dropdown-item" href="{% url 'events:events-list' %}?is_completed=True">Completed</a></li>
+                    <li><a class="dropdown-item" href="{% url 'events:events-list' %}?is_completed=False">Incomplete</a></li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Venues</a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item  z-3" href="{% url 'events:venues-list' %}">Venues List</a></li>
+                    <li><a class="dropdown-item z-3" href="{% url 'events:venue-create' %}">Create Venue</a></li>
+                    <li><a class="dropdown-item" href="{% url 'events:venue-text' %}">Save Venue Text file</a></li>
+                    <li><a class="dropdown-item" href="{% url 'events:venue-csv' %}">Save Venue CSV file</a></li>
+                    <li><a class="dropdown-item" href="{% url 'events:venue-pdf' %}">Save Venue PDF file</a></li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Favorites </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'events:favorites-list' %}">사진목록</a></li>
+                    <li><a class="dropdown-item" href="{% url 'events:favorite-create' %}">생성하기</a></li>
+                </ul>
+            </li>
+        </ul>
+
+        <form class="d-flex" role="search" action="{% url 'events:events-list' %}">
+            <input class="form-control me-2 py-1" type="search" 
+                placeholder="Search events..." name='searched' />
+            <button class="btn btn-outline-success btn-sm" type="submit">Search</button>
+        </form>
+        <form class="d-flex" role="search" action="{% url 'events:favorites-list' %}">
+            <input class="form-control me-2 py-1" type="search" 
+                placeholder="photos..." name='searched' />
+            <button class="btn btn-outline-info btn-sm" type="submit">Search</button>
+        </form>
+    </div>
+</nav>

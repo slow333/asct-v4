@@ -1,0 +1,69 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title %} Apps HOME {% endblock %}
+{% block content %}
+<h2>전체 앱에 대한 설명</h2>
+<h3>공통 적용 사항</h3>
+<div class="card" style="width: 100%; margin: auto">
+    <div class="card-body">
+        <ul style="list-style:circle; font-size: 1rem;">
+            <li>가능하면 fucntion base view 사용(필요시 Class base view 사용)<br>
+                <strong>from django import forms를 사용</strong><br>
+                <strong>forms에 style(widgets) 적용(crispy_forms 사용안함)</strong>
+            </li>
+            <li>app 이름은 복수형, modle은 단수형으로 정의</li>
+            <li>sub nav를 적용하고, 검색 기능 추가</li>
+            <li>FBV에서 from django.core.paginator import Paginator 사용</li>
+            <li>ckeditor 돈 달라고 해서 사용 안함</li>
+        </ul>
+    </div>
+</div>
+<h3>Events-Favorites(Images)-Todo-Venue</h3>
+<div class="card" style="width: 100%; margin: auto">
+    <div class="card-body">
+        <div class="d-flex justify-content-between">
+            <h4 class="card-title">이벤트 관리 앱입니다.(idol, events 통합)</h4>
+            <a href="{% url 'events:index' %}" 
+            class="btn btn-outline-secondary btn-sm mt-3">Events</a>
+        </div>
+        <h4 class="card-title">사용 기술</h4>
+        <ul class="list-group list-group-flush border-bottom pb-2">
+            <li class="list-group-item">from calendar import HTMLCalendar</li>
+            <li class="list-group-item">생성된 calendar에 일정 내용 주입</li>
+            <li class="list-group-item">월 이동 버튼 추가</li>
+            <li class="list-group-item">status(완료여부) 필터 추가</li>
+            <li class="list-group-item">image다루기(favimages)</li>
+            <li class="list-group-item">javascript로 image title form toggle 기능 추가</li>
+            <li class="list-group-item">events admin의 eventadmin에서 list_display에 many to many field 추가</li>            
+        </ul>
+    </div>
+</div>
+<h3>Blog-Polls</h3>
+<div class="card" style="width: 100%; margin: auto">
+    <div class="card-body">
+        <div class="d-flex justify-content-between">
+            <h4 class="card-title">blog 앱(polls를 통합)</h4>
+            <a href="{% url 'blog:index' %}" 
+            class="btn btn-outline-secondary btn-sm mt-3">Blogs</a>
+        </div>
+        <h4 class="card-title">사용 기술</h4>
+        <ul class="list-group list-group-flush border-bottom pb-2">
+            <li class="list-group-item">Category filter적용(admin 페이지와 유사)</li>
+            <li class="list-group-item">polls 기능과 연동</li>
+            <li class="list-group-item">blog detail 페이지(많이 복잡함)
+                <ul>
+                    <li>내부에 poll을 생성 또는 poll 투표 기능(조건에 따라)</li>
+                    <li>투표 후 페이지 내부에서 투표 결과 페이지로 이동</li>
+                    <li>polls는 javascript로 질문항목 추가하는 기능 추가</li>
+                    <li>Comment(댓글) 기능(수정, 삭제) 추가(카운트해서 보여주기)</li>
+                    <li>like 기능 추가(카운트해서 보여주기)</li>
+                    <li >관련해서 인증 기능 추가</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+<h3>Store</h3>
+<h3>Library</h3>
+<h3>ASCT</h3>
+{% endblock %}

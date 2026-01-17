@@ -1,0 +1,25 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title %} 장소 검색 {% endblock %}
+{% block content %}
+{% include 'events/_nav.html' %}
+<section>
+    <h1>Searched Venues for "{{ searched }}"</h1>
+    {% for venue in venues %}
+    <div class="card" style="width: 22rem;">
+        <h3 class="card-title text-center">{{ venue.name }}</h3>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">{{ venue.address }}</li>
+            <li class="list-group-item">{{ venue.zip_code }} </li>
+            <li class="list-group-item">{{ venue.phone }}</li>
+            <li class="list-group-item">{{ venue.web }}</li>
+            <li class="list-group-item">{{ venue.email_address }}</li>
+        </ul>
+        <img src="{% static 'images/events/bp009.jpg' %}" class="card-img-top" alt="...">
+    </div>
+    <br><br>
+    {% endfor %}
+
+</section>
+
+{% endblock %}

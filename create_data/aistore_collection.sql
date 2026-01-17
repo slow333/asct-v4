@@ -1,0 +1,13 @@
+insert into store_collection (title) values ('Toys');
+insert into store_collection (title) values ('Travel');
+insert into store_collection (title) values ('Food');
+insert into store_collection (title) values ('Kitchen');
+insert into store_collection (title) values ('Home');
+insert into store_collection (title) values ('Automotive');
+insert into store_collection (title) values ('Fitness');
+insert into store_collection (title) values ('Clothing');
+insert into store_collection (title) values ('Office');
+insert into store_collection (title) values ('Health');
+insert into store_collection (title) values ('Garden');
+insert into store_collection (title) values ('Pets');
+insert into store_collection (title) values ('Beauty');
