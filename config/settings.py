@@ -28,6 +28,17 @@ INSTALLED_APPS = [
     
     # Third-party apps
     "debug_toolbar",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    # "allauth.socialaccount.providers.google",
+    "allauth.socialaccount.providers.naver",
+    "allauth.socialaccount.providers.kakao",
+    "allauth.socialaccount.providers.github",
+    "allauth.socialaccount.providers.twitter",
+    "allauth.socialaccount.providers.facebook",
+    "allauth.socialaccount.providers.linkedin_oauth2",
+    "allauth.socialaccount.providers.instagram",
 ]
 
 MIDDLEWARE = [
@@ -39,7 +50,20 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+SITE_ID = 1
+# settings.py에서 아래처럼 설정하세요
+SOCIALACCOUNT_PROVIDERS = {
+    'naver': {
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {},
+    }
+}
 
 DEBUG_TOOLBAR_CONFIG = {
     # Set a high z-index to ensure the toolbar appears above other elements.

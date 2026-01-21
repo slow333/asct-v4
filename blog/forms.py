@@ -28,13 +28,14 @@ class PostForm(forms.ModelForm):
 class PostFormAdmin(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['title','title_tag', 'content', 'author', 'category']
+        fields = ['title','title_tag', 'content', 'author', 'category', 'photo']
         labels = {
             'title': '제목',
             'title_tag': '슬러그',
             'content': '내용',
             'author': '작성자',
             'category': '카테고리',
+            'photo': '사진',
         }
         widgets = {
             'title': forms.TextInput(attrs={
@@ -55,6 +56,7 @@ class PostFormAdmin(forms.ModelForm):
             'category': forms.Select(attrs={
                 'class': 'form-select',
                 'style': 'margin-bottom: 10px;'}),   
+            'photo': forms.FileInput(attrs={'class': 'form-control', 'placeholder': '이미지',}),
         }
         ordering = ['-updated_at']
 

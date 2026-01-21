@@ -2,7 +2,7 @@
 {% block title %}Blog Home{% endblock %}
 
 {% block content %}
-<div class="d-flex align-items-center justify-content-between mb-4">
+<div class="d-flex align-items-center justify-content-between mb-1">
     <h1 class="fw-bold text-primary pt-2"><i class="bi bi-journal-richtext me-2"></i>Blog Posts</h1>
     {% if page_obj %}
     <span class="badge bg-primary rounded-pill fs-6 px-3 py-2">{{ page_obj.paginator.count }} Posts</span>
@@ -13,22 +13,26 @@
 
 <!-- <div class="row g-4 mb-4"> -->
 <div class="d-flex">
-    <div class="row justify-content-center mb-3">
+    <div class="row mb-3 w-100">
+        <div class="alert alert-primary d-flex align-items-center fs-4 fw-bold py-1 ms-3 w-96" role="alert">
+            {% if current_category %} {{ current_category }} 
+            {% else %} All {% endif %}
+        </div>
         {% for post in page_obj %}
         <div class="col-lg-6 mb-3">
             <div class="card border-0 shadow-sm glass-card hover-shadow transition-all">
                 <div class="card-body p-3">
                     <div class="d-flex align-items-center mb-3">
                         {% if post.author.profile.image %}
-                        <img src="{{ post.author.profile.image.url }}" class="rounded-circle me-2 border" width="40" height="40" style="object-fit: cover;">
+                        <img src="{{ post.author.profile.image.url }}" class="rounded-circle me-2 border" width="40" height="40" style="object-fit: cover;" alt="Profile picture of {{ post.author.username }}, the author of this blog post">
                         {% else %}
-                        <div class="rounded-circle me-2 bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center border" style="width: 40px; height: 40px;">
+                        <div class="rounded-circle me-2 bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center border profile-placeholder">
                             <i class="bi bi-person text-secondary"></i>
                         </div>
                         {% endif %}
                         <div>
                             <span class="fw-bold text-dark">{{ post.author }}</span>
-                            <small class="text-muted d-block" style="font-size: 0.8rem;">{{ post.date_posted|date:"F d, Y" }}</small>
+                            <small class="text-muted d-block small-date">{{ post.date_posted|date:"F d, Y" }}</small>
                         </div>
                     </div>
                     
@@ -39,8 +43,28 @@
                     <p class="card-text text-secondary mb-3">
                         {{ post.content|striptags|truncatewords:15 }}
                     </p>
-                    <div class="d-flex justify-content-end align-items-center">
-                        <a href="{% url 'blog:detail' post.id %}{% if request.GET.page %}?page={{ request.GET.page }}{% endif %}" class="btn btn-sm btn-glass-primary rounded-pill px-3 position-relative z-2">Read More <i class="bi bi-arrow-right ms-1"></i></a>
+                    {% if post.photo %}
+                        <img src="{{ post.photo.url }}" class="rounded-2 border blog-post-image" width="100" height="100" alt="Primary subject">
+                    {% endif %}
+                    <p>{{post.comments.count}} Comments | {{post.likes.count}} Likes</p>
+                    <!-- ======================================= -->
+                    <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-end align-items-center">
+                            <a href="{% url 'blog:detail' post.id %}?page={{ request.GET.page }}{% if request.GET.category %}&category={{ request.GET.category|urlencode }}{% endif %}" class="btn btn-sm btn-glass-primary rounded-pill px-3 position-relative z-2">상세 보기 <i class="bi bi-arrow-right ms-1"></i></a>
+                        </div>
+                        {% if post.question_set.exists %}
+                            <!-- View Poll Button -->
+                            <button type="button" class="btn btn-outline-primary btn-sm rounded-pill position-relative z-2" data-bs-toggle="modal" data-bs-target="#pollModal-{{ post.id }}">
+                                <i class="bi bi-bar-chart-line me-1"></i>View Poll
+                            </button>
+                        {% else %}
+                            <!-- Create Poll Button -->
+                            <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill position-relative z-2" data-bs-toggle="modal" data-bs-target="#createPollModal-{{ post.id }}">
+                                <i class="bi bi-plus-lg me-1"></i>Create Poll
+                            </button>
+                        {% endif %}
+                        <!-- ========================================= -->
+
                     </div>
                 </div>
             </div>
@@ -51,4 +75,38 @@
         {% include 'blog/category_filter.html' %}
     </div>
 </div>
+<!-- Modals -->
+{% include 'blog/poll_section.html' %}
+
+<script>
+    // Toggle between Vote and Result views
+    function toggleResult(questionId) {
+        const voteSection = document.getElementById(`vote-section-${questionId}`);
+        const resultSection = document.getElementById(`result-section-${questionId}`);
+        if (voteSection.style.display === 'none') {
+            voteSection.style.display = 'block';
+            resultSection.style.display = 'none';
+        } else {
+            voteSection.style.display = 'none';
+            resultSection.style.display = 'block';
+        }
+    }
+
+    // Dynamic Choice Form handling for Modals
+    document.addEventListener('click', function(e) {
+        // Add Choice
+        if (e.target.classList.contains('add-more-choice-btn')) {
+            const modalBody = e.target.closest('.modal-body');
+            const emptyForm = modalBody.querySelector('.empty-form-template').innerHTML;
+            const formList = modalBody.querySelector('.form-list-container');
+            formList.insertAdjacentHTML('beforeend', emptyForm);
+        }
+        
+        // Remove Choice
+        if (e.target.classList.contains('remove-form')) {
+            e.target.closest('.dynamic-form').remove();
+        }
+    });
+</script>
+
 {% endblock %}

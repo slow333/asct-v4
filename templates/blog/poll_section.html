@@ -1,0 +1,102 @@
+{% for post in page_obj %}
+    {% if post.question_set.exists %}
+    <!-- View Poll Modal -->
+<div class="modal fade" id="pollModal-{{ post.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-card border-0">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold"><i class="bi bi-bar-chart-line me-2"></i>Polls for {{ post.title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% for question in post.question_set.all %}
+                    <div class="mb-4 last-mb-0">
+                        <h6 class="fw-bold">{{ question.question_text }}</h6>
+                        <small class="text-muted d-block mb-2">Created: {{ question.pub_date|date:"Y-m-d H:i" }}</small>
+                        
+                        {% with voted_pk=request.GET.voted_pk|default:"0" %}
+                            <!-- Vote Form -->
+                            <div id="vote-section-{{ question.id }}" {% if voted_pk == question.id|stringformat:"s" %}style="display:none;"{% endif %}>
+                                <form action="{% url 'polls:vote' question.id %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="d-flex flex-column gap-2 mb-3">
+                                    {% for choice in question.choice_set.all %}
+                                        <div class="form-check">
+                                            <input type="radio" name="choice" id="choice-{{ question.id }}-{{ forloop.counter }}" value="{{ choice.id }}" class="form-check-input">
+                                            <label for="choice-{{ question.id }}-{{ forloop.counter }}" class="form-check-label">{{ choice.choice_text }}</label>
+                                        </div>
+                                    {% endfor %}
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <input type="submit" value="Vote" class="btn btn-primary btn-sm rounded-pill px-3">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="toggleResult('{{ question.id }}')">View Results</button>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <!-- Results -->
+                            <div id="result-section-{{ question.id }}" {% if voted_pk != question.id|stringformat:"s" %}style="display:none;"{% endif %}>
+                                <ul class="list-group mb-3">
+                                    {% for choice in question.choice_set.all %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+                                            {{ choice.choice_text }}
+                                            <span class="badge bg-primary rounded-pill">{{ choice.votes }}</span>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                                <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" onclick="toggleResult('{{ question.id }}')">Back to Vote</button>
+                            </div>
+                        {% endwith %}
+
+                        {% if question.author == user or user.is_superuser %}
+                        <div class="mt-2">
+                            <a href="{% url 'polls:update' question.id %}" class="btn btn-link btn-sm text-decoration-none p-0 me-2">Edit Poll</a>
+                            <a href="{% url 'polls:delete' question.id %}" class="btn btn-link btn-sm text-danger text-decoration-none p-0" onclick="return confirm('Delete poll {{question.question_text}}?')">Delete Poll</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% if not forloop.last %}<hr class="my-3">{% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<!-- Create Poll Modal -->
+<div class="modal fade" id="createPollModal-{{ post.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-card border-0">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">New Poll for {{ post.title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{% url 'polls:create' %}" method="post">
+                    {% csrf_token %}
+                    <!-- Associate poll with this post -->
+                    <input type="hidden" name="blog" value="{{ post.id }}">
+                    
+                    <input type="text" name="question_text" class="form-control" placeholder="질문을 입력하세요">
+                    <div class="form-list-container">
+                        <input type="text" name="choice_text" class="form-control mb-2" placeholder="답변을 입력하세요">
+                    </div>
+                    
+                    <!-- Hidden empty form for JS cloning -->
+                    <div class="d-none empty-form-template">
+                        <div class="d-flex align-items-center gap-2 dynamic-form mb-2">
+                            <div class="flex-grow-1"><input type="text" name="choice_text" class="form-control" placeholder="답변을 입력하세요"></div>
+                            <button type="button" class="btn btn-danger btn-sm remove-form rounded-pill">Remove</button>
+                        </div>
+                    </div>
+
+                    <div class="mt-2 mb-3">
+                        <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill add-more-choice-btn">Add Choice</button>
+                    </div>
+                    <input type="submit" value="Save Poll" class="btn btn-primary btn-sm rounded-pill">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+    {% endif %}
+{% endfor %}

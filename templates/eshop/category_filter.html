@@ -1,0 +1,26 @@
+
+<div class="filters ms-3" style="width:13rem;">
+    <div class="content-section mb-2">
+        <h3>Categories</h3>
+        <ul class="list-group">
+            <li class="list-group-item filter-item">
+                <a href="{% url 'eshop:product_list' %}" class="text-decoration-none">All</a>
+            </li>
+            {% for cat in category_list %}
+                <li class="list-group-item filter-item">
+                    <a href="{% url 'eshop:product_list' %}?category={{ cat.name|urlencode }}" class="text-decoration-none">
+                        {{ cat.name }}
+                    </a>
+                    <span class="badge bg-primary rounded-pill">{{ cat.count }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+<style>
+    .filter-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+</style>

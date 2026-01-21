@@ -39,7 +39,7 @@
                             <input type="hidden" name="product_id" value="{{product.id}}">
                             <button type="submit" class="btn btn-primary btn-lg px-4">장바구니 추가</button>
                         </form>
-                        <a href="{% url 'eshop:product_all' %}" class="btn btn-outline-secondary btn-lg px-4">목록으로</a>
+                        <a href="{% url 'eshop:product_list' %}?page={{ request.GET.page|default:1 }}{% if request.GET.category %}&category={{ request.GET.category|urlencode }}{% endif %}" class="btn btn-outline-secondary btn-lg px-4">목록으로</a>
                     </div>
                 </div>
             </div>

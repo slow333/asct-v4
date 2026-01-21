@@ -374,4 +374,62 @@ def favorite_update(request, favorite_id):
     </article>
 </section>
 
+<section id="sec-etc" class="doc-section">
+    <h2 class="doc-header"><i class="bi bi-gear-wide-connected me-2"></i>Social Login</h2>
+    <article>
+        <h4 class="doc-subheader"><i class="bi bi-hash"></i>필요한 설치 패키지</h4>
+        <p><strong>☞ pip install</strong></p>
+<pre>
+✅ django-allauth
+✅ requests, oauthlib, cryptography, PyJWT, PyYAML - allauth의 OAuth 필요 패키지
+✅ django-debug-toolbar - 설치됨(상관 없음)
+✅ reportlab - events 앱의 PDF 생성 기능에 필요한 패키지 설치됨(상관 없음)
+✅ psycopg2-binary - PostgreSQL 데이터베이스 연결에 필요한 패키지 설치됨(상관 없음)
+✅ requirements.txt - 모든 의존성 정보로 업데이트됨(상관 없음)</pre>
+    </article>
+
+    <article>
+      <h4 class="doc-subheader"><i class="bi bi-hash"></i>settings.py, urls.py - allauth</h4>
+      <p><strong>☞ settings.py</strong></p>
+<pre>INSTALLED_APPS = [
+    ...
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    # "allauth.socialaccount.providers.google",
+    "allauth.socialaccount.providers.naver",
+    "allauth.socialaccount.providers.kakao",
+    "allauth.socialaccount.providers.github",
+    "allauth.socialaccount.providers.twitter",
+    "allauth.socialaccount.providers.facebook",
+    "allauth.socialaccount.providers.linkedin_oauth2",
+    "allauth.socialaccount.providers.instagram",
+]
+
+MIDDLEWARE = [
+    ...
+    'allauth.account.middleware.AccountMiddleware',
+]
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+SITE_ID = 1
+# settings.py에서 아래처럼 설정하세요
+SOCIALACCOUNT_PROVIDERS = {
+    'naver': {
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {},
+    }
+}</pre>
+<p><strong>☞ urls.py</strong></p>
+  <pre>urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('accounts/', include('allauth.urls')),
+    ...
+]
+</pre>
+    </article>
+
+
 {% endblock %}

@@ -21,6 +21,7 @@ class Post(models.Model):
     content = models.TextField(blank=True, null=True)
     date_posted = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=False, auto_now=True)
+    photo = models.ImageField(upload_to='blog/images', blank=True, null=True)
 
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -41,8 +42,8 @@ class Post(models.Model):
         ordering = ['updated_at','-date_posted']
 
 class Comment(models.Model):
-    post = models.ForeignKey('Post', related_name='comments', on_delete=models.CASCADE)
     content = models.TextField()
+    post = models.ForeignKey('Post', related_name='comments', on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     date_commented = models.DateTimeField(default=timezone.now)
 

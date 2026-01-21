@@ -4,7 +4,7 @@ from .models import Post, Category, Comment
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ['title', 'author', 'date_posted']
+    list_display = ['title', 'author', 'date_posted','photo']
     search_fields = ['title', 'content']
 
 admin.site.register(Category)

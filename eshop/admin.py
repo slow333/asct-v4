@@ -13,8 +13,8 @@ class CategoryAdmin(admin.ModelAdmin):
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug', 'category', 'made_by', 'price', 'stock', 'image']
     list_filter = ['created', 'updated', 'category']
-    prepopulated_fields = {'slug': ('name',)}
     list_editable = ['price', 'stock']
+    prepopulated_fields = {'slug': ('name',)}
     search_fields = ['name']
 
 

@@ -87,7 +87,7 @@ def index(request, year=None, month=None):
 
 # favorites 사진 ===========================================================
 def favorites_list(request):
-    favotrites = Favorite.objects.all().order_by('name')
+    favotrites = Favorite.objects.all().order_by('-created_at','-name')
 
     search_fatorites = request.GET.get('searched', '')
     if search_fatorites:

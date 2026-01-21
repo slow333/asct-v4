@@ -27,17 +27,18 @@ def post_list(request):
     for cat in category_list:
         cat['count'] = Post.objects.filter(category__name=cat['name']).count()
     
-    category_filter = request.GET.get('category', '')
-    if category_filter == '미분류':
+    current_category = request.GET.get('category', '')
+    
+    if current_category == '미분류':
         query_set = query_set.filter(category__isnull=True)
 
     # 미분류(None) 카테고리 추가
     none_category_count = Post.objects.filter(category__isnull=True).count()
     category_list.append({'name': '미분류', 'count': none_category_count})
     
-    if category_filter:
-        query_set = query_set.filter(category__name=category_filter)
-    print(category_filter)
+    if current_category:
+        query_set = query_set.filter(category__name=current_category)
+    
     paginator = Paginator(query_set, 6)
     page = request.GET.get('page')
     posts = paginator.get_page(page)
@@ -46,7 +47,7 @@ def post_list(request):
     context = {
         'page_obj': posts,
         'category_list': category_list,
-        # 'category': category_filter,
+        'current_category': current_category,
         'likes_count': likes_count,
     }
     return render(request, 'blog/home.html', context )
@@ -80,9 +81,9 @@ def update_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
     if request.method == 'POST':
         if request.user.is_superuser:
-            form = PostFormAdmin(request.POST, instance=post)
+            form = PostFormAdmin(request.POST, instance=post, files=request.FILES)
         else:
-            form = PostForm(request.POST, instance=post)
+            form = PostForm(request.POST, instance=post, files=request.FILES)
         if form.is_valid():
             form.save()
             return redirect('blog:detail', pk=post.pk)
@@ -123,7 +124,6 @@ def like_post(request, pk):
             messages.success(request, 'You liked the post.')
         return_url = request.META.get('HTTP_REFERER', reverse_lazy('blog:detail', kwargs={'pk': post.pk}))
         return redirect(return_url)
-
 
 @login_required
 def delete_post(request, pk):

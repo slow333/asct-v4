@@ -7,6 +7,7 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('allauth.urls')),
     path('', TemplateView.as_view(template_name='index.html'), name='main-index'),
     path('users/', include('users.urls')),
     path('users/', include('django.contrib.auth.urls')),
@@ -15,7 +16,7 @@ urlpatterns = [
     path('apps/blog/', include('blog.urls')),
     path('apps/polls/', include('polls.urls')),
     path('apps/events/', include('events.urls')),
-    path('apps/echop/', include('eshop.urls')),
+    path('apps/eshop/', include('eshop.urls')),
     # path('apps/library/', include('library.urls')),
 ]
 

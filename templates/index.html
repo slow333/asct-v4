@@ -3,9 +3,14 @@
 {% block title %} Home - ASCTool {% endblock %}
 
 {% block content %}
+<style>
+    .hero-gradient {
+        background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%);
+    }
+</style>
 <div class="container py-1">
     <!-- Hero Section -->
-    <div class="p-5 mb-4 rounded-3 shadow-sm border" style="background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%);">
+    <div class="p-5 mb-4 rounded-3 shadow-sm border hero-gradient">
         <div class="container-fluid py-1">
             <h1 class="display-6 fw-bold text-primary">Automated System Check Tool</h1>
             <p class="fs-5 text-muted text-center">시스템 점검, 일정 관리, 그리고 기술 문서를 한곳에서 효율적으로 관리하세요.</p>

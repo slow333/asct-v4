@@ -8,9 +8,9 @@
 
 {% include 'blog/_nav.html' %}
 
-<div class="justify-content-center" style="width:86%; margin:auto;">
-    <div class="card border-0 shadow-sm glass-card mb-4">
-        <div class="card-body p-4 p-md-5">
+<div class="justify-content-center" style="width:100%; margin:auto;">
+    <div class="card border-0 shadow-sm glass-card mb-2">
+        <div class="card-body p-md-5">
             <!-- Author & Meta -->
             <div class="d-flex align-items-center mb-4">
                 {% if post.author.profile.image %}
@@ -34,13 +34,20 @@
             </div>
 
             <!-- Title & Content -->
-            <h2 class="fw-bold text-dark mb-3">{{ post.title }}</h2>
-            <div class="article-content mb-4 text-secondary" style="line-height: 1.8;">
-                {{ post.content|safe }}
+            <h3 class="fw-bold text-dark mb-0">{{ post.title }}</h3>
+            <div class="row">
+                <div class="col-6 mb-2 text-secondary mt-2" style="line-height: 1.8;">
+                    {{ post.content|linebreaksbr|safe }}
+                </div>
+                {% if post.photo %}
+                <div class="col-6">
+                    <img src="{{ post.photo.url }}" class="rounded-2 border" width="100%" height="100%" style="object-fit: cover;">
+                </div>
+                {% endif %}
             </div>
 
             <!-- Like Button -->
-            <div class="mb-4">
+            <div>
                 <form action="{% url 'blog:like-post' post.id %}" method="POST" class="d-inline">
                     {% csrf_token %}
                     <button type="submit" class="btn {% if user in post.likes.all %}btn-primary{% else %}btn-outline-primary{% endif %} rounded-pill btn-sm px-3">
@@ -51,175 +58,77 @@
                 </form>
             </div>
 
-            <hr class="opacity-10 my-4">
-
-            <!-- Polls Section -->
-            {% if post.question_set.exists %}
-                <div class="bg-light bg-opacity-50 rounded-3 p-4 mb-4 border">
-                    <h5 class="fw-bold mb-3"><i class="bi bi-bar-chart-line me-2"></i>Polls</h5>
-                    {% for question in post.question_set.all %}
-                        <div class="mb-4 last-mb-0">
-                            <h6 class="fw-bold">{{ question.question_text }}</h6>
-                            <small class="text-muted d-block mb-2">Created: {{ question.pub_date|date:"Y-m-d H:i" }}</small>
-                            
-                            {% with voted_pk=request.GET.voted_pk|default:"0" %}
-                                <!-- Vote Form -->
-                                <div id="vote-section-{{ question.id }}" {% if voted_pk == question.id|stringformat:"s" %}style="display:none;"{% endif %}>
-                                    <form action="{% url 'polls:vote' question.id %}" method="post">
-                                        {% csrf_token %}
-                                        <div class="d-flex flex-column gap-2 mb-3">
-                                        {% for choice in question.choice_set.all %}
-                                            <div class="form-check">
-                                                <input type="radio" name="choice" id="choice-{{ question.id }}-{{ forloop.counter }}" value="{{ choice.id }}" class="form-check-input">
-                                                <label for="choice-{{ question.id }}-{{ forloop.counter }}" class="form-check-label">{{ choice.choice_text }}</label>
-                                            </div>
-                                        {% endfor %}
-                                        </div>
-                                        <div class="d-flex gap-2">
-                                            <input type="submit" value="Vote" class="btn btn-primary btn-sm rounded-pill px-3">
-                                            <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="toggleResult('{{ question.id }}')">View Results</button>
-                                        </div>
-                                    </form>
-                                </div>
-                                
-                                <!-- Results -->
-                                <div id="result-section-{{ question.id }}" {% if voted_pk != question.id|stringformat:"s" %}style="display:none;"{% endif %}>
-                                    <ul class="list-group mb-3">
-                                        {% for choice in question.choice_set.all %}
-                                            <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
-                                                {{ choice.choice_text }}
-                                                <span class="badge bg-primary rounded-pill">{{ choice.votes }}</span>
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                    <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" onclick="toggleResult('{{ question.id }}')">Back to Vote</button>
-                                </div>
-                            {% endwith %}
-
-                            {% if question.author == user or user.is_superuser %}
-                            <div class="mt-2">
-                                <a href="{% url 'polls:update' question.id %}" class="btn btn-link btn-sm text-decoration-none p-0 me-2">Edit Poll</a>
-                                <a href="{% url 'polls:delete' question.id %}" class="btn btn-link btn-sm text-danger text-decoration-none p-0" onclick="return confirm('Delete poll {{question.question_text}}?')">Delete Poll</a>
-                            </div>
-                            {% endif %}
-                        </div>
-                        {% if not forloop.last %}<hr class="my-3">{% endif %}
-                    {% endfor %}
-                </div>
-            {% else %}
-                <!-- Add Poll Button/Form -->
-                <div class="mb-4">
-                    <button type="button" id="toggle-form-btn" class="btn btn-outline-primary rounded-pill btn-sm"><i class="bi bi-plus-lg me-1"></i>Add Poll</button>
-                    
-                    <section id="question-form-section" style="display: none;" class="mt-3 p-3 border rounded bg-light bg-opacity-50">
-                        <form action="{% url 'polls:create' %}" method="post">
-                            {% csrf_token %}
-                            <h5 class="mb-3">New Poll</h5>
-                            {{ q_form.as_p }}
-                            <div id="form-list">
-                                {% if formset %}
-                                    {{ formset.management_form }}
-                                    {% for form in formset %}
-                                        {{ form.as_p }}
-                                    {% endfor %}
-                                {% else %}
-                                    {{ c_form.as_p }}
-                                {% endif %}
-                            </div>
-                            
-                            <div id="empty-form" class="d-none">
-                                <div class="d-flex align-items-center gap-2 dynamic-form mb-2">
-                                    <div class="flex-grow-1">{{ c_form.as_p }}</div>
-                                    <button type="button" class="btn btn-danger btn-sm remove-form rounded-pill">Remove</button>
-                                </div>
-                            </div>
-
-                            <div class="mt-2 mb-3">
-                                <button id="add-more" type="button" class="btn btn-outline-secondary btn-sm rounded-pill">Add Choice</button>
-                            </div>
-                            <input type="submit" value="Save Poll" class="btn btn-primary btn-sm rounded-pill">
-                        </form>
-                    </section>
-                </div>
-            {% endif %}
+            <hr class="opacity-10 my-3">
 
             <!-- Comments Section -->
-            <div class="mb-4">
-                <h5 class="fw-bold mb-3"><i class="bi bi-chat-dots me-2"></i>Comments ({{ comments.count }})</h5>
+            <div class="mb-2">
+                <h5 class="fw-bold mb-1"><i class="bi bi-chat-dots me-2"></i>Comments ({{ comments.count }})</h5>
                 
-                {% if comments.count > 0 %}
-                    <ul class="list-group list-group-flush mb-4">
-                        {% for comment in comments %}
-                            <li class="list-group-item bg-transparent px-0 py-3 border-bottom">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <div>
-                                        <strong class="text-dark">{{ comment.author.username }}</strong>
-                                        <small class="text-muted ms-2">{{ comment.date_posted|date:"Y-m-d H:i" }}</small>
-                                    </div>
-                                    {% if comment.author == user or user.is_superuser %}
-                                        <div class="dropdown">
-                                            <button class="btn btn-link btn-sm text-muted p-0" type="button" data-bs-toggle="dropdown">
-                                                <i class="bi bi-three-dots-vertical"></i>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                <li><a class="dropdown-item" href="#" onclick="toggleEdit('{{ comment.id }}'); return false;">Edit</a></li>
-                                                <li>
-                                                    <form action="{% url 'blog:delete-comment' comment.id %}" method="POST" onsubmit="return confirm('Delete comment?');">
-                                                        {% csrf_token %}
-                                                        <button type="submit" class="dropdown-item text-danger">Delete</button>
-                                                    </form>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    {% endif %}
+                <ul class="list-group list-group-flush mb-2">
+                {% for comment in comments %}
+                    <li class="list-group-item bg-transparent px-0 py-2 border-bottom">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <div>
+                                <strong class="text-dark">{{ comment.author.username }}</strong>
+                                <small class="text-muted ms-2">{{ comment.date_commented|date:"Y-m-d H:i" }}</small>
+                            </div>
+                            {% if comment.author == user or user.is_superuser %}
+                                <div class="dropdown">
+                                    <button class="btn btn-link btn-sm text-muted p-0" type="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="#" onclick="toggleEdit('{{ comment.id }}'); return false;">Edit</a></li>
+                                        <li>
+                                            <form action="{% url 'blog:delete-comment' comment.id %}" method="POST" onsubmit="return confirm('Delete comment?');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="dropdown-item text-danger">Delete</button>
+                                            </form>
+                                        </li>
+                                    </ul>
                                 </div>
-                                
-                                <div id="comment-content-{{ comment.id }}" class="text-secondary">
-                                    {{ comment.content|safe }}
+                            {% endif %}
+                        </div>
+                        
+                        <div id="comment-content-{{ comment.id }}" class="text-secondary">
+                            {{ comment.content|safe }}
+                        </div>
+                        
+                        <!-- Edit Form -->
+                        <div id="comment-edit-{{ comment.id }}" style="display: none;" class="mt-1">
+                            <form action="{% url 'blog:edit-comment' comment.id %}" method="POST">
+                                {% csrf_token %}
+                                <textarea name="content" class="form-control mb-2" rows="3" required>{{ comment.content }}</textarea>
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary btn-sm rounded-pill">Save</button>
+                                    <button type="button" class="btn btn-secondary btn-sm rounded-pill" onclick="toggleEdit('{{ comment.id }}')">Cancel</button>
                                 </div>
-                                
-                                <!-- Edit Form -->
-                                <div id="comment-edit-{{ comment.id }}" style="display: none;" class="mt-2">
-                                    <form action="{% url 'blog:edit-comment' comment.id %}" method="POST">
-                                        {% csrf_token %}
-                                        <textarea name="content" class="form-control mb-2" rows="3" required>{{ comment.content }}</textarea>
-                                        <div class="d-flex gap-2">
-                                            <button type="submit" class="btn btn-primary btn-sm rounded-pill">Save</button>
-                                            <button type="button" class="btn btn-secondary btn-sm rounded-pill" onclick="toggleEdit('{{ comment.id }}')">Cancel</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p class="text-muted fst-italic mb-4">No comments yet. Be the first to comment!</p>
-                {% endif %}
+                            </form>
+                        </div>
+                    </li>
+                {% empty %}
+                    <p class="text-muted fst-italic mb-4">댓글이 없습니다.</p>
+                {% endfor %}
+                </ul>
 
                 <!-- Add Comment -->
-                <div class="bg-light bg-opacity-50 rounded-3 p-3 border">
-                    <form action="{% url 'blog:add-comment' post.id %}" method="POST">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="content" class="form-label fw-medium">Leave a comment
-                                {% if not user.is_authenticated %}
-                                    <small class="text-muted fw-normal">(Login required)</small>
-                                {% endif %}
-                            </label>
-                            {{ comment_form.content }}
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4" {% if not user.is_authenticated %}disabled{% endif %}>Submit Comment</button>
-                    </form>
-                </div>
+                <form action="{% url 'blog:add-comment' post.id %}" method="POST" class="mt-1">
+                    {% csrf_token %}
+                    <div class="mb-2">
+                        {% if not user.is_authenticated %}
+                            <small class="text-muted fw-normal">(Login required)</small>
+                        {% endif %}
+                        {{ comment_form.content }}
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4" {% if not user.is_authenticated %}disabled{% endif %}>댓글 달기</button>
+                </form>
             </div>
 
             <!-- Footer Actions -->
-            <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
-                <div>
-                    <a href="{% url 'blog:index' %}{% if request.GET.page %}?page={{ request.GET.page }}{% endif %}" class="btn btn-glass-secondary rounded-pill px-3 btn-sm">
-                        <i class="bi bi-arrow-left me-2"></i>Back to List
-                    </a>
-                </div>
+            <div class="d-flex justify-content-between align-items-center mt-1 pt-3 border-top">
+                <a href="{% url 'blog:index' %}?page={{ request.GET.page|default:1 }}{% if request.GET.category %}&category={{ request.GET.category|urlencode }}{% endif %}" class="btn btn-glass-secondary rounded-pill px-3 btn-sm">
+                    <i class="bi bi-arrow-left me-2"></i>목록으로...
+                </a>
                 <div class="d-flex gap-2">
                     {% if post.author == user or user.is_superuser %}
                         <a href="{% url 'blog:update' post.id %}" class="btn btn-glass-primary rounded-pill px-3 btn-sm">
@@ -233,43 +142,6 @@
         </div>
     </div>
 </div>
-<script>
-    document.getElementById('add-more').addEventListener('click', function() {
-        const emptyForm = document.getElementById('empty-form').innerHTML;
-        document.getElementById('form-list').insertAdjacentHTML('beforeend', emptyForm);
-    });
-
-    document.getElementById('form-list').addEventListener('click', function(e) {
-        if (e.target.classList.contains('remove-form')) {
-            e.target.closest('.dynamic-form').remove();
-        }
-    });
-
-    document.getElementById('toggle-form-btn').addEventListener('click', function() {
-        const formSection = document.getElementById('question-form-section');
-        if (formSection.style.display === 'none') {
-            formSection.style.display = 'block';
-            this.innerHTML = '<i class="bi bi-dash-lg me-1"></i>Close Poll Form';
-            this.classList.replace('btn-outline-primary', 'btn-outline-secondary');
-        } else {
-            formSection.style.display = 'none';
-            this.innerHTML = '<i class="bi bi-plus-lg me-1"></i>Add Poll';
-            this.classList.replace('btn-outline-secondary', 'btn-outline-primary');
-        }
-    });
-    function toggleResult(questionId) {
-        const voteSection = document.getElementById(`vote-section-${questionId}`);
-        const resultSection = document.getElementById(`result-section-${questionId}`);
-        if (voteSection.style.display === 'none') {
-            voteSection.style.display = 'block';
-            resultSection.style.display = 'none';
-        } else {
-            voteSection.style.display = 'none';
-            resultSection.style.display = 'block';
-        }
-    }
-</script>
-
 <script>
     function toggleEdit(commentId) {
         const contentDiv = document.getElementById(`comment-content-${commentId}`);

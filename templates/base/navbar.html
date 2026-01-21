@@ -23,13 +23,13 @@
                     <a class="nav-link px-3 {% if '/asct/' in request.path %} active text-primary {% endif %}" href="{% url 'asct:index' %}">ASCT</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link px-3 {% if '/blog/' in request.path %} active text-primary {% endif %}" href="{% url 'blog:index' %}">Blog</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link px-3 {% if '/events/' in request.path %} active text-primary {% endif %}" href="{% url 'events:index' %}">Events</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link px-3 {% if '/eshop/' in request.path %} active text-primary {% endif %}" href="{% url 'eshop:product_all' %}">e-Shop</a>
+                    <a class="nav-link px-3 {% if '/blog/' in request.path %} active text-primary {% endif %}" href="{% url 'blog:index' %}">Blog</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link px-3 {% if '/eshop/' in request.path %} active text-primary {% endif %}" href="{% url 'eshop:product_list' %}">e-Shop</a>
                 </li>
                 {% comment %}
                 <li class="nav-item">
