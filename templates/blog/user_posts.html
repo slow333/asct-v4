@@ -6,8 +6,7 @@
     {% for post in page_obj %}
         <div class="border rounded-3 my-2 p-3">
             <div class="d-flex align-items-end gap-2">
-                <img src="{{ post.author.profile.image.url }}" width="60" alt=""
-                class="rounded me-1"> 
+                <img src="{{ post.author.profile.image.url }}" alt="{{post.author.username }}" class="rounded me-1 object-fit-cover" width="40" height="40"> 
                 <a href="{% url 'blog:user-posts' post.author.username %}">{{ post.author.username }}</a>
                 <small class="text-muted">{{ post.date_posted|date:"Y-m-d H:i"}}</small>
                 <span class="badge bg-secondary">{{ post.category }}</span>
@@ -15,10 +14,8 @@
             </div>
             <h3><a class="article-title pt-2" href="{% url 'blog:detail' post.id %}">{{ post.title }}</a></h3>
             <div>
-                {% if post.content|length > 60 %}
-                    {{ post.content|slice:":20" }} ...
-                {% else %}
-                    {{ post.content }}
+                {% if post.content|length > 60 %} {{ post.content|slice:":20" }} ...
+                {% else %} {{ post.content }}
                 {% endif %}
             </div>
             <div class="mt-2">
@@ -29,7 +26,6 @@
                     class="btn btn-outline-danger btn-sm">Delete</a>
                 {% endif %}
             </div>
-            </div>
-        </article>
+        </div>
     {% endfor %}
 {% endblock %}

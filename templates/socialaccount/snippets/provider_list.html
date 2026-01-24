@@ -1,0 +1,88 @@
+{% load socialaccount %}
+
+{% get_providers as socialaccount_providers %}
+
+{% for provider in socialaccount_providers %}
+<div class="mb-2">
+    <a title="{{provider.name}}" 
+        class="btn w-100 py-3 d-flex align-items-center justify-content-center position-relative social-btn-{{ provider.id }} social-btn-transition fw-bold"
+        href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}">
+        
+        {% if provider.id == 'naver' %}
+            <!-- 네이버 아이콘 (N 로고) -->
+            <span class="position-absolute start-0 ms-3 fw-black naver-icon naver-icon-size">N</span>
+            <span>네이버로 로그인</span>
+        {% elif provider.id == 'google' %}
+            <i class="bi bi-google position-absolute start-0 ms-3 social-icon-size"></i>
+            <span>Google로 로그인</span>
+        {% elif provider.id == 'kakao' %}
+            <i class="bi bi-chat-fill position-absolute start-0 ms-3 social-icon-size"></i>
+            <span>카카오로 로그인</span>
+        {% else %}
+            <i class="bi bi-box-arrow-in-right position-absolute start-0 ms-3 social-icon-size"></i>
+            <span>{{ provider.name }} 로그인</span>
+        {% endif %}
+    </a>
+</div>
+{% endfor %}
+
+<style>
+    .social-btn-transition {
+        transition: all 0.3s ease;
+        border: none;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+    }
+    
+    .social-btn-transition:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+    
+    .naver-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        color: white;
+    }
+    
+    .social-btn-naver {
+        background-color: #03C75A;
+        color: white;
+        border: 1px solid #03C75A;
+    }
+    
+    .social-btn-naver:hover {
+        background-color: #02b351;
+        color: white;
+        border-color: #019a3f;
+    }
+    
+    .social-btn-google {
+        background-color: #ffffff;
+        color: #3c4043;
+        border: 1px solid #dadce0;
+    }
+    
+    .social-btn-google:hover {
+        background-color: #f8f9fa;
+        color: #202124;
+        border-color: #dadce0;
+    }
+    
+    .social-btn-kakao {
+        background-color: #FFE812;
+        color: #000000;
+        border: 1px solid #FFE812;
+    }
+    
+    .social-btn-kakao:hover {
+        background-color: #FFD60B;
+        color: #000000;
+        border-color: #FFBE00;
+    }
+    
+    /* 필요한 경우 다른 스타일 추가 */
+</style>

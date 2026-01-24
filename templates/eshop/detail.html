@@ -12,7 +12,7 @@
         <div class="row g-0">
             <div class="col-md-5 bg-light d-flex align-items-center justify-content-center">
                 <div class="p-4">
-                    <img src="{{product.image.url}}" alt="{{product.name}}" class="img-fluid rounded shadow-sm" style="max-height: 400px; object-fit: contain;">
+                    <img src="{{product.image.url}}" alt="{{ product.name }}" width="400" height="400" class="img-fluid rounded shadow-sm object-fit-contain max-height-500">
                 </div>
             </div>
             <div class="col-md-7">
@@ -30,11 +30,11 @@
                     </div>
                     <div class="mb-4">
                         <h5 class="fw-bold">제품 설명</h5>
-                        <p class="card-text text-secondary" style="line-height: 1.7;">{{ product.description|linebreaksbr }}</p>
+                        <p class="card-text text-secondary line-height-1-7">{{ product.description|linebreaksbr }}</p>
                     </div>
                     <hr class="my-4">
                     <div class="d-flex gap-2">
-                        <form action="" method="POST" class="d-inline">
+                        <form action="" method="post" class="d-inline">
                             {% csrf_token %}
                             <input type="hidden" name="product_id" value="{{product.id}}">
                             <button type="submit" class="btn btn-primary btn-lg px-4">장바구니 추가</button>

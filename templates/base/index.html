@@ -2,11 +2,21 @@
 {% load static %}
 {% block title %} Apps HOME {% endblock %}
 {% block content %}
+<style>
+    .card-container {
+        width: 100%;
+        margin: auto;
+    }
+    .common-features-list {
+        list-style: circle;
+        font-size: 1rem;
+    }
+</style>
 <h2>전체 앱에 대한 설명</h2>
 <h3>공통 적용 사항</h3>
-<div class="card" style="width: 100%; margin: auto">
+<div class="card card-container">
     <div class="card-body">
-        <ul style="list-style:circle; font-size: 1rem;">
+        <ul class="common-features-list">
             <li>가능하면 fucntion base view 사용(필요시 Class base view 사용)<br>
                 <strong>from django import forms를 사용</strong><br>
                 <strong>forms에 style(widgets) 적용(crispy_forms 사용안함)</strong>
@@ -19,7 +29,7 @@
     </div>
 </div>
 <h3>Events-Favorites(Images)-Todo-Venue</h3>
-<div class="card" style="width: 100%; margin: auto">
+<div class="card card-container">
     <div class="card-body">
         <div class="d-flex justify-content-between">
             <h4 class="card-title">이벤트 관리 앱입니다.(idol, events 통합)</h4>
@@ -39,7 +49,7 @@
     </div>
 </div>
 <h3>Blog-Polls</h3>
-<div class="card" style="width: 100%; margin: auto">
+<div class="card card-container">
     <div class="card-body">
         <div class="d-flex justify-content-between">
             <h4 class="card-title">blog 앱(polls를 통합)</h4>

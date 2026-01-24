@@ -1,14 +1,26 @@
 {% extends "base/base.html" %}
+{% load socialaccount %}
 {% block title %} Login {% endblock %}
 
 {% block content %}
 <div class="row justify-content-center align-items-center py-5">
-    <div class="col-lg-6 col-md-8">
+    <div class="col-lg-8 col-md-8">
         <div class="card border-0 shadow-sm glass-card">
             <div class="card-body p-5">
                 <div class="text-center mb-4">
-                    <h2 class="fw-bold text-primary"><i class="bi bi-box-arrow-in-right me-2"></i>Login</h2>
+                    <h2 class="fw-bold text-primary"><i class="bi bi-box-arrow-in-right me-3"></i>Login</h2>
                 </div>
+
+                {% get_providers as socialaccount_providers %}
+                {% if socialaccount_providers %}
+                <div class="d-grid gap-2 mb-3">
+                    {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+                </div>
+                <div class="position-relative my-4">
+                    <hr class="text-muted">
+                    <span class="position-absolute top-50 start-50 translate-middle px-3 bg-white text-muted small">OR</span>
+                </div>
+                {% endif %}
 
                 {% if next %}
                     {% if user.is_authenticated %}
@@ -26,8 +38,7 @@
 
                 <form method="post" action="{% url 'users:login' %}">
                     {% csrf_token %}
-                    
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <label for="username" class="form-label fw-medium text-muted">Username</label>
                         <input type="text" class="form-control" name="username" id="username" required placeholder="Enter your username">
                     </div>
@@ -51,4 +62,5 @@
             </div>
         </div>
     </div>
+</div>
 {% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h3 class="card-title text-center mb-4 fw-bold">{% trans "Sign Up" %}</h3>
+                    
+                    <div class="alert alert-info text-center mb-4" role="alert">
+                        {% blocktrans with provider_name=account.get_provider.name site_name=site.name %}
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        <strong>{{ provider_name }}</strong> 계정으로 로그인하셨습니다.<br>
+                        가입을 완료하기 위해 아래 정보를 확인해 주세요.
+                        {% endblocktrans %}
+                    </div>
+
+                    <form class="signup" id="signup_form" method="post" action="{% url 'socialaccount_signup' %}">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger small">
+                            {{ form.non_field_errors }}
+                            {% for field in form %}
+                                {% if field.errors %}
+                                    {{ field.label }}: {{ field.errors|striptags }}<br>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label fw-medium">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                            <div class="form-text text-muted small">{{ field.help_text|safe }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        
+                        {% if redirect_field_value %}
+                        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                        {% endif %}
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button class="btn btn-primary py-2 fw-bold" type="submit">{% trans "Sign Up" %} »</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var inputs = document.querySelectorAll('.signup input:not([type="checkbox"]):not([type="hidden"]), .signup select, .signup textarea');
+        inputs.forEach(function(input) {
+            input.classList.add('form-control');
+        });
+    });
+</script>
+{% endblock %}

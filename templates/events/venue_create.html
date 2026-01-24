@@ -15,37 +15,9 @@
             <div class="card-body p-5">
                 <h4 class="card-title fw-bold mb-4 text-secondary">New Venue Details</h4>
                 
-                <form action="{% url 'events:venue-create' %}" method="POST" enctype="multipart/form-data">
+                <form action="{% url 'events:venue-create' %}" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    
-                    {% if form.errors %}
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i><strong>Please correct the errors below</strong>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endif %}
-
-                    {% for field in form %}
-                    <div class="mb-3">
-                        {% if field.label %}
-                        <label for="{{ field.id_for_label }}" class="form-label fw-medium text-muted">
-                            {{ field.label }}
-                            {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
-                        </label>
-                        {% endif %}
-                        
-                        {{ field }}
-                        
-                        {% if field.help_text %}
-                            <div class="form-text">{{ field.help_text }}</div>
-                        {% endif %}
-                        
-                        {% for error in field.errors %}
-                            <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    {% endfor %}
-
+                    {{ form.as_p }}
                     <div class="d-flex justify-content-end gap-2 mt-5">
                         <a href="{% url 'events:venues-list' %}" class="btn btn-glass-secondary rounded-pill px-4">
                             <i class="bi bi-x-lg me-2"></i>Cancel

@@ -33,7 +33,7 @@
         <hr>
         <div>
             <a href="{% url 'polls:index' %}" class="btn btn-outline-secondary btn-sm">Polls</a>
-            <a href="javascript:history.back()" class="btn btn-secondary btn-sm">Go Back</a>
+            <a href="{% url 'polls:index' %}" onclick="history.back(); return false;" class="btn btn-secondary btn-sm">Go Back</a>
         </div>
     </form>
 </section>

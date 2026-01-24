@@ -28,17 +28,18 @@ INSTALLED_APPS = [
     
     # Third-party apps
     "debug_toolbar",
+    "django.contrib.sites",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-    # "allauth.socialaccount.providers.google",
+    # "allauth.socialaccount.providers",
     "allauth.socialaccount.providers.naver",
-    "allauth.socialaccount.providers.kakao",
-    "allauth.socialaccount.providers.github",
-    "allauth.socialaccount.providers.twitter",
-    "allauth.socialaccount.providers.facebook",
-    "allauth.socialaccount.providers.linkedin_oauth2",
-    "allauth.socialaccount.providers.instagram",
+    # "allauth.socialaccount.providers.kakao",
+    # "allauth.socialaccount.providers.github",
+    # "allauth.socialaccount.providers.twitter",
+    # "allauth.socialaccount.providers.facebook",
+    # "allauth.socialaccount.providers.linkedin_oauth2",
+    # "allauth.socialaccount.providers.instagram",
 ]
 
 MIDDLEWARE = [
@@ -52,18 +53,12 @@ MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'allauth.account.middleware.AccountMiddleware',
 ]
+# 소셜 로그인에 필요
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 SITE_ID = 1
-# settings.py에서 아래처럼 설정하세요
-SOCIALACCOUNT_PROVIDERS = {
-    'naver': {
-        'SCOPE': ['profile', 'email'],
-        'AUTH_PARAMS': {},
-    }
-}
 
 DEBUG_TOOLBAR_CONFIG = {
     # Set a high z-index to ensure the toolbar appears above other elements.
@@ -131,6 +126,12 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 LOGIN_REDIRECT_URL = 'main-index'
+LOGOUT_REDIRECT_URL = 'main-index'
+# allauth 관련
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email' # 로그인 시 아이디/이메일 모두 허용
+ACCOUNT_EMAIL_VERIFICATION = 'optional' # 이메일 인증 설정 (mandatory, optional, none)
+
 LOGIN_URL = 'login'
 # LOGIN_URL = 'users:login'
 

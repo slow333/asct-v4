@@ -24,7 +24,7 @@ class PostForm(forms.ModelForm):
                 'class': 'form-select',
                 'style': 'margin-bottom: 10px;'}),
             }
-        
+
 class PostFormAdmin(forms.ModelForm):
     class Meta:
         model = Post
@@ -59,6 +59,10 @@ class PostFormAdmin(forms.ModelForm):
             'photo': forms.FileInput(attrs={'class': 'form-control', 'placeholder': '이미지',}),
         }
         ordering = ['-updated_at']
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['content'].required = False
 
 
 class CommentForm(forms.ModelForm):

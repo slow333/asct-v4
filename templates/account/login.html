@@ -1,0 +1,83 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h3 class="card-title text-center mb-4 fw-bold">{% trans "Sign In" %}</h3>
+
+                    {% get_providers as socialaccount_providers %}
+                    {% if socialaccount_providers %}
+                    <div class="d-grid gap-2 mb-3">
+                        {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+                    </div>
+                    <div class="position-relative my-4">
+                        <hr class="text-muted">
+                        <span class="position-absolute top-50 start-50 translate-middle px-3 bg-white text-muted small">OR</span>
+                    </div>
+                    {% endif %}
+
+                    <form class="login" method="post" action="{% url 'account_login' %}">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger small">
+                            {{ form.non_field_errors }}
+                            {% for field in form %}
+                                {% if field.errors %}
+                                    {{ field.label }}: {{ field.errors|striptags }}<br>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        {% for field in form %}
+                            {% if field.name != 'remember' %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if redirect_field_value %}
+                        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                        {% endif %}
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button class="btn btn-primary py-2" type="submit">{% trans "Sign In" %}</button>
+                        </div>
+                        
+                        <div class="text-center mt-3">
+                            <a class="text-decoration-none small" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center py-3 bg-light border-top-0">
+                    <span class="text-muted small">{% trans "Don't have an account?" %}</span>
+                    <a href="{{ signup_url }}" class="text-decoration-none fw-bold small ms-1">{% trans "Sign Up" %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Django 폼 필드에 Bootstrap 클래스 추가
+    document.addEventListener("DOMContentLoaded", function() {
+        var inputs = document.querySelectorAll('.login input:not([type="checkbox"]):not([type="hidden"]), .login select, .login textarea');
+        inputs.forEach(function(input) {
+            input.classList.add('form-control');
+        });
+        
+        var checkboxes = document.querySelectorAll('.login input[type="checkbox"]');
+        checkboxes.forEach(function(box) {
+            box.classList.add('form-check-input');
+        });
+    });
+</script>
+{% endblock %}

@@ -55,9 +55,9 @@
                                 {% for attendee in event.attendees.all %}
                                 <div class="col text-center">
                                     {% if attendee.image %}
-                                    <img src="{{ attendee.image.url }}" class="rounded-circle border shadow-sm mb-1" width="60" height="60" style="object-fit: cover;" title="{{ attendee.name }}">
+                                    <img src="{{ attendee.image.url }}" class="rounded-circle border shadow-sm mb-1 object-fit-cover" width="60" height="60" alt="Profile photo of {{ attendee.name }}, an event attendee">
                                     {% endif %}
-                                    <small class="d-block text-truncate" style="font-size: 0.75rem;">{{ attendee.name }}</small>
+                                    <small class="d-block text-truncate fs-small text-muted mb-1">{{ attendee.name }}</small>
                                 </div>
                                 {% endfor %}
                             </div>
@@ -70,9 +70,15 @@
                         <a href="{% url 'events:events-list' %}{% if request.GET.page %}?page={{ request.GET.page }}{% endif %}" class="btn btn-glass-secondary rounded-pill px-2">
                             <i class="bi bi-arrow-counterclockwise me-2"></i>Events
                         </a>
+                        {% if event.start_date %}
+                        <a href="{% url 'events:index' year=event.start_date.year month=event.start_date.month %}" class="btn btn-glass-secondary rounded-pill px-2">
+                            <i class="bi bi-arrow-left me-2"></i>Calendar
+                        </a>
+                        {% else %}
                         <a href="{% url 'events:index' %}" class="btn btn-glass-secondary rounded-pill px-2">
                             <i class="bi bi-arrow-left me-2"></i>Calendar
                         </a>
+                        {% endif %}
                     </div>
                     <div class="d-flex gap-2">
                         {% if user == event.manager or user.is_superuser %}
