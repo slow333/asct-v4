@@ -1,14 +1,25 @@
-<nav class="navbar navbar-expand-lg navbar-light mb-4 rounded-3 shadow-sm p-2 position-relative z-3" style="background-color: rgba(255, 255, 255, 0.45); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.4);">
+{% load humanize %}
+<style>
+    .nav_custom {
+        background-color: rgba(255, 255, 255, 0.45); 
+        backdrop-filter: blur(12px); 
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        margin-bottom: 1rem;
+        padding: 4px;
+        position: relative;
+    }
+</style>
+<nav class="navbar navbar-expand-lg navbar-light rounded-3 shadow-sm z-3 nav_custom">
     <div class="container-fluid">
         <a class="navbar-brand fw-bold text-primary" href="{% url 'eshop:product_list' %}">
             <i class="bi bi-bag-heart-fill"></i> e-shop</a>
         <div class="navbar-nav justify-content-end">
             <div class="nav-item active">
-                <a class="nav-link btn btn-outline-success" href="">Cart
+                <a class="nav-link btn btn-outline-success" href="{% url 'eshop:cart_details' %}">장바구니:
                     {% if cart|length > 0 %}
-                    {{ cart.get_product_total }} ({{ cart|length }}items)
+                    {{ cart.get_product_total|floatformat:0|intcomma }} ({{ cart|length }}개)
                     {% else %}
-                    : Empty
+                    : 0
                     {% endif %}
                 </a>
             </div>

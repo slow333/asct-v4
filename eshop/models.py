@@ -1,9 +1,6 @@
-from typing import Any, Iterable
 from django.db import models
-from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.text import slugify
-
 
 class Category(models.Model):
     name = models.CharField(max_length=200, db_index=True)
@@ -47,9 +44,7 @@ class Product(models.Model):
 
     class Meta:
         ordering = ['-category', 'name']
-        indexes = [
-            models.Index(fields=['id', 'slug']),
-        ]
+        indexes = [ models.Index(fields=['id', 'slug']), ]
 
     def __str__(self) -> str:
         return self.name
@@ -59,3 +54,16 @@ class Product(models.Model):
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
+
+
+# class Order(models.Model):
+#     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+#     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+#     quantity = models.PositiveSmallIntegerField(default=1)
+#     address = models.CharField(max_length=255, blank=True, default='')
+#     phone = models.CharField(max_length=20, blank=True, default='')
+#     placed_at = models.DateTimeField(auto_now_add=True)
+#     status = models.CharField(max_length=1, choices=[('P', 'Pending'), ('C', 'Complete'), ('F', 'Failed')], default='P')
+    
+#     def __str__(self) -> str:
+#         return self.product.name

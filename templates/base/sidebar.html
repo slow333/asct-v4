@@ -13,14 +13,12 @@
 
         <div class="collapse {% if '/blog/' in request.path or '/asct/' in request.path or '/idols/' in request.path or '/aistore/' in request.path or '/library/' in request.path or '/polls/' in request.path or '/events/' in request.path %} show {% endif %}" id="sidebar-apps">
             <div class="mt-1">
-                <a class="sidebar-link {% is_active '/asct/' %}" href="{% url 'asct:index' %}">
-                    <i class="bi bi-gear-wide-connected sidebar-icon"></i> ASCT</a>
+                <a class="sidebar-link {% is_active '/asct/' %}" href="{% url 'asct:index' %}"><i class="bi bi-gear-wide-connected sidebar-icon"></i> ASCT</a>
                 <a class="sidebar-link {% is_active '/blog/' %}" href="{% url 'blog:index' %}"><i class="bi bi-blockquote-left sidebar-icon"></i> Blog</a>
                 <a class="sidebar-link {% is_active '/events/' %}" href="{% url 'events:index' %}">
                     <i class="bi bi-calendar2-event sidebar-icon"></i> Events</a>
+                <a class="sidebar-link {% is_active '/eshop/' %}" href="{% url 'eshop:product_list' %}"> <i class="bi bi-shop sidebar-icon"></i> e-Shop</a>
                 {% comment %}
-                <a class="sidebar-link {% is_active '/store/' %}" href="{% url 'store:index' %}">
-                    <i class="bi bi-shop sidebar-icon"></i> Store</a>
                 <a class="sidebar-link {% is_active '/library/' %}" href="{% url 'library:index' %}">
                     <i class="bi bi-journals sidebar-icon"></i> Library</a>
                 {% endcomment %}

@@ -143,3 +143,5 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'ml.python.ai@gmail.com'
 EMAIL_HOST_PASSWORD = 'dtty tgfa lxzm bhue'
+
+CART_ID = 'cart_in_session'

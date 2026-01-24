@@ -1,8 +1,10 @@
 {% load static %}
-<!doctype html>
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ASCT Project - A Django-based web application featuring events, blogs, and documentation.">
+    <meta name="keywords" content="ASCT, Django, events, blogs, documentation, web application">
     <link rel="icon" href="{% static 'favicon2.ico' %}">
     {% block import %}{% endblock %}
     <title>{% block title %}{% endblock %}</title>
@@ -19,7 +21,7 @@
 <main role="main" class="container-lg mb-3">
 {% include 'base/navbar.html' %}
     <br>
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarCol" aria-labelledby="sidebarLabel" style="width:17rem;" data-bs-backdrop="true">
+    <div class="offcanvas offcanvas-start w-25" tabindex="-1" id="sidebarCol" aria-labelledby="sidebarLabel" data-bs-backdrop="true">
         <div class="offcanvas-header">
             <h3 class="offcanvas-title" id="sidebarLabel">Menu</h3>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>

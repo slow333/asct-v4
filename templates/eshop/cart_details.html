@@ -1,0 +1,60 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %} 장바구니 물품 {% endblock %}
+
+{% block content %}
+
+{% include 'eshop/_nav.html' %}
+
+<div class="container mt-4">
+    {% for item in cart %}
+    {% with product=item.product %}
+    <div class="card shadow-sm border-0 mb-3 py-3">
+        <div class="row g-0">
+            <div class="col-md-5 bg-light d-flex align-items-center justify-content-center">
+                <div class="p-4">
+                    <img src="{{product.image.url}}" alt="{{ product.name }}" width="400" height="400" class="img-fluid rounded shadow-sm object-fit-contain max-height-500">
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="card-body px-4 py-2">
+                    <div class="mb-2">
+                        {% if product.category %}
+                        <span class="badge bg-primary">{{ product.category }}</span>
+                        {% endif %}
+                        <span class="text-muted ms-2 small">생산자: {{ product.made_by }}</span>
+                    </div>
+                    <h3 class="card-title fw-bold mb-3">{{ product.name }}</h3>
+                    <p class="card-text text-secondary line-height-1-7">{{ product.description|linebreaksbr }}</p>
+                    <hr class="my-1">
+                    <form action="{% url 'eshop:cart_add_product' product.id %}" method="post" class="d-flex gap-3 mt-3 align-items-center">
+                        {% csrf_token %}
+                        수량: {{ item.quantity_form.quantity }}
+                        {{ item.quantity_form.is_update }}
+                        <button type="submit" class="btn btn-primary ">장바구니 추가</button>
+                        <a href="{% url 'eshop:cart_remove_product' product.id %}" class="btn btn-danger">물건 삭제</a>
+                    </form>
+                    <div class="mb-1">
+                        <p class="text-secondary fw-bold">가격: ￦{{ item.price|floatformat:0|intcomma }}</p>
+                        <h5 class="text-danger fw-bold">합계: ￦{{ item.total_price|floatformat:0|intcomma }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endwith %}
+    {% endfor %}
+    <div class="card shadow-sm border-0 mb-3 fs-4 text-muted px-3 py-2 text-end">
+        <div class="d-flex justify-content-end">
+            <span>전체 물품 가격 합계 : </span><span class="text-primary fw-bold ms-3">{{ cart.get_product_total|floatformat:0|intcomma }}원</span>
+
+        </div>
+    </div>
+    <p>
+        <a href="{% url 'eshop:product_list' %}?page={{ request.GET.page|default:1 }}{% if request.GET.category %}&category={{ request.GET.category|urlencode }}{% endif %}" class="btn btn-secondary px-4">
+            제품 목록으로 가기
+        </a>
+    </p>
+</div>
+{% endblock %}
