@@ -5,48 +5,48 @@
 {% block content %}
 {% include 'docs/django/sub_nav.html' %}
 <div class="doc-container">
-<h1 class="doc-title">Django Setup</h1>
-<section class="doc-section">
-    <h2 class="doc-header">Step to start project</h2>
-    <ol>
-        <li>create project: django-admin startproject projectname</li>
-        <li>create app: python manage.py startapp appname</li>
-        <li>run server: python manage.py runserver</li>
-        <li>create superuser: python manage.py createsuperuser</li>
-        <li>make migration: python manage.py makemigrations</li>
-        <li>apply migration: python manage.py migrate</li>
-        <li>collect static files: python manage.py collectstatic</li>
-        <li>test db connection: python manage.py dbshell</li>
-    </ol>
-    <h2 class="doc-header">Make Project</h2>
-    <ol>
-        <li>Model : class 생성</li>
-        <li>Model relation 설정</li>
-        <li>mok data 생성</li>
-        <li>admin.py 에 model 등록</li>
-        <li>settings.py 에 app 등록</li>
-        <li>views.py 에 view 생성</li>
-        <li>urls.py 에 path 설정</li>
-        <li>makemigrations & migrate</li>
-    </ol>
-</section>
-<section class="doc-section">
+    <h1 class="doc-title">Django Setup</h1>
+    <section class="doc-section">
+        <h2 class="doc-header">Step to start project</h2>
+        <ol>
+            <li>create project: django-admin startproject projectname</li>
+            <li>create app: python manage.py startapp appname</li>
+            <li>run server: python manage.py runserver</li>
+            <li>create superuser: python manage.py createsuperuser</li>
+            <li>make migration: python manage.py makemigrations</li>
+            <li>apply migration: python manage.py migrate</li>
+            <li>collect static files: python manage.py collectstatic</li>
+            <li>test db connection: python manage.py dbshell</li>
+        </ol>
+        <h2 class="doc-header">Make Project</h2>
+        <ol>
+            <li>Model : class 생성</li>
+            <li>Model relation 설정</li>
+            <li>mok data 생성</li>
+            <li>admin.py 에 model 등록</li>
+            <li>settings.py 에 app 등록</li>
+            <li>views.py 에 view 생성</li>
+            <li>urls.py 에 path 설정</li>
+            <li>makemigrations & migrate</li>
+        </ol>
+    </section>
+    <section class="doc-section">
 
         <h2 class="doc-header">wsl(linux, 우분투)에서 django 설치하고 실행하기</h2>
         <h3 class="doc-subheader">방화벽 연결(db)</h3>
-    <pre>apt install ufw
-    sudo ufw allow 5432/tcp</pre>
+<pre>apt install ufw
+sudo ufw allow 5432/tcp</pre>
         <h3 class="doc-subheader">venv 설정</h3>
-    <pre>apt install python3-venv
-    source venv/bin/activate</pre>
+<pre>apt install python3-venv
+source venv/bin/activate</pre>
         <h3 class="doc-subheader">package 설치</h3>
-        <pre>pip install 
-    pip install Pillow
-    pip install crispy-bootstrap5
-    pip install psycopg2 (컴파일 라이블러리 설치하고 ...)</pre>
-</section>
-<section class="doc-section">
-    <h2 class="doc-header">django debug-debug-toolbar 설치</h2>
+<pre>pip install 
+pip install Pillow
+pip install crispy-bootstrap5
+pip install psycopg2 (컴파일 라이블러리 설치하고 ...)</pre>
+    </section>
+    <section class="doc-section">
+        <h2 class="doc-header">django debug-debug-toolbar 설치</h2>
 <pre>pip install django-debug-toolbar # 이러면 import error 남
     python -m pip install django-debug-toolbar # 이렇게 해야함</pre>
     <h3 class="doc-subheader">settings.py 설정</h3>
@@ -63,8 +63,8 @@ INTERNAL_IPS = [
 ]
 </pre>
 
-    <h2 class="doc-header">설치 패키지: requirments.txt</h2>
-    <pre>asgiref==3.10.0
+        <h2 class="doc-header">설치 패키지: requirments.txt</h2>
+<pre>asgiref==3.10.0
 crispy-bootstrap5==2025.6
 Django==5.2.8
 django-crispy-forms==2.5
@@ -75,61 +75,61 @@ psycopg2==2.9.11
 sqlparse==0.5.3
 tzdata==2025.2</pre>
 
-    <h2 class="doc-header">전체 프로젝트 설치 및 시행 기초</h2>
-    <p>암호: admin/admin, test/test4321</p>
-    <h3 class="doc-subheader">start Django project</h3>
-    <pre>django-admin startproject myproject
+        <h2 class="doc-header">전체 프로젝트 설치 및 시행 기초</h2>
+        <p>암호: admin/admin, test/test4321</p>
+        <h3 class="doc-subheader">start Django project</h3>
+<pre>django-admin startproject myproject
 cd myproject
 python manage.py runserver</pre>
-    <h3 class="doc-subheader">create an app</h3>
-    <pre>python manage.py startapp myapp</pre>
-    <h3 class="doc-subheader">Configure settings: Edit myproject/settings.py</h3>
-    <pre>INSTALLED_APPS = [
+        <h3 class="doc-subheader">create an app</h3>
+<pre>python manage.py startapp myapp</pre>
+        <h3 class="doc-subheader">Configure settings: Edit myproject/settings.py</h3>
+<pre>INSTALLED_APPS = [
     # ...
     'myapp.apps.MyappConfig',
 ]</pre>
-</section>
-<section class="doc-section">
-    <h2 class="doc-header">project structure</h2>
+    </section>
+    <section class="doc-section">
+        <h2 class="doc-header">project structure</h2>
 <pre>/asct-v4
-  /app_1
+/app_1
     __init__.py
     admin.py
     app.py
     urls.py
     views.py
-  /config
+/config
     __init__.py
     asgi.py
     settings.py
     urls.py
     wsgi.py
-  /static : static files (config.settings에서 설정 필요)
-  /templates : 템플릿 위치(config.settings에서 설정 필요)
+/static : static files (config.settings에서 설정 필요)
+/templates : 템플릿 위치(config.settings에서 설정 필요)
 manage.py
 </pre>
-</section>
-<section class="doc-section">
-    <h2 class="doc-header">superuser 생성</h2>
-    <pre>python manage.py createsuperuser
+    </section>
+    <section class="doc-section">
+        <h2 class="doc-header">superuser 생성</h2>
+<pre>python manage.py createsuperuser
 # db migration이 없어서 애러남
 python manage.py makemigrations
 python manage.py migrate
-    </pre>
-    <h3 class="doc-subheader">model을 생성/변경하면 migration을 수행해야함</h3>
-    <pre>python manage.py makemigrations
-python manage.py migrate</pre>
-<pre># 실행된 migration 확인
-python manage.py sqlmigrate blog 0001</pre>
-<pre>## manage.py 환경을 수용한 shell 실행
+</pre>
+        <h3 class="doc-subheader">model을 생성/변경하면 migration을 수행해야함</h3>
+<pre>python manage.py makemigrations
+python manage.py migrate
+# 실행된 migration 확인
+python manage.py sqlmigrate blog 0001
+## manage.py 환경을 수용한 shell 실행
 python manage.py shell
 ## db 용 shell 실행(db에 연결)
 python manage.py dbshell</pre>
-</section>
+    </section>
 
-<section class="doc-section">
-    <h2 class="doc-header">화면 이쁘게 해주는 crispy 설정</h2>
-    <pre>pip install crispy-bootstrap5
+    <section class="doc-section">
+        <h2 class="doc-header">화면 이쁘게 해주는 crispy 설정</h2>
+<pre>pip install crispy-bootstrap5
 # settings.py에 추가
 INSTALLED_APPS = (
     ...
@@ -141,70 +141,69 @@ INSTALLED_APPS = (
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"  </pre>
-</section>
-<section class="doc-section">
-<h2 class="doc-header">db 설정</h2>
-    <h3 class="doc-subheader">postgresql 설치하고, pg_hba.conf 설정하고, 원격접속 password 설정</h3>
-    <pre>sudo -u postgres psql
-    ALTER USER postgres WITH PASSWORD '새_비밀번호';
-    sudo nano /etc/postgresql/16/main/pg_hba.conf  # version 을 실제 버전에 맞게 변경
+    </section>
+    <section class="doc-section">
+    <h2 class="doc-header">db 설정</h2>
+        <h3 class="doc-subheader">postgresql 설치하고, pg_hba.conf 설정하고, 원격접속 password 설정</h3>
+<pre>sudo -u postgres psql
+ALTER USER postgres WITH PASSWORD '새_비밀번호';
+sudo nano /etc/postgresql/16/main/pg_hba.conf  # version 을 실제 버전에 맞게 변경
 
-    TYPE  DATABASE  USER    ADDRESS         METHOD
-    host    all       all     127.0.0.1/32    md5
-    아래 ip도 추가
-    host    all             all             172.31.16.1/32            md5
+TYPE  DATABASE  USER    ADDRESS         METHOD
+host    all       all     127.0.0.1/32    md5
+아래 ip도 추가
+host    all             all             172.31.16.1/32            md5
 
-    sudo vi /etc/postgresql/16/main/postgresql.conf
-    password_encryption = md5
-    listen_addresses = '*'          # what IP address(es) to listen on;
+sudo vi /etc/postgresql/16/main/postgresql.conf
+password_encryption = md5
+listen_addresses = '*'          # what IP address(es) to listen on;
 
-    sudo systemctl restart postgresql
+sudo systemctl restart postgresql
 
-    - 연결 시험
-    psql -h localhost -U postgres -W
-    python manage.py migrate</pre>
-</section>
-<section class="doc-section">
-    <h2 class="doc-header">reportlab 설치</h2>
-    <pre>pip install reportlab 이러면 안되고 
-        python -m pip install reportlab 이렇게 해야함</pre>
+- 연결 시험
+psql -h localhost -U postgres -W
+python manage.py migrate</pre>
+    </section>
+    <section class="doc-section">
+        <h2 class="doc-header">reportlab 설치</h2>
+<pre>pip install reportlab 이러면 안되고 
+python -m pip install reportlab 이렇게 해야함</pre>
     
         <h3 class="doc-subheader">urls.py 설정</h3>
-    <pre>from django.conf import settings
-    from django.conf.urls import include
-    if settings.DEBUG:
-        import debug_toolbar
-        urlpatterns = [
-            path('__debug__/', include(debug_toolbar.urls)),
-        ] + urlpatterns
+<pre>from django.conf import settings
+from django.conf.urls import include
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns
     </pre>  
-</section>
-<section class="doc-section">
-    <h2 class="doc-header">json 파일을 db에 적용하기</h2>
-    <pre>import json
-    with open('blog/post_data.json', 'r') as f:
-    posts_json = json.load(f)
-    for p in posts_json:
-    post = Post(title=p['title'], content=p['content'], author_id = p['user_id'])
-    post.save() </pre>
-</section>
+    </section>
+    <section class="doc-section">
+        <h2 class="doc-header">json 파일을 db에 적용하기</h2>
+<pre>import json
+with open('blog/post_data.json', 'r') as f:
+posts_json = json.load(f)
+for p in posts_json:
+post = Post(title=p['title'], content=p['content'], author_id = p['user_id'])
+post.save() </pre>
+    </section>
 
+    <section class="doc-section">
+        <h2 class="doc-header">사용자 정의 py 를 생성해서 template에 적용하기</h2>
+<pre>app/templatetags/nav_tag.py # 폴더에 __init__.py 생성
+from django import template
 
-<section class="doc-section">
-    <h2 class="doc-header">사용자 정의 py 를 생성해서 template에 적용하기</h2>
-    <pre>app/templatetags/nav_tag.py # 폴더에 __init__.py 생성
-    from django import template
-    
-    register = template.Library()
-    
-    @register.simple_tag(takes_context=True)
-    def is_active(context, url_pattern):
-    request = context['request']
-    if url_pattern in request.path:
-        return 'active'
-    return ''
+register = template.Library()
+
+@register.simple_tag(takes_context=True)
+def is_active(context, url_pattern):
+request = context['request']
+if url_pattern in request.path:
+    return 'active'
+return ''
     </pre>
-    <h3 class="doc-subheader">template에서 사용하기</h3>
+        <h3 class="doc-subheader">template에서 사용하기</h3>
     &#123;% load nav_tags %&#125;
     <xmp><div class="container d-flex flex-column align-items-start">
     <div class="text-white text-center mx-auto border-bottom w-100" 
@@ -218,7 +217,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"  </pre>
         <a class="list-group-item list-group-item-action &#123;% is_active '/idol/' %}" 
             href="/idol/">Idol</a>
     </xmp>            
-</section>
+    </section>
 </div>
 
 {% endblock %}

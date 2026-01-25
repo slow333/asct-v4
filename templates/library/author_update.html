@@ -1,0 +1,18 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title %} 작가 수정하기 {% endblock %}
+{% block content %}
+{% include 'library/_nav.html' %}
+<section>
+    <h1>작가 수정하기</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</section>
+<div class="card-footer">
+    <a href="{% url 'library:books' %}" class="btn btn-primary btn-sm">Go List</a>
+    <a href="javascript:history.back()" class="btn btn-secondary btn-sm">Go Back</a>
+</div>
+{% endblock %}

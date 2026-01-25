@@ -1,0 +1,93 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title %} Local Library Catalog Home {% endblock %}
+{% block content %}
+{% include 'library/_nav.html' %}
+<div class="container">
+    <!-- Book Info Card -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white p-4">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h1 class="display-6 fw-bold mb-2">{{ book.title }}</h1>
+                    <h5 class="text-muted mb-0">
+                        By 
+                        {% if book.author %}
+                        <a href="{% url 'library:author-detail' book.author.pk %}" class="text-decoration-none">{{ book.author }}</a>
+                        {% else %}
+                        Unknown
+                        {% endif %}
+                    </h5>
+                </div>
+                <span class="badge bg-light text-dark border fs-6">ISBN: {{ book.isbn }}</span>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <div class="mb-4">
+                <h5 class="fw-bold">Summary</h5>
+                <p class="card-text">{{ book.summary }}</p>
+            </div>
+            
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <strong>Language:</strong> {{ book.language }}
+                </div>
+                <div class="col-md-6">
+                    <strong>Genre:</strong> 
+                    {% for genre in book.genre.all %} 
+                        <span class="badge bg-secondary">{{ genre }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-light p-3 d-flex justify-content-end gap-2">
+            <a href="{% url 'library:books' %}" class="btn btn-outline-secondary btn-sm">Go List</a>
+            <a href="{% url 'library:books' %}" onclick="history.back(); return false;" class="btn btn-outline-secondary btn-sm">Go Back</a>
+            <a href="{% url 'library:book-update' book.id %}" class="btn btn-outline-primary btn-sm">Edit Book</a>
+            <a href="{% url 'library:book-delete' book.id %}" class="btn btn-outline-danger btn-sm" onclick="return confirm('삭제할 까요 ?')">Delete Book</a>
+        </div>
+    </div>
+
+    <!-- Book Instances Section -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0"><i class="bi bi-collection me-2"></i>Book Instances</h3>
+        <a href="{% url 'library:bookinstance-create' book.id %}" class="btn btn-success btn-sm">
+            <i class="bi bi-plus-lg me-1"></i>Add Copy
+        </a>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+        {% if book.bookinstance_set.all %}
+            {% for copy in book.bookinstance_set.all %}
+            <div class="col">
+                <div class="card h-100 border-start border-4 {% if copy.status == 'a' %}border-success{% elif copy.status == 'm' %}border-danger{% else %}border-warning{% endif %} shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="badge {% if copy.status == 'a' %}bg-success{% elif copy.status == 'm' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                                {{ copy.get_status_display }}
+                            </span>
+                            <small class="text-muted text-truncate" style="max-width: 100px;" title="{{ copy.id }}">{{ copy.id }}</small>
+                        </div>
+                        <p class="card-text mb-1"><strong>Imprint:</strong> {{ copy.imprint }}</p>
+                        {% if copy.status != 'a' %}
+                            <p class="card-text text-danger"><small><strong>Due back:</strong> {{ copy.due_back }}</small></p>
+                        {% else %}
+                            <p class="card-text text-success"><small>Available for loan</small></p>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0 text-end">
+                        <a href="{% url 'library:bookinstance-detail' copy.id %}" class="btn btn-sm btn-outline-secondary">Manage</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>No copies of this book are currently in the library.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

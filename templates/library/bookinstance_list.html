@@ -1,0 +1,80 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title %} Local Library Catalog Home {% endblock %}
+{% block content %}
+{% include 'library/_nav.html' %}
+<div class="container mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">
+            {% if request.resolver_match.url_name == 'bookinstance-available' %}
+            <i class="bi bi-check-circle-fill me-2 text-success"></i>Available Book Instances
+            {% else %}
+            <i class="bi bi-list-ul me-4"></i>Book Instance List
+            {% endif %}
+        </h1>
+        {% if page_obj %}
+        <span class="badge bg-primary rounded-pill">{{ page_obj.paginator.count }} Copies</span>
+        {% endif %}
+    </div>
+<style>
+    table tr td, th {
+        text-align: center;
+    }
+</style>
+    {% if page_obj %}
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr class="text-center">
+                            <th scope="col" class="ps-4 py-3">Book Title</th>
+                            <th scope="col" class="py-3">Status</th>
+                            <th scope="col" class="py-3">Due Back</th>
+                            <th scope="col" class="text-end pe-4 py-3">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bookinstance in page_obj %}
+                        <tr>
+                            <td class="ps-4 text-start">
+                                <div class="fw-bold">{{ bookinstance.book.title }}</div>
+                                <small class="text-muted">{{ bookinstance.imprint }}</small>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge rounded-pill 
+                                    {% if bookinstance.status == 'a' %}bg-success
+                                    {% elif bookinstance.status == 'm' %}bg-danger
+                                    {% elif bookinstance.status == 'o' %}bg-warning text-dark
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ bookinstance.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                {% if bookinstance.status != 'a' and bookinstance.due_back %}
+                                    <span class="{% if bookinstance.is_overdue %}text-danger fw-bold{% endif %}">
+                                        {{ bookinstance.due_back }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <a href="{% url 'library:bookinstance-detail' bookinstance.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-warning text-center" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>There are no book copies in the library.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

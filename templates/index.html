@@ -3,18 +3,14 @@
 {% block title %} Home - ASCTool {% endblock %}
 
 {% block content %}
-<style>
-    .hero-gradient {
-        background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%);
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/apps-style.css' %}">
 <div class="container py-1">
     <!-- Hero Section -->
-    <div class="p-5 mb-4 rounded-3 shadow-sm border hero-gradient">
+    <div class="px-5 py-4 mb-4 rounded-3 shadow-sm border hero-gradient">
         <div class="container-fluid py-1">
             <h1 class="display-6 fw-bold text-primary">Automated System Check Tool</h1>
             <p class="fs-5 text-muted text-center">시스템 점검, 일정 관리, 그리고 기술 문서를 한곳에서 효율적으로 관리하세요.</p>
-            <p class="fs-6 text-muted text-center">소셜 로그인(네이버)가 적용되어 있습니다.</p>
+            <p class="fs-6 text-muted text-center">소셜 로그인(네이버)과 세션(cart)가 적용되어 있습니다.</p>
             <div class="mt-4 text-center">
                 <a class="btn btn-glass-primary btn-md me-2" href="{% url 'project-intro' %}" role="button"><i class="bi bi-info-circle me-2"></i>프로젝트 소개</a>
                 <a class="btn btn-glass-secondary btn-md" href="{% url 'django-tips' %}" role="button"><i class="bi bi-book me-2"></i>개발 문서</a>
@@ -23,75 +19,75 @@
     </div>
 
     <!-- Main Applications -->
-    <div class="row align-items-md-stretch mb-2">
-        <div class="col-md-8 mb-3">
+    <div class="row align-items-md-stretch mb-3">
+        <div class="col-md-8 ">
             <div class="h-100 p-4 glass-card rounded-3 shadow-sm position-relative overflow-hidden">
                 <h2 class="position-relative z-1 mt-0 pt-0">ASCT</h2>
                 <p class="position-relative z-1">시스템의 자원을 수집하여 분석하기 위한 어플리케이션 입니다.</p>
                 <a class="btn btn-outline-success z-1 mt-4" 
                     href="{% url 'asct:index' %}">ASCT 바로가기</a>
-                <i class="bi bi-speedometer position-absolute bottom-0 end-0 mb-n2 me-3 text-secondary" style="font-size: 6rem; opacity: 0.25;"></i>
+                <i class="bi bi-speedometer position-absolute bottom-0 end-0 mb-n2 me-3 text-secondary bi-bg"></i>
             </div>
         </div>
-        <div class="col-md-4 mb-3">
+        <div class="col-md-4 ">
             <div class="h-100 p-4 glass-card rounded-3 shadow-sm position-relative overflow-hidden">
                 <h2 class="position-relative z-1 mt-0 pt-0">Techs</h2>
                 <p class="position-relative z-1">Linux 시스템의 CPU, Memory, Disk 정보를 수집하여 분석합니다.</p>
                 <a class="btn btn-outline-success z-1" 
                     href="#">Techs 바로가기</a>
-                <i class="bi bi-list-check position-absolute bottom-0 end-0 mb-n2 me-3 text-secondary" style="font-size: 6rem; opacity: 0.2;"></i>
+                <i class="bi bi-list-check position-absolute bottom-0 end-0 mb-n2 me-3 text-secondary bi-bg"></i>
             </div>
         </div>
     </div>
 
-    <div class="row align-items-md-stretch mb-2">
-        <div class="col-md-8 mb-3">
+    <div class="row align-items-md-stretch mb-3">
+        <div class="col-md-8">
             <div class="h-100 p-4 glass-card rounded-3 shadow-sm position-relative overflow-hidden">
                 <h2 class="position-relative z-1 mt-0 pt-0">Events</h2>
                 <p class="position-relative z-1 text-muted">일정을 관리하고 이벤트를 생성하세요. 참석자 관리 및 장소 예약이 가능합니다.<br>참여자에 대해 사진을 관리합니다.</p>
                 <a class="btn btn-outline-primary z-1 mt-4" 
                     href="/apps/events/">이벤트 바로가기</a>
-                <i class="bi bi-calendar-event position-absolute bottom-0 end-0 mb-n2 me-3 text-secondary" style="font-size: 6rem; opacity: 0.1;"></i>
+                <i class="bi bi-calendar-event position-absolute bottom-0 end-0 mb-n2 me-3 text-secondary bi-bg"></i>
             </div>
         </div>
-        <div class="col-md-4 mb-3">
+        <div class="col-md-4">
             <div class="h-100 p-4 glass-card rounded-3 shadow-sm position-relative overflow-hidden">
                 <h2 class="position-relative z-1 mt-0 pt-0">Favorite</h2>
                 <p class="position-relative z-1">참여자의 사진을 올리고 관리합니다.</p>
                 <a class="btn btn-outline-secondary z-1 mt-5" 
                 href="{% url 'events:favorites-list' %}">Favorites 바로가기</a>
-                <i class="bi bi-images position-absolute bottom-0 end-0 mb-n2 me-3 text-secondary" style="font-size: 6rem; opacity: 0.1;"></i>
+                <i class="bi bi-images position-absolute bottom-0 end-0 mb-n2 me-3 text-secondary bi-bg"></i>
             </div>
         </div>
     </div>
-    <div class="row align-items-md-stretch mb-2">
-        <div class="col-md-8 mb-3">
+    <div class="row align-items-md-stretch mb-3">
+        <div class="col-md-8">
             <div class="h-100 p-4 glass-card rounded-3 shadow-sm position-relative overflow-hidden">
                 <h2 class="position-relative z-1 mt-0 pt-0">Blog</h2>
                 <p class="position-relative z-1">최신 소식과 기술 블로그 포스트를 확인하세요. 지식을 공유합니다.<br>블로그 포스트 내에서 Poll을 수행합니다.</p>
                 <a class="btn btn-outline-primary z-1" 
                     href="/apps/blog/">블로그 바로가기</a>
-                <i class="bi bi-journal-text position-absolute bottom-0 end-0 mb-n2 me-3 text-secondary" style="font-size: 6rem; opacity: 0.1;"></i>
+                <i class="bi bi-journal-text position-absolute bottom-0 end-0 mb-n2 me-3 text-secondary bi-bg"></i>
             </div>
         </div>
-        <div class="col-md-4 mb-3">
+        <div class="col-md-4">
             <div class="h-100 p-4 glass-card rounded-3 shadow-sm position-relative overflow-hidden" >
                 <h2 class="position-relative z-1 mt-0 pt-0">Polls</h2>
                 <p class="position-relative z-1 text-muted">설문조사에 참여하고 결과를 확인하세요.</p>
                 <a class="btn btn-outline-primary z-1" 
                     href="/apps/polls/">설문조사 바로가기</a>
-                <i class="bi bi-bar-chart-line position-absolute bottom-0 end-0 mb-n2 me-3 text-secondary" style="font-size: 6rem; opacity: 0.1;"></i>
+                <i class="bi bi-bar-chart-line position-absolute bottom-0 end-0 mb-n2 me-3 text-secondary bi-bg"></i>
             </div>
         </div>
     </div>
-    <div class="row align-items-md-stretch mb-5">
+    <div class="row align-items-md-stretch mb-4">
         <div class="col-md-6 mb-3">
             <div class="h-100 p-4 glass-card rounded-3 shadow-sm position-relative overflow-hidden">
                 <h2 class="position-relative z-1 mt-0 pt-0">Store</h2>
                 <p class="position-relative z-1">쇼핑 몰에 관련된 앱입니다..</p>
                 <a class="btn btn-outline-primary z-1" 
                     href="#">스토어 바로가기</a>
-                <i class="bi bi-journal-text position-absolute bottom-0 end-0 mb-n2 me-3 text-secondary" style="font-size: 6rem; opacity: 0.1;"></i>
+                <i class="bi bi-journal-text position-absolute bottom-0 end-0 mb-n2 me-3 text-secondary bi-bg"></i>
             </div>
         </div>
         <div class="col-md-6 mb-3">
@@ -100,7 +96,7 @@
                 <p class="position-relative z-1 text-muted">도서관 관리 앱입니다. 소규모 도서관에 적합합니다.</p>
                 <a class="btn btn-outline-primary z-1" 
                     href="#">도서관 관리앱 바로가기</a>
-                <i class="bi bi-book position-absolute bottom-0 end-0 mb-n2 me-3 text-secondary" style="font-size: 6rem; opacity: 0.1;"></i>
+                <i class="bi bi-book position-absolute bottom-0 end-0 mb-n2 me-3 text-secondary bi-bg"></i>
             </div>
         </div>
     </div>

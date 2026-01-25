@@ -18,7 +18,7 @@ urlpatterns = [
     path('apps/polls/', include('polls.urls')),
     path('apps/events/', include('events.urls')),
     path('apps/eshop/', include('eshop.urls')),
-    # path('apps/library/', include('library.urls')),
+    path('apps/library/', include('library.urls')),
 ]
 
 if settings.DEBUG:

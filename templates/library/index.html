@@ -1,0 +1,99 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title %} 도서관 관리 앱 {% endblock %}
+{% block content %}
+{% include 'library/_nav.html' %}
+<div class="container">
+    <h1 class="fst-italic">도서관 관리 시스템</h1>
+    <p class="lead my-3 text-center">도서관 관리 앱입니다! 보유하고 있는 책 목록과 대출 현황을 한눈에 확인하세요.</p>
+
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5 g-4 mb-5">
+        <!-- Books -->
+        <div class="col">
+            <div class="card h-100 shadow-sm border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0"><i class="bi bi-book me-2"></i>Books</h5>
+                </div>
+                <div class="card-body text-center">
+                    <h2 class="display-4 fw-bold text-primary">{{ num_books }}</h2>
+                    <p class="card-text text-muted">Total Books</p>
+                </div>
+                <div class="card-footer bg-transparent border-top-0 text-center pb-3">
+                    <a href="{% url 'library:books' %}" class="btn btn-outline-primary btn-sm">View List</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Copies -->
+        <div class="col">
+            <div class="card h-100 shadow-sm border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0"><i class="bi bi-files me-2"></i>Copies</h5>
+                </div>
+                <div class="card-body text-center">
+                    <h2 class="display-4 fw-bold text-success">{{ num_instances }}</h2>
+                    <p class="card-text text-muted">Total Copies</p>
+                </div>
+                <div class="card-footer bg-transparent border-top-0 text-center pb-3">
+                    <a href="{% url 'library:bookinstances' %}" class="btn btn-outline-success btn-sm">View Instances</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Available -->
+        <div class="col">
+            <div class="card h-100 shadow-sm border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0"><i class="bi bi-check-circle me-2"></i>Available</h5>
+                </div>
+                <div class="card-body text-center">
+                    <h2 class="display-4 fw-bold text-info">{{ num_instances_available }}</h2>
+                    <p class="card-text text-muted">Copies Available</p>
+                </div>
+                <div class="card-footer bg-transparent border-top-0 text-center pb-3">
+                    <a href="{% url 'library:bookinstance-available' %}" class="btn btn-outline-info btn-sm">View Available</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Authors -->
+        <div class="col">
+            <div class="card h-100 shadow-sm border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="card-title mb-0"><i class="bi bi-person me-2"></i>Authors</h5>
+                </div>
+                <div class="card-body text-center">
+                    <h2 class="display-4 fw-bold text-warning">{{ num_authors }}</h2>
+                    <p class="card-text text-muted">Total Authors</p>
+                </div>
+                <div class="card-footer bg-transparent border-top-0 text-center pb-3">
+                    <a href="{% url 'library:authors' %}" class="btn btn-outline-warning btn-sm">View Authors</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visits -->
+        <div class="col">
+            <div class="card h-100 shadow-sm border-secondary">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="card-title mb-0"><i class="bi bi-eye me-2"></i>Visits</h5>
+                </div>
+                <div class="card-body text-center">
+                    <h2 class="display-4 fw-bold text-secondary">{{ num_visits }}</h2>
+                    <p class="card-text text-muted">Total Visits</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-5">
+        <div class="card-header">
+            <h4 class="mb-0">Local Library UML Diagram</h4>
+        </div>
+        <div class="card-body text-center">
+            <img src="{% static 'images/library/local_library_model_uml.png' %}" alt="UML diagram" class="img-fluid rounded" width="100%" height="100%">
+        </div>
+    </div>
+</div>
+
+{% endblock %}

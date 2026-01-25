@@ -18,10 +18,8 @@
                 <a class="sidebar-link {% is_active '/events/' %}" href="{% url 'events:index' %}">
                     <i class="bi bi-calendar2-event sidebar-icon"></i> Events</a>
                 <a class="sidebar-link {% is_active '/eshop/' %}" href="{% url 'eshop:product_list' %}"> <i class="bi bi-shop sidebar-icon"></i> e-Shop</a>
-                {% comment %}
                 <a class="sidebar-link {% is_active '/library/' %}" href="{% url 'library:index' %}">
                     <i class="bi bi-journals sidebar-icon"></i> Library</a>
-                {% endcomment %}
             </div>
         </div>
     </div>

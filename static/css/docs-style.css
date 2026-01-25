@@ -32,3 +32,11 @@
 .note-box { 
     background-color: #e7f1ff; border-left: 4px solid #0d6efd; padding: 1rem; margin-bottom: 1.5rem; border-radius: 0.25rem; 
 }
+.docs-nav-home {
+    color:aliceblue; 
+    background: #5052cc; 
+    height:2rem; 
+    margin:6px 6px 0 6px; 
+    padding:3px 6px 0 6px;
+    border-radius: 4px;
+}

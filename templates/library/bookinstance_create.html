@@ -1,0 +1,14 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title %} 책상태 생성하기 {% endblock %}
+{% block content %}
+{% include 'library/_nav.html' %}
+<section>
+    <h1>책상태 생성하기</h1>
+    <form action="" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</section>
+{% endblock %}

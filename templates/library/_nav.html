@@ -1,0 +1,38 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/apps-style.css' %}">
+
+<nav class="navbar navbar-expand-lg navbar-light mb-4 rounded-3 shadow-sm p-2  custom-nav-bg z-3 nav_custom">
+    <div class="container-fluid d-flex align-items-center">
+        <a class="navbar-brand" href="{% url 'library:index' %}">Library</a>
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Book </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'library:books' %}">Books</a></li>
+                    <li><a class="dropdown-item" href="{% url 'library:book-create' %}">Create Books</a></li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Author </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'library:authors' %}">Authors</a></li>
+                    <li><a class="dropdown-item" href="{% url 'library:author-create' %}">Create Author</a></li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Book Instance </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'library:bookinstances' %}">Book Instances</a></li>
+                    <li><a class="dropdown-item" href="{% url 'library:bookinstance-available' %}">Book Available</a></li>
+                    <li><a class="dropdown-item" href="{% url 'library:bookinstance-create' %}">Create Book Instance</a></li>
+                </ul>
+            </li>
+        </ul>
+        <span class="me-3 text-info">{{page_obj.paginator.count}}</span>
+        <form class="d-flex rounded-3 mb-0" role="search" action="{% url 'library:books' %}">
+            <input class="form-control me-2 py-1" type="search" placeholder="Search books" name='searched' value="{{ searched|default:'' }}"/>
+            <button class="btn btn-outline-success btn-sm py-1 me-2" type="submit">Search</button>
+            <a href="{% url 'library:books' %}" class="btn btn-outline-secondary btn-sm py-1">Cancel</a>
+        </form>
+    </div>
+</nav>

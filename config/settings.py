@@ -24,7 +24,7 @@ INSTALLED_APPS = [
     'polls',
     'events',
     'eshop',
-    # 'library',
+    'library',
     
     # Third-party apps
     "debug_toolbar",

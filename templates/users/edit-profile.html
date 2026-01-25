@@ -13,7 +13,7 @@
 
                 <div class="d-flex align-items-center justify-content-center mb-4">
                 {% if user.profile.image %}
-                    <img src="{{ user.profile.image.url }}" class="rounded-circle border shadow-sm" width="120" height="120" style="object-fit: cover;">
+                    <img src="{{ user.profile.image.url }}" class="rounded-circle border shadow-sm object-fit-cover" width="120" height="120" alter="사진">
                 {% else %}
                     <div class="rounded-circle border shadow-sm bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
                         <i class="bi bi-person text-secondary fs-1"></i>

@@ -1,4 +1,8 @@
-<nav class="navbar navbar-expand-lg navbar-light mb-4 rounded-3 shadow-sm p-2 position-relative z-3" style="background-color: rgba(255, 255, 255, 0.45); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.4);">
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/events-style.css' %}">
+<link rel="stylesheet" href="{% static 'css/apps-style.css' %}">
+
+<nav class="navbar navbar-expand-lg navbar-light mb-4 rounded-3 shadow-sm p-2 position-relative z-3 nav_custom">
     <div class="container-fluid">
         <a class="navbar-brand fw-bold text-primary" href="{% url 'events:index' %}">
             <i class="bi bi-calendar-check me-2"></i>달력</a>
@@ -34,12 +38,12 @@
             </li>
         </ul>
 
-        <form class="d-flex" role="search" action="{% url 'events:events-list' %}">
+        <form class="d-flex mb-0" role="search" action="{% url 'events:events-list' %}">
             <input class="form-control me-2 py-1" type="search" 
                 placeholder="Search events..." name='searched' />
             <button class="btn btn-outline-success btn-sm" type="submit">Search</button>
         </form>
-        <form class="d-flex" role="search" action="{% url 'events:favorites-list' %}">
+        <form class="d-flex mb-0" role="search" action="{% url 'events:favorites-list' %}">
             <input class="form-control me-2 py-1" type="search" 
                 placeholder="photos..." name='searched' />
             <button class="btn btn-outline-info btn-sm" type="submit">Search</button>

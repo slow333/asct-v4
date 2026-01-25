@@ -1,0 +1,67 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title %} Author Detail - {{ author.last_name }} {{ author.first_name }} {% endblock %}
+{% block content %}
+{% include 'library/_nav.html' %}
+<div class="container">
+    <!-- Author Info Card -->
+    <div class="card shadow-sm mb-5">
+        <div class="card-header bg-white p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="display-6 fw-bold mb-0">
+                    <i class="bi bi-person-circle me-2 text-primary"></i>
+                    {{ author.first_name }} {{ author.last_name }} 
+                </h1>
+                {% if author.date_of_birth %}
+                <span class="badge bg-light text-dark border fs-6">
+                    <i class="bi bi-calendar3 me-2"></i>
+                    {{ author.date_of_birth }} ~ {{ author.date_of_death|default:"Present" }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-footer bg-light p-3 d-flex justify-content-end gap-2">
+            <a href="{% url 'library:authors' %}" class="btn btn-outline-secondary btn-sm">Go List</a>
+            <a  href="{% url 'library:authors' %}" onclick="javascript:history.back(); return false;" class="btn btn-outline-secondary btn-sm">Go Back</a>
+            <a href="{% url 'library:author-update' author.id %}" class="btn btn-outline-primary btn-sm">Edit Author</a>
+            <a href="{% url 'library:author-delete' author.id %}" class="btn btn-outline-danger btn-sm" onclick="return confirm('삭제할 까요 ?')">Delete Author</a>
+        </div>
+    </div>
+
+    <!-- Author's Books Section -->
+    <div class="d-flex align-items-center mb-4">
+        <h3 class="mb-0"><i class="bi bi-journal-text me-2"></i>Author's Books</h3>
+        <span class="badge bg-secondary ms-2">{{ author.book_set.count }}</span>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+        {% if author.book_set.all %}
+            {% for book in author.book_set.all %}
+            <div class="col">
+                <div class="card h-100 shadow-sm hover-shadow">
+                    <div class="card-body">
+                        <h5 class="card-title text-truncate">
+                            <a href="{% url 'library:book-detail' book.id %}" class="text-decoration-none text-dark stretched-link">
+                                {{ book.title }}
+                            </a>
+                        </h5>
+                        <p class="card-text text-muted small mb-3">
+                            {{ book.summary|default:"No summary available."|truncatechars:100 }}
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0 text-end">
+                        <a href="{% url 'library:book-detail' book.id %}" class="btn btn-sm btn-outline-primary position-relative z-2">View Book</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>This author has no books in the library yet.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

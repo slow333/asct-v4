@@ -1,1 +1,0 @@
-INSERT INTO asct_sshinfo (login_id, ip, password) VALUES()

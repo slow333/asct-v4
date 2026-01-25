@@ -37,11 +37,9 @@
                 <li class="nav-item">
                     <a class="nav-link px-3 {% if '/eshop/' in request.path %} active text-primary {% endif %}" href="{% url 'eshop:product_list' %}">e-Shop</a>
                 </li>
-                {% comment %}
                 <li class="nav-item">
                     <a class="nav-link px-3 {% if '/library/' in request.path %} active text-primary {% endif %}" href="{% url 'library:index' %}">Library</a>
                 </li>
-                {% endcomment %}
             </ul>
 
             <ul class="navbar-nav ms-auto">

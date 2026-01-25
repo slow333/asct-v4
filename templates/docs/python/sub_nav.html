@@ -1,6 +1,9 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/docs-style.css' %}">
+
 <div class="mb-4">
     <ul class="nav nav-tabs">
-        <li style="color:aliceblue; background: #777; height:2rem; margin:6px 6px 0 6px; padding:3px 6px 0 6px;">Python</li>
+        <li class="docs-nav-home">Python</li>
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'docs-python-datatype' %}active fw-bold{% endif %}" href="{% url 'docs-python-datatype' %}">DataType</a>
         </li>
