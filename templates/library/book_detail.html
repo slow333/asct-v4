@@ -2,14 +2,14 @@
 {% load static %}
 {% block title %} Local Library Catalog Home {% endblock %}
 {% block content %}
-{% include 'library/_nav.html' %}
-<div class="container">
+<div class="container pt-3">
+    {% include 'library/_nav.html' %}
     <!-- Book Info Card -->
     <div class="card shadow-sm mb-3">
         <div class="card-header bg-white p-4">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <h1 class="display-6 fw-bold mb-2">{{ book.title }}</h1>
+                    <h1 class="display-6 fw-bold mb-2 text-secondary">{{ book.title }}</h1>
                     <h5 class="text-muted mb-0">
                         By 
                         {% if book.author %}
@@ -41,17 +41,17 @@
             </div>
         </div>
         <div class="card-footer bg-light p-3 d-flex justify-content-end gap-2">
-            <a href="{% url 'library:books' %}" class="btn btn-outline-secondary btn-sm">Go List</a>
-            <a href="{% url 'library:books' %}" onclick="history.back(); return false;" class="btn btn-outline-secondary btn-sm">Go Back</a>
-            <a href="{% url 'library:book-update' book.id %}" class="btn btn-outline-primary btn-sm">Edit Book</a>
-            <a href="{% url 'library:book-delete' book.id %}" class="btn btn-outline-danger btn-sm" onclick="return confirm('삭제할 까요 ?')">Delete Book</a>
+            <a href="{% url 'library:books' %}" class="btn btn-outline-secondary">Go List</a>
+            <a href="{% url 'library:books' %}" onclick="history.back(); return false;" class="btn btn-outline-secondary">Go Back</a>
+            <a href="{% url 'library:book-update' book.id %}" class="btn btn-outline-primary">Edit Book</a>
+            <a href="{% url 'library:book-delete' book.id %}" class="btn btn-outline-danger" onclick="return confirm('삭제할 까요 ?')">Delete Book</a>
         </div>
     </div>
 
     <!-- Book Instances Section -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3 class="mb-0"><i class="bi bi-collection me-2"></i>Book Instances</h3>
-        <a href="{% url 'library:bookinstance-create' book.id %}" class="btn btn-success btn-sm">
+        <a href="{% url 'library:bookinstance-create' book.id %}" class="btn btn-success">
             <i class="bi bi-plus-lg me-1"></i>Add Copy
         </a>
     </div>
@@ -76,7 +76,7 @@
                         {% endif %}
                     </div>
                     <div class="card-footer bg-transparent border-top-0 text-end">
-                        <a href="{% url 'library:bookinstance-detail' copy.id %}" class="btn btn-sm btn-outline-secondary">Manage</a>
+                        <a href="{% url 'library:bookinstance-detail' copy.id %}" class="btn btn-outline-secondary">Manage</a>
                     </div>
                 </div>
             </div>

@@ -4,13 +4,13 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/apps-style.css' %}">
-<div class="container py-1">
+<div class="container pt-3">
     <!-- Hero Section -->
     <div class="px-5 py-4 mb-4 rounded-3 shadow-sm border hero-gradient">
         <div class="container-fluid py-1">
-            <h1 class="display-6 fw-bold text-primary">Automated System Check Tool</h1>
-            <p class="fs-5 text-muted text-center">시스템 점검, 일정 관리, 그리고 기술 문서를 한곳에서 효율적으로 관리하세요.</p>
-            <p class="fs-6 text-muted text-center">소셜 로그인(네이버)과 세션(cart)가 적용되어 있습니다.</p>
+            <h1 class="display-6 fw-bold text-white">Automated System Check Tool</h1>
+            <p class="fs-5 text-black text-center">시스템 점검, 일정 관리, 그리고 기술 문서를 한곳에서 효율적으로 관리하세요.</p>
+            <p class="fs-6 text-white text-center">소셜 로그인(네이버)과 세션(cart)가 적용되어 있습니다.</p>
             <div class="mt-4 text-center">
                 <a class="btn btn-glass-primary btn-md me-2" href="{% url 'project-intro' %}" role="button"><i class="bi bi-info-circle me-2"></i>프로젝트 소개</a>
                 <a class="btn btn-glass-secondary btn-md" href="{% url 'django-tips' %}" role="button"><i class="bi bi-book me-2"></i>개발 문서</a>
@@ -101,8 +101,8 @@
         </div>
     </div>
 
-    <h3 class="pb-2 border-bottom mb-4 text-secondary"><i class="bi bi-collection me-2"></i>Technical Documentation</h3>
-    <div class="row g-4 row-cols-1 row-cols-lg-3 mb-5">
+    <h3 class="pb-2 border-bottom mb-4 text-white"><i class="bi bi-collection me-2"></i>Technical Documentation</h3>
+    <div class="row g-4 row-cols-1 row-cols-lg-3 mb-3">
         <div class="col">
             <div class="card h-100 border-0 shadow-sm hover-shadow transition-all glass-card">
                 <div class="card-body">
@@ -190,6 +190,7 @@
         </div>
     </div>
 
+    <hr>
     <!-- Developer Guidelines Section -->
     <div class="p-4 mb-4 glass-card rounded-3 shadow-sm">
         <h4 class="fw-bold text-dark mb-3 border-bottom pb-2"><i class="bi bi-clipboard-check me-2"></i>Project Guidelines</h4>

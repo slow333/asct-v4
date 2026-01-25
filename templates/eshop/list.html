@@ -3,41 +3,44 @@
 {% block title %}Events List{% endblock %}
 
 {% block content %}
-{% include 'eshop/_nav.html' %}
 
-<div class="d-flex">
-    <div class="row justify-content-center mb-3">
-        <div class="alert alert-primary d-flex align-items-center fs-4 fw-bold py-1 w-96 ">
-            {% if current_category %} {{ current_category.name }} 
-            {% else %} All {% endif %}
-        </div>
-        {% for product in page_obj %}
-        <div class="col-lg-4 mb-3">
-            <div class="card border-0 shadow-sm glass-card hover-shadow transition-all">
-                <div class="card-body d-flex flex-column">
-                    <div class="d-flex justify-content-between mb-3">
-                        <div>
-                            <h5 class="card-title">{{product.name}}</h5>
-                            <p class="card-text text-muted small">{{product.made_by}}</p>
+<div class="container pt-4">
+    {% include 'eshop/_nav.html' %}
+
+    <div class="d-flex mt-3">
+        <div class="row justify-content-center mb-3">
+            <div class="alert alert-primary d-flex align-items-center fs-4 fw-bold py-1 w-96 ">
+                {% if current_category %} {{ current_category.name }} 
+                {% else %} All {% endif %}
+            </div>
+            {% for product in page_obj %}
+            <div class="col-lg-4 mb-3">
+                <div class="card border-0 shadow-sm glass-card hover-shadow transition-all">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between mb-3">
+                            <div>
+                                <h5 class="card-title">{{product.name}}</h5>
+                                <p class="card-text text-muted small">{{product.made_by}}</p>
+                            </div>
+                            <div class="w-50">
+                                <img src="{{product.image.url}}" alt="{{product.name}}" class="img-fluid rounded object-fit-cover" width="100%" height="100%">
+                            </div>
                         </div>
-                        <div class="w-50">
-                            <img src="{{product.image.url}}" alt="{{product.name}}" class="img-fluid rounded object-fit-cover" width="100%" height="100%">
+                        <p class="card-text text-muted small">{{product.description|truncatechars:40|linebreaksbr}}</p>
+                        {% comment %}
+                        {% endcomment %}
+                        <div class="mt-auto d-flex justify-content-between align-items-center">
+                            <span class="badge bg-secondary">￦{{product.price|floatformat:0|intcomma}}</span>
+                            <a href="{{ product.get_absolute_url }}?page={{ page_obj.number }}{% if current_category %}&category={{ current_category.name|urlencode }}{% endif %}" class="btn btn-primary btn-sm">제품 상세</a>
                         </div>
-                    </div>
-                    <p class="card-text text-muted small">{{product.description|truncatechars:40|linebreaksbr}}</p>
-                    {% comment %}
-                    {% endcomment %}
-                    <div class="mt-auto d-flex justify-content-between align-items-center">
-                        <span class="badge bg-secondary">￦{{product.price|floatformat:0|intcomma}}</span>
-                        <a href="{{ product.get_absolute_url }}?page={{ page_obj.number }}{% if current_category %}&category={{ current_category.name|urlencode }}{% endif %}" class="btn btn-primary btn-sm">제품 상세</a>
                     </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-    <div class="collapse" id="filters-sidebar">
-        {% include 'eshop/category_filter.html' %}
+        <div class="collapse" id="filters-sidebar">
+            {% include 'eshop/category_filter.html' %}
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -38,10 +38,10 @@
             </li>
         </ul>
 
-        <form class="d-flex mb-0" role="search" action="{% url 'events:events-list' %}">
+        <form class="d-flex mb-0 ms-3" role="search" action="{% url 'events:events-list' %}">
             <input class="form-control me-2 py-1" type="search" 
-                placeholder="Search events..." name='searched' />
-            <button class="btn btn-outline-success btn-sm" type="submit">Search</button>
+                placeholder="events..." name='searched' />
+            <button class="btn btn-outline-success btn-sm me-3" type="submit">Search</button>
         </form>
         <form class="d-flex mb-0" role="search" action="{% url 'events:favorites-list' %}">
             <input class="form-control me-2 py-1" type="search" 

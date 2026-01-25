@@ -2,13 +2,13 @@
 {% load static %}
 {% block title %} Author Detail - {{ author.last_name }} {{ author.first_name }} {% endblock %}
 {% block content %}
-{% include 'library/_nav.html' %}
-<div class="container">
+<div class="container pt-3">
+    {% include 'library/_nav.html' %}
     <!-- Author Info Card -->
-    <div class="card shadow-sm mb-5">
+    <div class="card shadow-sm mb-3">
         <div class="card-header bg-white p-4">
             <div class="d-flex justify-content-between align-items-center">
-                <h1 class="display-6 fw-bold mb-0">
+                <h1 class="display-6 fw-bold mb-0 text-secondary">
                     <i class="bi bi-person-circle me-2 text-primary"></i>
                     {{ author.first_name }} {{ author.last_name }} 
                 </h1>

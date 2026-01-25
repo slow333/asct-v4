@@ -2,20 +2,25 @@
 {% load static %}
 {% block title %} ASCT Home {% endblock %}
 {% block content %}
-<h1>About ASCT</h1>
-{% include 'asct/_nav.html' %}
-<section>
-    <h2>Models</h2>
-    <h3>naming : 모두 단수형으로(urls, models, functions)</h3>
-    <ul>
-        <li>Operator: User와 1:1 관계</li>
-        <li>Server SSH Access Info(SSHInfo) : id, password, ip address => Operator와 N:N</li>
-        <li>ServerInfo : hostname, ip, os-version, kernel, cpu info, total Memory</li>
-        <li>Command: SrvBasic, traffic, etc basic shell command</li>
-        <li>CPU USAGE(CpuUsage): cpu 사용량, 1달간, sar(sysstat)</li>
-        <li>Memory USAGE(MemoryUsage): Memory 사용량, 1달간, sar(sysstat)</li>
-        <li>Log Message</li>
-    </ul>
-    <img src="{% static 'images/asct-images/asct-db-model_1.png' %}" alt="ASCT DB Models" class="img-fluid mt-3">
-</section>
+<div class="container pt-3">
+    {% include 'asct/_nav.html' %}
+    <h1>About ASCT</h1>
+    <section>
+        <h2>Models</h2>
+        <h3>naming : 모두 단수형으로(urls, models, functions)</h3>
+        <ul>
+            <li>Operator: User와 1:1 관계</li>
+            <li>Server SSH Access Info(SSHInfo) : id, password, ip address => Operator와 N:N</li>
+            <li>ServerInfo : hostname, ip, os-version, kernel, cpu info, total Memory</li>
+            <li>Command: SrvBasic, traffic, etc basic shell command</li>
+            <li>CPU USAGE(CpuUsage): cpu 사용량, 1달간, sar(sysstat)</li>
+            <li>Memory USAGE(MemoryUsage): Memory 사용량, 1달간, sar(sysstat)</li>
+            <li>Log Message</li>
+        </ul>
+        <div class="p-3 border mt-4">
+            <img src="{% static 'images/asct-images/asct-db-model_1.png' %}" width="100%" height="100%" alt="ASCT DB Models" class="img-fluid mt-3">
+        </div>
+    </section>
+
+</div>
 {% endblock %}

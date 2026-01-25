@@ -3,32 +3,34 @@
 {% block title %} Create Event {% endblock %}
 
 {% block content %}
-<div class="d-flex align-items-center justify-content-between mb-4">
-    <h1 class="fw-bold text-primary"><i class="bi bi-calendar-plus me-2"></i>Create Event</h1>
-</div>
-
-{% include 'events/_nav.html' %}
-
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card border-0 shadow-sm glass-card mb-4">
-            <div class="card-body p-5">
-                <h4 class="card-title fw-bold mb-4 text-secondary">New Event Details</h4>
-                
-                <form action="{% url 'events:event-create' %}" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <div class="d-flex justify-content-end gap-2 mt-5">
-                        <a href="{% url 'events:events-list' %}" class="btn btn-glass-secondary rounded-pill px-4">
-                            <i class="bi bi-x-lg me-2"></i>Cancel
-                        </a>
-                        <button type="submit" class="btn btn-glass-primary rounded-pill px-4">
-                            <i class="bi bi-check-lg me-2"></i>Create Event
-                        </button>
-                    </div>
-                </form>
+<div class="container pt-3">
+    {% include 'events/_nav.html' %}
+    <div class="d-flex align-items-center justify-content-between mb-2">
+        <h1 class="fw-bold text-white"><i class="bi bi-calendar-plus me-2"></i>Create Event</h1>
+    </div>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-12">
+            <div class="card border-0 shadow-sm glass-card mb-4">
+                <div class="card-body p-5">
+                    <h4 class="card-title fw-bold mb-4 text-secondary">New Event Details</h4>
+                    
+                    <form action="{% url 'events:event-create' %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <div class="d-flex justify-content-end gap-2 mt-5">
+                            <a href="{% url 'events:events-list' %}" class="btn btn-glass-secondary rounded-pill px-4">
+                                <i class="bi bi-x-lg me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-glass-primary rounded-pill px-4">
+                                <i class="bi bi-check-lg me-2"></i>Create Event
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+
 </div>
 {% endblock %}

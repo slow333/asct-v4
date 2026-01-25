@@ -2,8 +2,8 @@
 {% load static %}
 {% block title %} 도서관 관리 앱 {% endblock %}
 {% block content %}
-{% include 'library/_nav.html' %}
-<div class="container">
+<div class="container pt-3">
+    {% include 'library/_nav.html' %}
     <h1 class="fst-italic">도서관 관리 시스템</h1>
     <p class="lead my-3 text-center">도서관 관리 앱입니다! 보유하고 있는 책 목록과 대출 현황을 한눈에 확인하세요.</p>
 
@@ -88,7 +88,7 @@
 
     <div class="card shadow-sm mb-5">
         <div class="card-header">
-            <h4 class="mb-0">Local Library UML Diagram</h4>
+            <h4 class="mb-0 text-secondary">Local Library UML Diagram</h4>
         </div>
         <div class="card-body text-center">
             <img src="{% static 'images/library/local_library_model_uml.png' %}" alt="UML diagram" class="img-fluid rounded" width="100%" height="100%">

@@ -1,9 +1,9 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/apps-style.css' %}">
 
-<nav class="navbar navbar-expand-lg navbar-light mb-4 rounded-3 shadow-sm p-2  custom-nav-bg">
-    <div class="container-fluid d-flex align-items-center">
-        <a class="navbar-brand" href="#">Home</a>
+<nav class="navbar navbar-expand-lg navbar-light mb-4 rounded-3 shadow-sm p-2 position-relative z-3 nav_custom">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold text-primary" href="#">Home</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
         <span class="navbar-toggler-icon"></span>
         </button>
@@ -16,9 +16,9 @@
             <li class="nav-item"><a class="nav-link" href="#">CPU</a></li>
             <li class="nav-item"><a class="nav-link" href="#">Memory</a></li>
         </ul>
-        <form class="d-flex" role="search" >
+        <form class="d-flex mb-0" role="search" >
             <input class="form-control me-2" type="search" placeholder="Search events..." name='searched' aria-label="Search"/>
-            <button class="btn btn-outline-success" type="submit">Search</button>
+            <button class="btn btn-outline-success btn-sm" type="submit">Search</button>
         </form>
         </div>
     </div>

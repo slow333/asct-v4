@@ -1,5 +1,6 @@
 .hero-gradient {
-    background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%);
+    background: linear-gradient(to right, #5a6b8f, #4d588a, #3e45a7);
+    opacity: 0.6;
 }
 .bi-bg {
     font-size: 6rem; opacity: 0.25;
@@ -12,9 +13,27 @@
     margin-bottom: 1rem;
     padding: 4px;
     position: relative;
+    color: #333333;
 }
 .filter-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.nav-tabs .nav-link {
+    color: #adb5bd;
+}
+.navbar .navbar-nav .nav-item ul {
+    color: white;
+    background-color: #3e45a7;
+}
+.navbar .navbar-nav .nav-item li a {
+    color: white;
+}
+.navbar .navbar-nav .nav-item li a:hover {
+    color: rgb(245, 129, 129);
+}
+.navbar .navbar-nav .nav-item .nav-link {
+    color: white;
 }

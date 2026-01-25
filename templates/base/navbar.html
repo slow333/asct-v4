@@ -1,11 +1,11 @@
 <style>
     .navbar-custom {
-        background-color: rgba(255, 255, 255, 0.85);
+        background-color: rgba(255, 255, 255, 0.60);
         backdrop-filter: blur(12px);
     }
 </style>
 
-<nav class="navbar navbar-expand-lg fixed-top navbar-light shadow-sm py-2 mb-2 navbar-custom">
+<nav class="navbar navbar-expand-lg fixed-top navbar-light shadow-sm py-0 mb-1 navbar-custom">
     <div class="container-lg">
         <div class="d-flex align-items-center">
             <button class="btn btn-link text-dark p-0 me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarCol" aria-controls="sidebarCol">
@@ -22,8 +22,17 @@
         
         <div class="collapse navbar-collapse" id="navbarToggle">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-medium">
-                <li class="nav-item">
-                    <a class="nav-link px-3 {% if '/docs/' in request.path %} active text-primary {% endif %}" href="{% url 'docs-contents' %}">Docs</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle px-3 {% if '/docs/' in request.path %} active text-primary {% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Docs</a>
+                    <ul class="dropdown-menu shadow border-0 rounded-3">
+                        <li><a class="dropdown-item" href="{% url 'docs-contents' %}">Docs Main</a></li>
+                        <li><hr class="dropdown-divider bg-white"></li>
+                        <li><a class="dropdown-item" href="{% url 'django-tips' %}">Django</a></li>
+                        <li><a class="dropdown-item" href="/docs/psql/datatype">PSQL</a></li>
+                        <li><a class="dropdown-item" href="/docs/python/datatype">Python</a></li>
+                        <li><a class="dropdown-item" href="/docs/flask/install">Flask</a></li>
+                        <li><a class="dropdown-item" href="/docs/others/basic-settings">Others</a></li>
+                    </ul>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link px-3 {% if '/asct/' in request.path %} active text-primary {% endif %}" href="{% url 'asct:index' %}">ASCT</a>

@@ -2,13 +2,19 @@
 {% load static %}
 {% block title %} 책상태 생성하기 {% endblock %}
 {% block content %}
-{% include 'library/_nav.html' %}
-<section>
-    <h1>책상태 생성하기</h1>
-    <form action="" method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-</section>
+<div class="container pt-3">
+    {% include 'library/_nav.html' %}
+    <section class="p-5 glass-card">
+        <h1>책상태 생성하기</h1>
+        <form action="" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </section>
+    <div class="card-footer">
+        <a href="{% url 'library:bookinstances' %}" onclick="javascript:history.back(); return false;" class="btn btn-secondary">Go Back</a>
+        <a href="{% url 'library:bookinstances' %}" class="btn btn-primary">Go List</a>
+    </div>
+</div>
 {% endblock %}
