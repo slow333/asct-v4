@@ -129,7 +129,8 @@ LOGIN_REDIRECT_URL = 'main-index'
 LOGOUT_REDIRECT_URL = 'main-index'
 # allauth 관련
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
-ACCOUNT_AUTHENTICATION_METHOD = 'username_email' # 로그인 시 아이디/이메일 모두 허용
+ACCOUNT_LOGIN_METHODS = {'username','email'}
+# ACCOUNT_AUTHENTICATION_METHOD = 'username_email' # 로그인 시 아이디/이메일 모두 허용
 ACCOUNT_EMAIL_VERIFICATION = 'optional' # 이메일 인증 설정 (mandatory, optional, none)
 
 LOGIN_URL = 'login'

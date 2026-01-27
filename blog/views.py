@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
-from django.utils.safestring import mark_safe
 from django.db.models import Q, Count
 from .models import Post, Category, Comment
 from .forms import PostForm, PostFormAdmin, CommentForm
@@ -20,13 +19,13 @@ def post_list(request):
     search_title = request.GET.get('searched', '')
     if search_title:
         query_set = query_set.filter(Q(title__icontains=search_title) | Q(author__username__icontains=search_title))
-    
+
     category_list = list(Category.objects.all().values('name')) 
-    # 각 카테고리별 게시글 수 집계
+
     # [{'name': '카테고리1', 'count': 5}, {'name': '카테고리2', 'count': 3}, ...]
     for cat in category_list:
         cat['count'] = Post.objects.filter(category__name=cat['name']).count()
-    
+
     current_category = request.GET.get('category', '')
     
     if current_category == '미분류':

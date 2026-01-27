@@ -5,9 +5,8 @@
 
 {% block content %}
 
-{% include 'eshop/_nav.html' %}
-
-<div class="container mt-4">
+<div class="container pt-3">
+    {% include 'eshop/_nav.html' %}
     {% for item in cart %}
     {% with product=item.product %}
     <div class="card shadow-sm border-0 mb-3 py-3">

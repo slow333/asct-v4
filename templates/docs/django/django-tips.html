@@ -372,7 +372,23 @@ SOCIALACCOUNT_PROVIDERS = {
 ]
 </pre>
     </article>
+    <article>
+      <h3>error(allauth관련 db애러)</h3>
+      <pre> migrate 시에 애러 발생 : 
+django.db.utils.ProgrammingError: 오류: "account_emailaddress" 이름의 릴레이션(relation)이 이미 있습니다
 
-</section>
+이 오류는 django-allauth 패키지의 account 앱이 생성하려는 account_emailaddress 테이블이 데이터베이스(asct_v4)에 이미 존재하기 때문에 발생합니다.
+
+보통 데이터베이스에는 테이블이 생성되어 있지만, Django의 마이그레이션 기록(django_migrations 테이블)에는 해당 마이그레이션이 적용되지 않은 것으로 되어 있을 때 발생합니다. (예: 기존 DB를 연결했거나 마이그레이션 기록이 초기화된 경우)
+
+해결 방법은 --fake 옵션을 사용하여, 실제로 테이블을 다시 생성하지 않고 마이그레이션이 완료된 것으로 기록만 남기는 것입니다.
+
+python manage.py migrate account --fake
+python manage.py migrate socialaccount --fake
+python manage.py migrate
+
+      </pre>
+    </article>
+  </section>
 </div>
 {% endblock %}
