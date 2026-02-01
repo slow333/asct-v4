@@ -3,7 +3,6 @@
 
 {% block content %}
 {% include 'docs/flask/sub_nav.html' %}
-<div class="doc-container">
 <h1 class="doc-title">Note for Flask</h1>
 <section class="doc-section">
 <h2 class="doc-header">flask app 패스워드 변경</h2>
@@ -91,11 +90,10 @@ def reset_with_token(token):
         db = get_db()
         with db.cursor() as cur:
             cur.execute('UPDATE users SET password = %s WHERE id = %s;',
-                       (hashed_password, user['id']))
+                    (hashed_password, user['id']))
         db.commit()
         flash('Your password has been reset.')
         return redirect('/auth/login')
 </pre>
 </section>
-</div>
 {% endblock %}

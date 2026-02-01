@@ -1,0 +1,188 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    {% include 'asct/_nav.html' %}
+    <h1 class="mt-4">Dashboard</h1>
+    
+    <!-- 요약 카드 -->
+    <div class="row">
+        <div class="col-xl-3 col-md-4">
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body">Total Servers</div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <span class="h4">{{ total_servers }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-4">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body">Physical Servers</div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <span class="h4">{{ physical_count }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-4">
+            <div class="card bg-info text-white mb-4">
+                <div class="card-body">Virtual Servers</div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <span class="h4">{{ virtual_count }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 리소스 사용률 Top 5 -->
+    <div class="row">
+        <!-- CPU Usage -->
+        <div class="col-xl-4 col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-microchip me-1"></i> Top CPU Usage (%)
+                </div>
+                <div class="card-body">
+                    {% for server in top_cpu_usage %}
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span>{{ server.hostname }}</span>
+                            <span class="fw-bold">{{ server.cpu_usage }}%</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: {{ server.cpu_usage }}%" aria-valuenow="{{ server.cpu_usage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center my-3">No data available</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <!-- Memory Usage -->
+        <div class="col-xl-4 col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-memory me-1"></i> Top Memory Usage (%)
+                </div>
+                <div class="card-body">
+                    {% for server in top_memory_usage %}
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span>{{ server.hostname }}</span>
+                            <span class="fw-bold">{{ server.memory_usage }}%</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ server.memory_usage }}%" aria-valuenow="{{ server.memory_usage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center my-3">No data available</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <!-- Disk Usage -->
+        <div class="col-xl-4 col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-hdd me-1"></i> Top Disk Usage (%)
+                </div>
+                <div class="card-body">
+                    {% for server in top_disk_usage %}
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span>{{ server.hostname }}</span>
+                            <span class="fw-bold">{{ server.disk_usage }}%</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ server.disk_usage }}%" aria-valuenow="{{ server.disk_usage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center my-3">No data available</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 차트 영역 -->
+    <div class="row">
+        <!-- OS 분포 차트 -->
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-pie me-1"></i>
+                    OS Distribution
+                </div>
+                <div class="card-body"><canvas id="osChart" width="100%" height="50"></canvas></div>
+            </div>
+        </div>
+        <!-- 메모리 상위 서버 차트 -->
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar me-1"></i>
+                    Top Memory Servers (GB)
+                </div>
+                <div class="card-body"><canvas id="memoryChart" width="100%" height="50"></canvas></div>
+            </div>
+        </div>
+        <!-- 디스크 상위 서버 차트 -->
+        <div class="col-lg-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-hdd me-1"></i>
+                    Top Disk Servers (GB)
+                </div>
+                <div class="card-body"><canvas id="diskChart" width="100%" height="30"></canvas></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // OS Chart (Doughnut)
+    var ctxOs = document.getElementById("osChart");
+    var osChart = new Chart(ctxOs, {
+        type: 'doughnut',
+        data: {
+            labels: {{ os_labels|safe }},
+            datasets: [{
+                data: {{ os_data|safe }},
+                backgroundColor: ['#007bff', '#dc3545', '#ffc107', '#28a745', '#17a2b8', '#6610f2', '#fd7e14'],
+            }],
+        },
+    });
+
+    // Memory Chart (Bar)
+    var ctxMem = document.getElementById("memoryChart");
+    var memChart = new Chart(ctxMem, {
+        type: 'bar',
+        data: {
+            labels: {{ mem_labels|safe }},
+            datasets: [{
+                label: "Memory (GB)",
+                backgroundColor: "rgba(2,117,216,1)",
+                data: {{ mem_data|safe }},
+            }],
+        },
+    });
+
+    // Disk Chart (Bar)
+    var ctxDisk = document.getElementById("diskChart");
+    var diskChart = new Chart(ctxDisk, {
+        type: 'bar',
+        data: {
+            labels: {{ disk_labels|safe }},
+            datasets: [{
+                label: "Total Disk (GB)",
+                backgroundColor: "rgba(23,162,184,1)",
+                data: {{ disk_data|safe }},
+            }],
+        },
+    });
+</script>
+{% endblock %}

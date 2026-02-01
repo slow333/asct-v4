@@ -3,7 +3,6 @@
 
 {% block content %}
 {% include 'docs/postgresql/sub_nav.html' %}
-<div class="doc-container">
 <h1 class="doc-title">GROUP BY AND HAVING</h1>
 <section class="doc-section">
 
@@ -72,5 +71,4 @@
   SELECT make, COUNT(id) AS total_price FROM car  
   GROUP BY make WITH ROLLUP;  </pre>
 </section>
-</div>
 {% endblock %}

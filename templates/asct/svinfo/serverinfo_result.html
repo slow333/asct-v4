@@ -1,0 +1,82 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    {% include 'asct/_nav.html' %}
+    <h1 class="mt-4">Server Info 수집 결과</h1>
+
+    {# 에러 메시지 표시 #}
+    {% if error %}
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading"><i class="fas fa-exclamation-triangle me-1"></i> Error!</h4>
+        <pre class="mb-0">{{ error }}</pre>
+    </div>
+    {% endif %}
+
+    {# 성공 메시지 표시 #}
+    {% if result %}
+    <div class="alert alert-success" role="alert">
+        <i class="fas fa-check-circle me-1"></i> {{ result }}
+    </div>
+    {% endif %}
+
+    {# 수집된 서버 정보 표시 #}
+    {% if server_info %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-server me-1"></i> Collected Server Information
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <tbody>
+                    <tr>
+                        <th width="20%">Hostname</th>
+                        <td>{{ server_info.hostname }}</td>
+                        <th width="20%">Data Time</th>
+                        <td>{{ server_info.data_time }}</td>
+                    </tr>
+                    <tr>
+                        <th>IP Address</th>
+                        <td colspan="3">{{ server_info.ip1 }} {% if server_info.ip2 %}/ {{ server_info.ip2 }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <th>OS Version</th>
+                        <td>{{ server_info.os_version }}</td>
+                        <th>Kernel Version</th>
+                        <td>{{ server_info.kernel_version }}</td>
+                    </tr>
+                    <tr>
+                        <th>CPU Cores</th>
+                        <td>{{ server_info.cpu_cores }} Core(s)</td>
+                        <th>Memory</th>
+                        <td>{{ server_info.memory }} GB</td>
+                    </tr>
+                    <tr>
+                        <th>Total Disk</th>
+                        <td>{{ server_info.total_disk }} GB</td>
+                        <th>Uptime</th>
+                        <td>{{ server_info.uptime }} days</td>
+                    </tr>
+                    <tr>
+                        <th>Virtual Machine</th>
+                        <td>
+                            {% if server_info.is_virtual %}
+                                <span class="badge bg-info text-dark">Virtual</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Physical</span>
+                            {% endif %}
+                        </td>
+                        <th>SSH Info</th>
+                        <td>{{ ssh_info.name }} ({{ ssh_info.ip }})</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="mb-4">
+        <a href="{% url 'asct:serverinfo_select' %}" class="btn btn-primary"><i class="fas fa-arrow-left me-1"></i> Back to Select</a>
+    </div>
+</div>
+{% endblock %}

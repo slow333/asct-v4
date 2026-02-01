@@ -1,0 +1,35 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    {% include 'asct/_nav.html' %}
+    <h1 class="mt-4">Server Info 수집하기</h1>
+
+    <div class="card mb-4">
+        <div class="card-header"> <i class="fas fa-terminal me-1"></i>SSH와 shell Script file 선택</div>
+        <div class="card-body">
+            <form method="post" action="{% url 'asct:serverinfo_select' %}" enctype="multipart/form-data" >
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="ssh_id" class="form-label">SSH 선택</label>
+                    <select name="ssh_id" id="ssh_id" class="form-select" required>
+                        <option value="" selected disabled>SSH 선택...</option>
+                        {% for ssh in sshinfos %}
+                        <option value="{{ ssh.id }}">{{ ssh.name }} ({{ ssh.ip }})</option>
+                        {% empty %}
+                        <option disabled>가용한 서버가 없습니다. (권한을 점검하세요)</option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text">서버에 대한 권한이 없습니다..</div>
+                </div>
+                <div class="mb-3">
+                    <label for="shell_script" class="form-label">shell Script file 선택</label>
+                    <input type="file" name="script_file" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-play me-1"></i> Run</button>
+                <a href="{% url 'asct:serverinfo_list' %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

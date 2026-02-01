@@ -3,7 +3,6 @@
 
 {% block content %}
 {% include 'docs/django/sub_nav.html' %}
-<div class="doc-container">
 <h1 class="doc-title">Project 개요</h1>
 <section class="doc-section">
   <h2 class="doc-header">시스템 체크 프로세스</h2>
@@ -66,6 +65,4 @@ storage_nfs_total = models.IntegerField(null=True, blank=True)
 storage_nfs_usage_percent = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
 </pre>
 </section>
-</div>
-
 {% endblock %}

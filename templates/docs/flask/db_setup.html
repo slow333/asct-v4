@@ -1,8 +1,8 @@
 {% extends 'base/base.html' %}
 {% block title %} Flask {% endblock %}
+
 {% block content %}
 {% include 'docs/flask/sub_nav.html' %}
-<div class="doc-container">
 <h1 class="doc-title">psycopg2를 통한 db 연결</h1>
 <section class="doc-section"> 
   <pre>
@@ -146,5 +146,4 @@ if __name__ == '__main__':
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600 # 1시간  </pre>
 </section>
-</div>
 {% endblock %}

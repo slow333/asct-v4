@@ -6,8 +6,10 @@ from django.contrib.auth.admin import UserAdmin
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ['user__username', 'image_preview']
+    list_display = ['user__username', 'image_preview', 'role','phone']
     search_fields = ['user__username',]
+    list_filter = ('role',)
+    list_editable =('role',)
     list_per_page = 20
     list_select_related = ['user']
     ordering = ('user__username',)

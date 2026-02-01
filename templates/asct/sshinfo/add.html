@@ -1,0 +1,47 @@
+{% extends "base/base.html" %}
+{% block title %} Add SSH info {% endblock %}
+
+{% block content %}
+<h1 class="fw-bold text-white"><i class="bi bi-pencil-square me-2"></i>Add SSH info</h1>
+
+{% include 'asct/_nav.html' %}
+
+<div class="col-lg-10 mx-auto">
+    <div class="card border-0 shadow-sm glass-card mb-4">
+        <div class="card-body p-5">
+            <h4 class="card-title fw-bold mb-4 text-secondary">Add SSH</h4>
+            <form method="post" >
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="d-flex justify-content-end gap-2 mt-5">
+                    <a href="{% url 'asct:sshinfo_list' %}{% if request.GET.page %}?page={{request.GET.page }}{% endif %}" class="btn btn-glass-secondary rounded-pill px-4">
+                        <i class="bi bi-x-lg me-2"></i>Cancel
+                    </a>
+                    <button type="submit" class="btn btn-glass-primary rounded-pill px-4">
+                        <i class="bi bi-check-lg me-2"></i>Add SSH
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<style>
+    .choices__input {
+        min-width: 250px !important;
+    }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const elements = document.querySelectorAll('.select2');
+    elements.forEach(function(element) {
+        new Choices(element, {
+            removeItemButton: true,
+            placeholder: true,
+            placeholderValue: '운영자를 검색하여 선택하세요',
+            searchPlaceholderValue: '검색...',
+            itemSelectText: '',
+        });
+    });
+});
+</script>
+{% endblock %}

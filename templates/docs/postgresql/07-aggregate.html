@@ -3,7 +3,6 @@
 
 {% block content %}
 {% include 'docs/postgresql/sub_nav.html' %}
-<div class="doc-container">
 <h1 class="doc-title">SQL Aggregate</h1>
 <section class="doc-section">
   <h2 class="doc-header">The most commonly used SQL arrgregate functions:</h2>
@@ -57,6 +56,4 @@ SELECT AVG(price) AS average_price FROM product WHERE CategoryID = 1;
 SELECT * FROM product
 WHERE price > (SELECT AVG(price) FROM product)</pre>
 </section>
-</div>
-
 {% endblock %}

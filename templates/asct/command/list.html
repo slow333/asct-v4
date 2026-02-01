@@ -1,0 +1,53 @@
+{% extends 'base/base.html' %}
+{% block title %}명령어 리스트{% endblock %}
+
+{% block content %}
+
+{% include 'asct/_nav.html' %}
+
+<div class="flex-between">
+    <div class="flex-start">
+        <h1 class="fw-bold text-white"><i class="bi bi-journal-richtext me-3"></i>명령어 리스트</h1>
+        {% if page_obj %}
+        <span class="badge bg-primary rounded-pill ms-3">{{ page_obj.paginator.count }} 개</span>
+    </div>
+    {% endif %}
+    <a href="{% url 'asct:command_add' %}" class="btn btn-sm btn-glass-primary rounded-pill px-3 position-relative z-2">
+        <i class="bi bi-plus-circle-fill me-2"></i>Add Command </a>
+</div>
+
+<div class="alert alert-primary flex-between fs-4 fw-bold py-1" role="alert">
+    <div>{% if current_category %} {{ current_category }} 
+    {% else %} All {% endif %}</div>
+    <button class="btn btn-secondary btn-sm ms-2 w-auto" type="button" data-bs-toggle="collapse" data-bs-target="#filters-sidebar" >분류<i class="bi bi-arrow-bar-down"></i></button>
+</div>
+<div class="d-flex">
+    <div class="row mb-3">
+        {% for cmd in page_obj %}
+        <div class="col-lg-6 mb-3">
+            <div class="card border-0 shadow-sm glass-card hover-shadow transition-all">
+                <div class="card-body p-3">
+                    <div class="flex-between mb-3">
+                        <span class="fw-bold text-dark">{{ cmd.name }}</span>
+                        <div class="text-success">{{ cmd.category }}</div>
+                    </div>
+                    
+                    <h4 class="card-title fw-bold mb-3">{{ cmd.script }}</h4>
+                    <div class="card-text text-secondary mb-1 d-flex align-itmes-start gap-3">
+                            {{ cmd.description }} 
+                    </div>
+                    <div class="flex-end">
+                        <a href="{% url 'asct:cmd_detail' cmd.id %}?page={{ request.GET.page }}{% if request.GET.category %}&category={{ request.GET.category|urlencode }}{% endif %}" class="btn btn-sm btn-glass-primary rounded-pill px-3 position-relative z-2">
+                            상세 보기 <i class="bi bi-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="collapse" id="filters-sidebar">
+        {% include 'asct/command/category_filter.html' %}
+    </div>
+</div>
+
+{% endblock %}

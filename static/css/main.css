@@ -4,7 +4,7 @@ body {
   font-family: 'Noto Sans KR', sans-serif;
   letter-spacing: -0.015em;
   line-height: 1.6;
-  min-height: 100vh;
+  /* height: 100%; */
   position: relative;
 }
 
@@ -184,7 +184,21 @@ code {
   font-size:14px; 
   padding: 2px 10px; 
 }
-
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.flex-start {
+  display: flex;
+  justify-content: start;
+  align-items: baseline;
+}
+.flex-end {
+  display: flex;
+  justify-content: end;
+  align-items: baseline;
+}
 #scrollTopBtn {
   display: none; 
   position: fixed; 
@@ -305,10 +319,10 @@ th { background-color: #f2f2f2; }
     color: white;
 }
 .btn-glass-secondary {
-    background-color: rgba(255, 255, 255, 0.6);
+    background-color: rgba(56, 56, 56, 0.6);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(108, 117, 125, 0.2);
-    color: #495057;
+    color: #ffffff;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
 }
@@ -318,7 +332,20 @@ th { background-color: #f2f2f2; }
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
     color: #212529;
 }
-
+.btn-glass-danger {
+    background-color: orangered;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(108, 117, 125, 0.2);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+.btn-glass-danger:hover {
+    background-color: rgba(235, 96, 96, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    color: white;
+}
 /* Card Icon Animations */
 .glass-card .position-absolute.bi {
     transition: transform 0.5s ease-out;

@@ -3,7 +3,6 @@
 
 {% block content %}
 {% include 'docs/postgresql/sub_nav.html' %}
-<div class="doc-container">
 <h1 class="doc-title">SELECT</h1>
 <section class="doc-section">
   
@@ -231,5 +230,4 @@ SELECT c.name, o.price, c.address
   FROM customer c, order_detail o
   WHERE c.id = o.id;</pre>
 </section>
-</div>
 {% endblock %}

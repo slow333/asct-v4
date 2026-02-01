@@ -1,0 +1,58 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    {% include 'asct/_nav.html' %}
+    <h1 class="mt-4">Execution Result</h1>
+    <ol class="breadcrumb mb-4 bg-white py-2 px-3 rounded-3">
+        <li class="breadcrumb-item"><a href="{% url 'asct:cmd_history_list' %}">History</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'asct:cmd_select' %}">Run Command</a></li>
+        <li class="breadcrumb-item active">Result</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-poll me-1"></i>
+            Output
+        </div>
+        <div class="card-body">
+            {% if error %}
+            <div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading">Error Occurred!</h4>
+                <p>{{ error|linebreaks }}</p>
+            </div>
+            {% endif %}
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong>Server:</strong> {{ ssh_info.name }} ({{ ssh_info.ip }})
+                </div>
+                <div class="col-md-6">
+                    <strong>Command:</strong> {{ command.name }}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Script:</label>
+                <pre class="bg-light p-3 border rounded">{{ command.script }}</pre>
+            </div>
+
+            {% if result %}
+            <div class="mb-3">
+                <label class="form-label fw-bold">Standard Output:</label>
+                <pre class="bg-dark text-white p-3 border rounded" style="max-height: 500px; overflow-y: auto;">{{ result }}</pre>
+            </div>
+            {% elif not error %}
+            <div class="alert alert-info">
+                Command executed successfully with no output.
+            </div>
+            {% endif %}
+
+            <div class="mt-4">
+                <a href="{% url 'asct:cmd_select' %}" class="btn btn-primary">Run Another Command</a>
+                <a href="{% url 'asct:cmd_history_list' %}" class="btn btn-secondary">View History</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

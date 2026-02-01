@@ -1,8 +1,8 @@
 {% extends 'base/base.html' %}
 {% block title %} Python {% endblock %}
+
 {% block content %}
 {% include 'docs/python/sub_nav.html' %}
-<div class="doc-container">
 <h1 class="doc-title">try, except, finally</h1>
 <section class="doc-section">
 <pre>def say_nick(nick):
@@ -11,8 +11,8 @@
     print(nick)
 
 class MyError(Exception):
-  def __str__(self):
-    return &#39;허용되지 않는 별명입니다.&#39;
+    def __str__(self):
+        return &#39;허용되지 않는 별명입니다.&#39;
 
 try:
     say_nick(&#39;천사&#39;)
@@ -58,6 +58,4 @@ except ZeroDivisionError:
     # Code to handle the specific error
     print("Cannot divide by zero!")</pre>
 </section>
-</div>
-
 {% endblock %}

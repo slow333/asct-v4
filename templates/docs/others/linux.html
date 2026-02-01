@@ -3,7 +3,6 @@
 
 {% block content %}
 {% include 'docs/others/sub_nav.html' %}
-<div class="doc-container">
 <h1 class="doc-title">Linux</h1>
 <section class="doc-section">
   
@@ -132,7 +131,7 @@ Apache HTTP 서버 구성
 Apache의 기본 구성 파일은 일반적으로 Red Hat 기반 시스템의 /etc/httpd/conf/httpd.conf에 있다. 
 이 파일을 편집하여 기본 문서 루트 변경, 디렉토리 목록 활성화 또는 
 가상 호스트 구성과 같은 서버 설정을 사용자 정의할 수 있다.
- 
+
 1. Apache HTTP Server 시작 및 활성화
 sudo systemctl start httpd (시작)
 sudo systemctl enable httpd (활성화)
@@ -156,7 +155,7 @@ Apache를 사용하여 기본 웹 사이트 설정
 아래는 넣어도 잘안됨 모르겠습니다.
 ==============================================
 1. 웹사이트를 위한 새 디렉터리 생성먼저 웹사이트 파일을 보관할 새 디렉토리를 만든다.
- 이 예에서는 /var/www 디렉토리에 example-site라는 디렉토리를 생성한다.
+  이 예에서는 /var/www 디렉토리에 example-site라는 디렉토리를 생성한다.
 sudo mkdir /var/www/example-site
 2. 적절한 권한 설정Apache 사용자가 디렉토리에 액세스할 수 있도록 하려면 새 디렉토리의 소유권과 권한을 업데이트한다.
 sudo chown apache:apache /var/www/example-site 
@@ -168,7 +167,7 @@ vi /var/www/example-site/index.html
 4. 파일에 다음 콘텐츠를 추가한다.
   HTML 파일 생성
 파일을 저장하고 닫는다.
- 
+
 5. 가상 호스트 구성 파일을 만든다. Apache는 가상 호스트 파일을 사용하여 개별 웹 사이트에 대한 설정을 정의한다. 
 예제 사이트에 대한 새 가상 호스트 구성 파일을 만든다.
 sudo nano /etc/httpd/conf.d/example-site.conf
@@ -302,7 +301,7 @@ sar## - 시스템 활동 보고서 파일입니다.
 # sar -f /var/log/sa/sa11 -r  // sa11파일내 메모리 파일만 봅니다. 
 
 2) sar##
-   - 일반 텍스트 파일처럼 vi or cat 으로 확인이 가능합니다. 
+  - 일반 텍스트 파일처럼 vi or cat 으로 확인이 가능합니다. 
 
 # cat /var/log/sa/sa11
 
@@ -321,6 +320,4 @@ SAR데이터를 GUI 로 변형해서 보여주는 Tool이 있습니다. 그 이�
   </li>
 </ol>
 </section>
-</div>
- 
 {% endblock %}

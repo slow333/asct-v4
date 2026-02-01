@@ -3,7 +3,6 @@
 
 {% block content %}
 {% include 'docs/postgresql/sub_nav.html' %}
-<div class="doc-container">
 <h1 class="doc-title">Postgresql Notes</h1>
 <section class="doc-section">
     <h2 class="doc-header">백업하기</h2>
@@ -17,5 +16,4 @@ CREATE DATABASE new_dbname; (using psql).
 C:\Users\slow3>psql -h localhost -U postgres new_dbname < django_asct_v2_backup.sql
     </pre>
 </section>
-</div>
 {% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base/base.html' %}
+{% block title %}명령어 리스트{% endblock %}
+
+{% block content %}
+<div class="flex-between">
+    <h1 class="fw-bold text-white"><i class="bi bi-pencil-square me-2"></i>Update Command</h1>
+</div>
+{% include 'asct/_nav.html' %}
+<div class="col-md-10 mx-auto">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-3">
+            <h2 class="fw-bold text-dark me-3"> 이름 : {{ command.name }}</h2>
+            <div class="text-muted flex-end small-date">
+            {{ command.created_at|date:"Y-m-d" }}</div>
+            <h3 class="card-title fw-bold mb-3">{{ command.script }} </h3>
+            <div class="card-text mb-3"> {{ command.description }}  </div>
+            <hr>
+            <a href="{% url 'asct:cmd_list' %}?page={{ request.GET.page }}{% if request.GET.category %}&category={{ request.GET.category|urlencode }}{% endif %}" 
+                class="btn btn-glass-secondary position-relative z-3">
+                <i class="bi bi-arrow-left me-2"></i>List로 이동</a>
+            <a href="{% url 'asct:cmd_update' command.id %}" 
+                class="btn btn-glass-primary position-relative z-3">update</a>
+            <a href="{% url 'asct:cmd_delete' command.id %}" 
+                class="btn btn-glass-danger position-relative z-3" onclick="return confirm('삭제하게요?');">delete</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

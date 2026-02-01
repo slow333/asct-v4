@@ -3,23 +3,19 @@
 {% block title %} Events 검색 {% endblock %}
 {% block content %}
 {% include 'events/_nav.html' %}
-<section>
-    <h1>Event 검색</h1>
-    {% for event in events %}
-    <div class="card w-50">
-        <h3 class="card-title text-center">{{ event.name }}</h3>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">{{ event.event_date }}</li>
-            <li class="list-group-item">{{ event.venue }} </li>
-            <li class="list-group-item">{{ event.manager }}</li>
-            <li class="list-group-item">{{ event.description }}</li>
-            <li class="list-group-item">{{ event.attendees }}</li>
-        </ul>
-        <img src="{% static 'images/events/bp009.jpg' %}" class="card-img-top" width="100" height="100" alt="...">
-    </div>
-    <br><br>
-    {% endfor %}
-
-</section>
-
+<h1>Event 검색</h1>
+{% for event in events %}
+<div class="card w-50">
+    <h3 class="card-title text-center">{{ event.name }}</h3>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">{{ event.event_date }}</li>
+        <li class="list-group-item">{{ event.venue }} </li>
+        <li class="list-group-item">{{ event.manager }}</li>
+        <li class="list-group-item">{{ event.description }}</li>
+        <li class="list-group-item">{{ event.attendees }}</li>
+    </ul>
+    <img src="{% static 'images/events/bp009.jpg' %}" class="card-img-top" width="100" height="100" alt="...">
+</div>
+<br><br>
+{% endfor %}
 {% endblock %}

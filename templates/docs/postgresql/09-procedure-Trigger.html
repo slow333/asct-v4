@@ -3,7 +3,6 @@
 
 {% block content %}
 {% include 'docs/postgresql/sub_nav.html' %}
-<div class="doc-container">
 <h1 class="doc-title">STORED PROCEDURE</h1>
 <section class="doc-section">
   <h2 class="doc-header">STORED PROCEDURE: 자주 쓰는 SQL을 함수로 저장</h2>
@@ -114,6 +113,4 @@
     SET expense_total = expense_total + (NEW.salary - OLD.salary) -- 새로운 값에서 이전 값을 뺌
     WHERE expense_name = "salaries"; </pre>
 </section>
-</div>
-
 {% endblock %}

@@ -3,7 +3,6 @@
 
 {% block content %}
 {% include 'docs/postgresql/sub_nav.html' %}
-<div class="doc-container">
 <h1 class="doc-title">SQL Constraints</h1>
 <section class="doc-section">
   <p>: 테이블에 있는 데이터에 대해 규칙을 정의하는데 사용됨, 이 규칙을 위반하면 action이 중단됨</p>
@@ -208,5 +207,4 @@ ALTER TABLE Persons
   ON UPDATE CASCADE
   );</pre>
 </section>
-</div>
 {% endblock %}

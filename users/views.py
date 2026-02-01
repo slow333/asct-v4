@@ -9,7 +9,6 @@ from .models import Profile
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 
-
 def login_view(request):
     if request.method == "POST":
         form = LoginForm(request.POST)
@@ -43,14 +42,14 @@ def user_register(request):
         form = UserRegisterForm()
     return render(request, "users/register.html", {"form": form})
 
-
+@login_required
 def user_edit(request):
     if request.method == "POST":
         u_form = UserUpdateForm(request.POST, instance=request.user)
         p_form = ProfileUpdateForm(
             request.POST, request.FILES, instance=request.user.profile
         )
-        if u_form.is_valid() and p_form.is_valid():
+        if u_form.is_valid() and p_form.is_valid() :
             u_form.save()
             p_form.save()
             messages.success(request, f"Profile이 업데이트 되었습니다.")

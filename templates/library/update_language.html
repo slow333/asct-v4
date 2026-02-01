@@ -2,7 +2,7 @@
 
 {% block content %}
 {% include 'library/_nav.html' %}
-<form action="" method="post">
+<form method="post">
     {% csrf_token %}
     <input type="hidden" name="action" value="update_language">
     <input type="hidden" name="apply" value="1">

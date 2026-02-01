@@ -1,0 +1,50 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    {% include 'asct/_nav.html' %}
+    <h1 class="mt-4">Run Command</h1>
+    <ol class="breadcrumb mb-4 bg-white py-2 px-3 rounded-3">
+        <li class="breadcrumb-item"><a href="{% url 'asct:cmd_history_list' %}">History</a></li>
+        <li class="breadcrumb-item active">Run Command</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header"> <i class="fas fa-terminal me-1"></i> SSH와 Command 선택</div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="ssh_id" class="form-label">SSH 선택</label>
+                    <select name="ssh_id" id="ssh_id" class="form-select" required>
+                        <option value="" selected disabled>SSH 선택...</option>
+                        {% for ssh in sshinfos %}
+                        <option value="{{ ssh.id }}">{{ ssh.name }} ({{ ssh.ip }})</option>
+                        {% empty %}
+                        <option disabled>가용한 서버가 없습니다. (권한을 점검하세요)</option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text">서버에 대한 권한이 없습니다..</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="cmd_id" class="form-label">명령어 실행</label>
+                    <select name="cmd_id" id="cmd_id" class="form-select" required>
+                        <option value="" selected disabled>명령어 선택...</option>
+                        {% for cmd in commands %}
+                        <option value="{{ cmd.id }}">[{{ cmd.get_category_display }}] {{ cmd.name }}</option>
+                        {% empty %}
+                        <option disabled>명령어가 없습니다.</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-play me-1"></i> Execute</button>
+                    <a href="{% url 'asct:cmd_history_list' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
