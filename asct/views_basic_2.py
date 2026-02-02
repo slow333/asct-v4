@@ -149,7 +149,7 @@ def cmd_history_list(request):
     page = request.GET.get("page")
     page_obj = paginator.get_page(page)
     
-    return render(request, 'asct/command/history_list.html', {'page_obj': page_obj})
+    return render(request, 'asct/run/history_list.html', {'page_obj': page_obj})
 
 @login_required
 def cmd_history_delete(request, pk):
@@ -169,13 +169,16 @@ def cmd_select(request):
     # 현재 로그인한 사용자가 권한을 가진 서버만 조회
     sshinfos = SSHInfo.objects.filter(operators=request.user)
     
-    return render(request, 'asct/command/select.html', {'commands': commands, 'sshinfos': sshinfos})
+    return render(request, 'asct/run/select.html', {'commands': commands, 'sshinfos': sshinfos})
 
-def run_ssh(request, ssh_obj, cmd_obj=None):
+@login_required
+def cmd_run(request, ssh_id, cmd_id):
+    ssh_info = get_object_or_404(SSHInfo, id=ssh_id)
+    command_obj = get_object_or_404(Command, id=cmd_id)
+    
     result = ""
     error = ""
-    server_info_obj=None
-
+    
     try:
         # 1. SSH 클라이언트 생성
         client = paramiko.SSHClient()
@@ -183,103 +186,42 @@ def run_ssh(request, ssh_obj, cmd_obj=None):
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         # 3. 서버 접속
         client.connect(
-            hostname=ssh_obj.ip,
-            port=ssh_obj.port,
-            username=ssh_obj.login_id,
-            password=ssh_obj.password,
+            hostname=ssh_info.ip,
+            port=ssh_info.port,
+            username=ssh_info.login_id,
+            password=ssh_info.password,
             timeout=10
         )
         
         # 4. 명령어 실행
-        if cmd_obj:
-            stdin, stdout, stderr = client.exec_command(cmd_obj.script) # type: ignore
-            result = stdout.read().decode('utf-8')
-            error = stderr.read().decode('utf-8')
-            client.close()
-            
-            CommandHistory.objects.create(
-                ssh_info=ssh_obj,
-                command=cmd_obj,
-                executed_by=request.user,
-                stdout=result,
-                stderr=error
-            )
-            return result, error
-            
-        else:
-            sftp = client.open_sftp()
-            remote_script = f'/tmp/get_svinfo_{ssh_obj.id}.sh' # type: ignore
-
-            if request.method == 'POST' and request.FILES.get('script_file'):
-                script_file = request.FILES['script_file']
-                sftp.putfo(script_file, remote_script)
-            else:
-                script_path = os.path.join(settings.BASE_DIR, 'static', 'script_files', 'get_svinfo.sh')
-                if os.path.exists(script_path):
-                    sftp.put(script_path, remote_script)
-                else:
-                    raise FileNotFoundError("Default script file not found.")
-            
-            sftp.chmod(remote_script, 0o755)
-            sftp.close()# 3. Execute Script (Fix windows line endings first)
-            
-            client.exec_command(f"sed -i 's/\r$//' {remote_script}")
-            
-            stdin, stdout, stderr = client.exec_command(remote_script)
-            exit_status = stdout.channel.recv_exit_status()
-            
-            # 4. Cleanup
-            client.exec_command(f"rm {remote_script}")
-            
-            # 5. 결과 읽기 (bytes를 utf-8로 디코딩)
-            result = stdout.read().decode('utf-8')
-            error = stderr.read().decode('utf-8')
-            client.close()
-            
-            # 6. JSON 파싱 (출력 중 JSON 부분만 추출)
-            json_str = result[result.find('{'):result.rfind('}')+1]
-            data = json.loads(json_str)
-            
-            # 결과 저장 (ServerInfo 업데이트 또는 생성)
-            server_info_obj, created = ServerInfo.objects.update_or_create(
-                hostname=data['hostname'],
-                defaults={
-                    'sshinfos': ssh_obj,
-                    'ip1': data.get('ip1'),
-                    'ip2': data.get('ip2'),
-                    'os_version': data.get('os_version'),
-                    'kernel_version': data.get('kernel_version'),
-                    'cpu_cores': data.get('cpu_cores'),
-                    'memory': data.get('memory'),
-                    'total_disk': data.get('total_disk'),
-                    'uptime': data.get('uptime'),
-                    'data_time': data.get('data_time'),
-                    'is_virtual': data.get('is_virtual'),
-                    'cpu_usage': data.get('cpu_usage'),
-                    'memory_usage': data.get('memory_usage'),
-                    'disk_usage': data.get('disk_usage'),
-                }
-            )
-            return server_info_obj, created, data, error
+        stdin, stdout, stderr = client.exec_command(command_obj.script)
+        
+        # 5. 결과 읽기 (bytes를 utf-8로 디코딩)
+        result = stdout.read().decode('utf-8')
+        error = stderr.read().decode('utf-8')
+        
+        client.close()
         
     except Exception as e:
-        return ("", f"## 연결실패: {str(e)} ##")
+        error = f"Connection Failed: {str(e)}"
 
+    # 6. 실행 이력 저장
+    CommandHistory.objects.create(
+        ssh_info=ssh_info,
+        command=command_obj,
+        executed_by=request.user,
+        stdout=result,
+        stderr=error
+    )
 
-@login_required
-def cmd_run(request, ssh_id, cmd_id):
-    ssh_info = get_object_or_404(SSHInfo, id=ssh_id)
-    command_obj = get_object_or_404(Command, id=cmd_id)
-    
-    result, error = run_ssh(request, ssh_info, command_obj)
-
+    # 결과를 보여줄 템플릿으로 렌더링 (result.html은 예시입니다)
     context = {
         'ssh_info': ssh_info,
         'command': command_obj,
         'result': result,
         'error': error,
     }
-    return render(request, 'asct/command/result.html', context)
+    return render(request, 'asct/run/result.html', context)
 
 # =============== Paramiko server info 수집 ===============
 @login_required
@@ -298,8 +240,72 @@ def serverinfo_update(request, pk):
     if request.method == 'POST':
         if 'refresh_server' in request.POST:
             ssh_info = server_info.sshinfos
-            server_info_obj, created, data, error = run_ssh(request, ssh_info )
-            messages.success(request, f"{server_info_obj.hostname} 갱신 성공")
+            if not ssh_info:
+                messages.error(request, "No SSH Info associated with this server.")
+                return redirect('asct:serverinfo_update', pk=pk)
+            
+            try:
+                # 1. SSH Connection
+                client = paramiko.SSHClient()
+                client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                client.connect(
+                    hostname=ssh_info.ip,
+                    port=ssh_info.port,
+                    username=ssh_info.login_id,
+                    password=ssh_info.password,
+                    timeout=10
+                )
+                
+                # 2. Script Preparation & Upload
+                script_path = os.path.join(settings.BASE_DIR, 'static', 'script_files', 'get_svinfo.sh')
+                if not os.path.exists(script_path):
+                    raise FileNotFoundError("Default script file not found.")
+                
+                sftp = client.open_sftp()
+                remote_script = f'/tmp/get_svinfo_{ssh_info.id}.sh' # type: ignore
+                sftp.put(script_path, remote_script)
+                sftp.chmod(remote_script, 0o755)
+                sftp.close()
+                
+                # 3. Execute Script (Fix windows line endings first)
+                client.exec_command(f"sed -i 's/\r$//' {remote_script}")
+                
+                stdin, stdout, stderr = client.exec_command(remote_script)
+                exit_status = stdout.channel.recv_exit_status()
+                output = stdout.read().decode('utf-8')
+                err_output = stderr.read().decode('utf-8')
+                
+                # 4. Cleanup
+                client.exec_command(f"rm {remote_script}")
+                client.close()
+                
+                if exit_status == 0:
+                    # 5. Parse & Update
+                    json_str = output[output.find('{'):output.rfind('}')+1]
+                    data = json.loads(json_str)
+                    
+                    server_info.hostname = data['hostname']
+                    server_info.ip1 = data.get('ip1')
+                    server_info.ip2 = data.get('ip2')
+                    server_info.os_version = data.get('os_version')
+                    server_info.kernel_version = data.get('kernel_version')
+                    server_info.cpu_cores = data.get('cpu_cores')
+                    server_info.memory = data.get('memory')
+                    server_info.total_disk = data.get('total_disk')
+                    server_info.uptime = data.get('uptime')
+                    server_info.data_time = data.get('data_time')
+                    server_info.is_virtual = data.get('is_virtual')
+                    server_info.cpu_usage = data.get('cpu_usage')
+                    server_info.memory_usage = data.get('memory_usage')
+                    server_info.disk_usage = data.get('disk_usage')
+                    server_info.save()
+                    
+                    messages.success(request, f"Successfully refreshed info for {server_info.hostname}")
+                else:
+                    messages.error(request, f"Script execution failed: {err_output}")
+            except Exception as e:
+                messages.error(request, f"Error refreshing info: {str(e)}")
+            
             return redirect('asct:serverinfo_update', pk=pk)
 
         form = ServerInfoForm(request.POST, instance=server_info)
@@ -329,17 +335,98 @@ def serverinfo_select(request):
     return render(request, 'asct/svinfo/serverinfo_select.html', {'sshinfos': sshinfos})
 
 @login_required
-def serverinfo_run(request, ssh_id): # create
+def serverinfo_run(request, ssh_id):
     ssh_info = get_object_or_404(SSHInfo, id=ssh_id)
     
-    server_info_obj, created, data, error = run_ssh(request, ssh_info )
+    result = ""
+    error = ""
+    server_info_obj = None
+    
+    try:
+        # 1. SSH 클라이언트 생성
+        client = paramiko.SSHClient()
+        # 2. 호스트 키 정책 설정 (알려지지 않은 호스트도 자동 허용 - 보안상 주의 필요)
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        # 3. 서버 접속
+        client.connect(
+            hostname=ssh_info.ip,
+            port=ssh_info.port,
+            username=ssh_info.login_id,
+            password=ssh_info.password,
+            timeout=10
+        )
+        
+        # 4. 스크립트 업로드
+        sftp = client.open_sftp()
+        remote_script = f'/tmp/get_svinfo_{ssh_info.id}.sh' # type: ignore
+
+        if request.method == 'POST' and request.FILES.get('script_file'):
+            script_file = request.FILES['script_file']
+            sftp.putfo(script_file, remote_script)
+        else:
+            script_path = os.path.join(settings.BASE_DIR, 'static', 'script_files', 'get_svinfo.sh')
+            if os.path.exists(script_path):
+                sftp.put(script_path, remote_script)
+            else:
+                raise FileNotFoundError("Default script file not found.")
+
+        sftp.chmod(remote_script, 0o755)
+        sftp.close()
+        
+        # 윈도우 개행문자 제거
+        stdin, stdout, stderr = client.exec_command(f"sed -i 's/\r$//' {remote_script}")
+        stdout.channel.recv_exit_status()
+        # 수정된 remote_script 내용으로 실행
+        stdin, stdout, stderr = client.exec_command(remote_script)
+        exit_status = stdout.channel.recv_exit_status()
+        
+        output = stdout.read().decode('utf-8')
+        err_output = stderr.read().decode('utf-8')
+        
+        # 원격 스크립트 삭제
+        stdin, stdout, stderr = client.exec_command(f"rm {remote_script}")
+        stdout.channel.recv_exit_status()
+        
+        client.close()
+        
+        if exit_status == 0:
+            # JSON 파싱 (출력 중 JSON 부분만 추출)
+            json_str = output[output.find('{'):output.rfind('}')+1]
+            data = json.loads(json_str)
+            
+            # 6. 결과 저장 (ServerInfo 업데이트 또는 생성)
+            server_info_obj, created = ServerInfo.objects.update_or_create(
+                hostname=data['hostname'],
+                defaults={
+                    'sshinfos': ssh_info,
+                    'ip1': data.get('ip1'),
+                    'ip2': data.get('ip2'),
+                    'os_version': data.get('os_version'),
+                    'kernel_version': data.get('kernel_version'),
+                    'cpu_cores': data.get('cpu_cores'),
+                    'memory': data.get('memory'),
+                    'total_disk': data.get('total_disk'),
+                    'uptime': data.get('uptime'),
+                    'data_time': data.get('data_time'),
+                    'is_virtual': data.get('is_virtual'),
+                    'cpu_usage': data.get('cpu_usage'),
+                    'memory_usage': data.get('memory_usage'),
+                    'disk_usage': data.get('disk_usage'),
+                }
+            )
+            result = f"Successfully updated info for {data['hostname']}"
+        else:
+            error = f"Script execution failed:\n{err_output}"
+            
+    except Exception as e:
+        error = f"Error: {str(e)}"
 
     # 결과를 보여줄 템플릿으로 렌더링 (result.html은 예시입니다)
     context = {
         'ssh_info': ssh_info,
-        'result': data,
+        'result': result,
         'error': error,
-        'server_info': server_info_obj or created,
+        'server_info': server_info_obj,
     }
     return render(request, 'asct/svinfo/serverinfo_result.html', context)
 

@@ -15,6 +15,7 @@ urlpatterns = [
     path('command/select/', views_basic.cmd_select, name='cmd_select'),
     path('command/history/', views_basic.cmd_history_list, name='cmd_history_list'),
     path('command/history/delete/<int:pk>', views_basic.cmd_history_delete, name='cmd_history_delete'),
+    path('command/run/<int:ssh_id>/<int:cmd_id>/', views_basic.cmd_run, name='cmd_run'),
     
     path('sshinfo/list/', views_basic.sshinfo_list, name='sshinfo_list'),
     path('sshinfo/add/', views_basic.sshinfo_add, name='sshinfo_add'),
@@ -22,7 +23,6 @@ urlpatterns = [
     path('sshinfo/update/<int:pk>/', views_basic.sshinfo_update, name='sshinfo_update'),
     path('sshinfo/delete/<int:pk>/', views_basic.sshinfo_delete, name='sshinfo_delete'),
     
-    path('run/<int:ssh_id>/<int:cmd_id>/', views_basic.run_cmd, name='run_cmd'),
     
     path('svinfo/list/', views_basic.serverinfo_list, name='serverinfo_list'),
     path('svinfo/export/', views_basic.serverinfo_export, name='serverinfo_export'),
