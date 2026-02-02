@@ -274,11 +274,12 @@ def serverinfo_export(request):
     # 5. 저장 및 반환
     wb.save(response)
     return response
-
+from django.views.decorators.http import require_POST
+@require_POST
 @login_required
 def serverinfo_update(request, pk):
     server_info = get_object_or_404(ServerInfo, id=pk)
-    if request.method == 'POST':
+    # if request.method == 'POST':
         if 'refresh_server' in request.POST:
             ssh_info = server_info.sshinfos
             if not ssh_info:
