@@ -148,14 +148,35 @@ python manage.py migrate asct</pre>
   </article>
 
   <article>
+    <h4><i class="bi bi-hash"></i>DB에서 asct관련 테이블을 모두 삭제하고 django model을 다시 설정하는 방법</h4>
+    <ol>
+      <li>기존 테이블 삭제 (Migrate Zero)
+        <code>python manage.py migrate asct zero</code>
+      </li>
+      <li>마이그레이션 파일 정리 (선택 사항)
+        <code>__init__.py 파일을 제외한 모든 파일(예: 0001_initial.py, 0002_...py)을 삭제합니다</code>
+      </li>
+      <li>(참고아님, 이거해야함) 만약 migrate asct zero가 실패하는 경우
+        <code>DELETE FROM django_migrations WHERE app = 'asct';</code>
+      </li>
+      <li>마이그레이션 파일 재생성
+        <pre>python manage.py makemigrations asct
+  python manage.py migrate asct</pre>
+      </li>
+    </ol>
+    <h4><i class="bi bi-hash"></i>백업한 테이블 복원하기(relation을 고려해서 순서에 맞게 해야함)</h4>
+    <pre>psql -U postgres -d asct_v4 -f "b:\ASCT_dj_v4\create_data\backup\asct_file.sql"
+  --> 암호 입력  </pre>
+  </article>
+
+  <article>
     <h4 class="doc-subheader"><i class="bi bi-hash"></i>JSON 파일에서 데이터 가져오기</h4>
-<pre>
-import json
+<pre>import json
 with open('blog/post_data.json', 'r') as f:
-posts_json = json.load(f)
+  posts_json = json.load(f)
 for p in posts_json:
-post = Post(title=p['title'], content=p['content'], author_id = p['user_id'])
-post.save()</pre>
+  post = Post(title=p['title'], content=p['content'], author_id = p['user_id'])
+  post.save()</pre>
   </article>
 
   <article>
@@ -308,10 +329,10 @@ def favorite_update(request, favorite_id):
   </article>
   <article>
       <h4 class="doc-subheader"><i class="bi bi-hash"></i>페이지 정보 전달 및 다시 돌아가기</h4>
-      <p class="ps-2">☞ index 페이지에서 이동하는 링크에 <br>
-        <code>&#123;% if request.GET.page %}?page=&#123;&#123; request.GET.page }}&#123;% endif %}</code>를 전달하고</p>
-      <p class="ps-2">☞ 이동한 페이지에서 list로 다시 이동하는 링크에 <br>
-        <code>&#123;% if request.GET.page %}?page=&#123;&#123; request.GET.page }}&#123;% endif %}</code>를 적용한다.</p>
+      <pre>☞ index 페이지에서 이동하는 링크에
+  &#123;% if request.GET.page %}?page=&#123;&#123; request.GET.page }}&#123;% endif %} 를 전달하고
+☞ 이동한 페이지에서 list로 다시 이동하는 링크에
+  &#123;% if request.GET.page %}?page=&#123;&#123; request.GET.page }}&#123;% endif %}</code>를 적용한다. </pre>
   </article>
 </section>
 
@@ -372,40 +393,38 @@ SOCIALACCOUNT_PROVIDERS = {
 </pre>
   </article>
   <article>
-    <h3>error(allauth관련 db애러)</h3>
+    <h3><i class="bi bi-hash"></i> error(allauth관련 db애러)</h3>
     <pre> migrate 시에 애러 발생 : 
 django.db.utils.ProgrammingError: 오류: "account_emailaddress" 이름의 릴레이션(relation)이 이미 있습니다
 
-이 오류는 django-allauth 패키지의 account 앱이 생성하려는 account_emailaddress 테이블이 데이터베이스(asct_v4)에 이미 존재하기 때문에 발생합니다.
+이 오류는 django-allauth 패키지의 account 앱이 생성하려는 account_emailaddress 
+테이블이 데이터베이스(asct_v4)에 이미 존재하기 때문에 발생합니다.
 
-보통 데이터베이스에는 테이블이 생성되어 있지만, Django의 마이그레이션 기록(django_migrations 테이블)에는 해당 마이그레이션이 적용되지 않은 것으로 되어 있을 때 발생합니다. (예: 기존 DB를 연결했거나 마이그레이션 기록이 초기화된 경우)
+보통 데이터베이스에는 테이블이 생성되어 있지만, Django의 마이그레이션 기록(django_migrations 테이블)에는 
+해당 마이그레이션이 적용되지 않은 것으로 되어 있을 때 발생합니다. (예: 기존 DB를 연결했거나 
+마이그레이션 기록이 초기화된 경우)
 
-해결 방법은 --fake 옵션을 사용하여, 실제로 테이블을 다시 생성하지 않고 마이그레이션이 완료된 것으로 기록만 남기는 것입니다.
+해결 방법은 --fake 옵션을 사용하여, 실제로 테이블을 다시 생성하지 않고 마이그레이션이 
+완료된 것으로 기록만 남기는 것입니다.
 
 python manage.py migrate account --fake
 python manage.py migrate socialaccount --fake
 python manage.py migrate
     </pre>
   </article>
-</section>
-<section>
   <article>
-    <h3>edb에서 asct관련 테이블을 모두 삭제하고 django model을 다시 설정하는 방법</h3>
-    <ol>
-      <li>기존 테이블 삭제 (Migrate Zero)
-        <code>python manage.py migrate asct zero</code>
-      </li>
-      <li>마이그레이션 파일 정리 (선택 사항)
-        <code>__init__.py 파일을 제외한 모든 파일(예: 0001_initial.py, 0002_...py)을 삭제합니다</code>
-      </li>
-      <li>마이그레이션 파일 재생성
-        <code>python manage.py makemigrations asct</code>
-        <code>python manage.py migrate asct</code>
-      </li>
-      <li>(참고) 만약 migrate asct zero가 실패하는 경우
-        <code>DELETE FROM django_migrations WHERE app = 'asct';</code>
-      </li>
-    </ol>
+      <h4 class="doc-subheader"><i class="bi bi-hash"></i>정규식을 이용한 문자 변환</h4>
+      <p>[ re.sub(r' Server| release|\s*\([^)]*\)', '', l.replace('Red Hat Enterprise Linux', 'RHEL')).strip() for l in os_labels ]</p>
+<pre>
+  1. l.replace('Red Hat Enterprise Linux', 'RHEL') 값을 받음
+  2. re.sub(정규식, 바꿀 문자, 받아서 처리할 문자)
+  3. Server: 앞에 공백이 포함된 " Server"라는 글자를 찾아 지웁니다.
+      release: 앞에 공백이 포함된 " release"라는 글자를 찾아 지웁니다.
+      \s*\([^)]*\): 괄호와 그 안의 내용을 지우는 패턴입니다.
+      [^)]*: 닫는 괄호 )가 아닌 문자가 0개 이상 있음 (괄호 안의 내용물)
+      의미: (Core), (Maipo) 처럼 괄호로 묶인 별칭이나 부가 정보를 
+            앞의 공백 포함해서 통째로 지웁니다.
+</pre>
   </article>
 </section>
 {% endblock %}

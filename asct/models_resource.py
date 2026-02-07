@@ -1,50 +1,51 @@
 from django.db import models
-from django.contrib.auth.models import User
+from .models_basic import SSHInfo
 
+class CPUUsage(models.Model):
+    ssh_info = models.ForeignKey(SSHInfo, on_delete=models.CASCADE)
+    hostname = models.CharField(max_length=50, null=True)
+    ip = models.GenericIPAddressField(default="127.0.0.0", null=False)
+    cpu_cores = models.PositiveSmallIntegerField(default=1, null=False)
+    usage_p = models.DecimalField(max_digits=8, decimal_places=2)
+    data_time = models.DateTimeField()
+    
+    comment = models.TextField(null=True, blank=True)
+    is_confirmed = models.BooleanField(default=False, null=False)
+    
+    @property
+    def cpu_core_count(self):
+        return self.cpu_cores
+    
+    def __str__(self) -> str:
+        return f'CPU Usage : {self.hostname} => {self.usage_p}'
+    
+    class Meta:
+        ordering = ['hostname','-data_time']
+        unique_together = ('hostname','ip','data_time')
 
-# class CPUUsage(models.Model):
-#     serverinfo = models.OneToOneField(ServerInfo, on_delete=models.CASCADE)
+class MemoryUsage(models.Model):
+    ssh_info = models.ForeignKey(SSHInfo, on_delete=models.CASCADE)
+    hostname = models.CharField(max_length=50, null=True)
+    ip = models.GenericIPAddressField(default="127.0.0.0", null=False)
+    total_memory = models.PositiveIntegerField(default=0, null=False) # MB 단위
+    usage_p = models.DecimalField(max_digits=5, decimal_places=2)
+    data_time = models.DateTimeField()
     
-#     usage_percent = models.DecimalField(max_digits=8, decimal_places=2, null=False)
-#     data_time = models.DateTimeField(null=False)
+    comment = models.TextField(null=True, blank=True)
+    is_confirmed = models.BooleanField(default=False, null=False)
     
-#     comment = models.TextField(null=True, blank=True)
-#     is_confirmed = models.BooleanField(default=False, null=False)
+    def __str__(self) -> str:
+        return f'Memory Usage : {self.hostname} => {self.usage_p}%'
     
-#     def cpu_core_count(self):
-#         return self.serverinfo.cpu_cores
-    
-#     def __str__(self) -> str:
-#         return f'CPU Usage for {self.serverinfo.hostname}'
-    
-#     class Meta:
-#         ordering = ['serverinfo__hostname','-data_time']
-#         unique_together = ('serverinfo','data_time')
-
-# class MemoryUsage(models.Model):
-#     serverinfo = models.OneToOneField(ServerInfo, on_delete=models.CASCADE)
-    
-#     usage_percent = models.DecimalField(max_digits=4, decimal_places=2, null=False)
-#     @property
-#     def total_memory(self):
-#         return self.serverinfo.memory
-#     data_time = models.DateTimeField(null=False)
-    
-#     comment = models.TextField(null=True, blank=True)
-#     is_confirmed = models.BooleanField(default=False, null=False)
-    
-#     def __str__(self) -> str:
-#         return f'Memory Usage for {self.serverinfo.hostname}'
-    
-#     class Meta:
-#         ordering = ['serverinfo__hostname','-data_time']
-#         unique_together = ('serverinfo', 'data_time')
+    class Meta:
+        ordering = ['hostname','-data_time']
+        unique_together = ('hostname','ip','data_time')
 
 # class DiskUsage(models.Model):
 #     serverinfo = models.OneToOneField(ServerInfo, on_delete=models.CASCADE)
     
 #     storage_local_total = models.IntegerField(null=False) 
-#     storage_local_usage_percent = models.DecimalField(max_digits=4, decimal_places=2, null=False)
+#     storage_local_usage_p = models.DecimalField(max_digits=4, decimal_places=2, null=False)
 #     data_time = models.DateTimeField(null=False)
     
 #     comment = models.TextField(null=True, blank=True)
@@ -120,24 +121,3 @@ from django.contrib.auth.models import User
 #     class Meta:
 #         ordering = ['serverinfo','-data_time']
 #         unique_together = ('serverinfo', 'data_time')
-
-class Command(models.Model):
-    CATEGORY = (
-        ('os', 'Operatiion System Command'),
-        ('basic', 'Basic Shell Command'),
-        ('app','Application Command'),
-        ('traffic','Traffic Command'),
-        ('sysctl','System ctl Command'),
-        ('etc', '기타')
-    )
-    name = models.CharField(max_length=255, unique=True, null=False)
-    script = models.TextField(null=False)
-    description = models.TextField(null=True, blank=True)
-    category = models.CharField(max_length=10, choices=CATEGORY, default='os')
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self) -> str:
-        return self.name
-
-    class Meta:
-        ordering = ['name']

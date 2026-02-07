@@ -5,8 +5,8 @@ from django.core.paginator import Paginator
 from django.conf import settings
 from django.db.models import Count
 from django.http import HttpResponse
-from .models_basic import Command, SSHInfo, CommandHistory, ServerInfo
-from .forms_basic import CommandForm, SSHInfoForm, ServerInfoForm
+from ..asct.models_basic import Command, SSHInfo, CommandHistory, ServerInfo
+from ..asct.forms_basic import CommandForm, SSHInfoForm, ServerInfoForm
 import paramiko
 import os
 import json

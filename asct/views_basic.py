@@ -2,48 +2,12 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.conf import settings
 from django.db.models import Count
 from django.http import HttpResponse
 from .models_basic import Command, SSHInfo, CommandHistory, ServerInfo
 from .forms_basic import CommandForm, SSHInfoForm, ServerInfoForm
-import paramiko
-import os
-import json
 import openpyxl
-
-def index(request):
-    servers = ServerInfo.objects.all()
-    
-    # 1. OS 버전별 분포 (Pie Chart용)
-    os_dist = servers.values('os_version').annotate(count=Count('os_version')).order_by('-count')
-    
-    # 2. Memory 상위 10개 서버 (Bar Chart용)
-    top_memory = servers.order_by('-memory')[:10]
-    
-    # 3. Disk 상위 10개 서버 (Bar Chart용)
-    top_disk = servers.order_by('-total_disk')[:10]
-    
-    # 4. Resource Usage Top 5 (Progress Bar용)
-    top_cpu_usage = servers.exclude(cpu_usage__isnull=True).order_by('-cpu_usage')[:5]
-    top_memory_usage = servers.exclude(memory_usage__isnull=True).order_by('-memory_usage')[:5]
-    top_disk_usage = servers.exclude(disk_usage__isnull=True).order_by('-disk_usage')[:5]
-
-    context = {
-        'total_servers': servers.count(),
-        'virtual_count': servers.filter(is_virtual=True).count(),
-        'physical_count': servers.filter(is_virtual=False).count(),
-        'os_labels': list(os_dist.values_list('os_version', flat=True)),
-        'os_data': list(os_dist.values_list('count', flat=True)),
-        'mem_labels': [s.hostname for s in top_memory],
-        'mem_data': [s.memory for s in top_memory],
-        'disk_labels': [s.hostname for s in top_disk],
-        'disk_data': [s.total_disk for s in top_disk],
-        'top_cpu_usage': top_cpu_usage,
-        'top_memory_usage': top_memory_usage,
-        'top_disk_usage': top_disk_usage,
-    }
-    return render(request, 'asct/dashboard.html', context)
+from .run_by_ssh import run_ssh_cmd_serverinfo
 
 # =============== command 관련 CRUD ===============
 def cmd_list(request):
@@ -171,107 +135,12 @@ def cmd_select(request):
     
     return render(request, 'asct/command/select.html', {'commands': commands, 'sshinfos': sshinfos})
 
-def run_ssh(request, ssh_obj, cmd_obj=None):
-    result = ""
-    error = ""
-    server_info_obj=None
-
-    try:
-        # 1. SSH 클라이언트 생성
-        client = paramiko.SSHClient()
-        # 2. 호스트 키 정책 설정 (알려지지 않은 호스트도 자동 허용 - 보안상 주의 필요)
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        # 3. 서버 접속
-        client.connect(
-            hostname=ssh_obj.ip,
-            port=ssh_obj.port,
-            username=ssh_obj.login_id,
-            password=ssh_obj.password,
-            timeout=10
-        )
-        
-        # 4. 명령어 실행
-        if cmd_obj:
-            stdin, stdout, stderr = client.exec_command(cmd_obj.script) # type: ignore
-            result = stdout.read().decode('utf-8')
-            error = stderr.read().decode('utf-8')
-            client.close()
-            
-            CommandHistory.objects.create(
-                ssh_info=ssh_obj,
-                command=cmd_obj,
-                executed_by=request.user,
-                stdout=result,
-                stderr=error
-            )
-            return result, error
-            
-        else:
-            sftp = client.open_sftp()
-            remote_script = f'/tmp/get_svinfo_{ssh_obj.id}.sh' # type: ignore
-
-            if request.method == 'POST' and request.FILES.get('script_file'):
-                script_file = request.FILES['script_file']
-                sftp.putfo(script_file, remote_script)
-            else:
-                script_path = os.path.join(settings.BASE_DIR, 'static', 'script_files', 'get_svinfo.sh')
-                if os.path.exists(script_path):
-                    sftp.put(script_path, remote_script)
-                else:
-                    raise FileNotFoundError("Default script file not found.")
-            
-            sftp.chmod(remote_script, 0o755)
-            sftp.close()# 3. Execute Script (Fix windows line endings first)
-            
-            client.exec_command(f"sed -i 's/\r$//' {remote_script}")
-            
-            stdin, stdout, stderr = client.exec_command(remote_script)
-            exit_status = stdout.channel.recv_exit_status()
-            
-            # 4. Cleanup
-            client.exec_command(f"rm {remote_script}")
-            
-            # 5. 결과 읽기 (bytes를 utf-8로 디코딩)
-            result = stdout.read().decode('utf-8')
-            error = stderr.read().decode('utf-8')
-            client.close()
-            
-            # 6. JSON 파싱 (출력 중 JSON 부분만 추출)
-            json_str = result[result.find('{'):result.rfind('}')+1]
-            data = json.loads(json_str)
-            
-            # 결과 저장 (ServerInfo 업데이트 또는 생성)
-            server_info_obj, created = ServerInfo.objects.update_or_create(
-                hostname=data['hostname'],
-                defaults={
-                    'sshinfos': ssh_obj,
-                    'ip1': data.get('ip1'),
-                    'ip2': data.get('ip2'),
-                    'os_version': data.get('os_version'),
-                    'kernel_version': data.get('kernel_version'),
-                    'cpu_cores': data.get('cpu_cores'),
-                    'memory': data.get('memory'),
-                    'total_disk': data.get('total_disk'),
-                    'uptime': data.get('uptime'),
-                    'data_time': data.get('data_time'),
-                    'is_virtual': data.get('is_virtual'),
-                    'cpu_usage': data.get('cpu_usage'),
-                    'memory_usage': data.get('memory_usage'),
-                    'disk_usage': data.get('disk_usage'),
-                }
-            )
-            return server_info_obj, created, data, error
-        
-    except Exception as e:
-        return ("", f"## 연결실패: {str(e)} ##")
-
-
 @login_required
 def cmd_run(request, ssh_id, cmd_id):
     ssh_info = get_object_or_404(SSHInfo, id=ssh_id)
     command_obj = get_object_or_404(Command, id=cmd_id)
     
-    result, error = run_ssh(request, ssh_info, command_obj)
+    result, error = run_ssh_cmd_serverinfo(request, ssh_info, command_obj)
 
     context = {
         'ssh_info': ssh_info,
@@ -291,24 +160,6 @@ def serverinfo_list(request):
     page_obj = paginator.get_page(page)
     
     return render(request, 'asct/svinfo/list.html', {'page_obj': page_obj})
-
-@login_required
-def serverinfo_update(request, pk):
-    server_info = get_object_or_404(ServerInfo, id=pk)
-    if request.method == 'POST':
-        if 'refresh_server' in request.POST:
-            ssh_info = server_info.sshinfos
-            server_info_obj, created, data, error = run_ssh(request, ssh_info )
-            messages.success(request, f"{server_info_obj.hostname} 갱신 성공")
-            return redirect('asct:serverinfo_update', pk=pk)
-
-        form = ServerInfoForm(request.POST, instance=server_info)
-        if form.is_valid():
-            form.save()
-            return redirect('asct:serverinfo_list')
-    else:
-        form = ServerInfoForm(instance=server_info)
-    return render(request, 'asct/svinfo/update.html', {'form': form, 'server_info': server_info})
 
 @login_required
 def serverinfo_delete(request, pk):
@@ -332,7 +183,7 @@ def serverinfo_select(request):
 def serverinfo_run(request, ssh_id): # create
     ssh_info = get_object_or_404(SSHInfo, id=ssh_id)
     
-    server_info_obj, created, data, error = run_ssh(request, ssh_info )
+    server_info_obj, created, data, error = run_ssh_cmd_serverinfo(request, ssh_info )
 
     # 결과를 보여줄 템플릿으로 렌더링 (result.html은 예시입니다)
     context = {
@@ -342,6 +193,24 @@ def serverinfo_run(request, ssh_id): # create
         'server_info': server_info_obj or created,
     }
     return render(request, 'asct/svinfo/serverinfo_result.html', context)
+
+@login_required
+def serverinfo_update(request, pk):
+    server_info = get_object_or_404(ServerInfo, id=pk)
+    if request.method == 'POST':
+        if 'refresh_server' in request.POST:
+            ssh_info = server_info.sshinfos
+            server_info_obj, created, data, error = run_ssh_cmd_serverinfo(request, ssh_info )
+            messages.success(request, f"{server_info_obj.hostname} 갱신 성공")
+            return redirect('asct:serverinfo_update', pk=pk)
+
+        form = ServerInfoForm(request.POST, instance=server_info)
+        if form.is_valid():
+            form.save()
+            return redirect('asct:serverinfo_list')
+    else:
+        form = ServerInfoForm(instance=server_info)
+    return render(request, 'asct/svinfo/update.html', {'form': form, 'server_info': server_info})
 
 @login_required
 def serverinfo_export(request):

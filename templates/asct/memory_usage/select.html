@@ -3,12 +3,12 @@
 {% block content %}
 <div class="container-fluid px-4">
     {% include 'asct/_nav.html' %}
-    <h1 class="mt-4">Server Info 수집하기</h1>
+    <h1 class="mt-4">Memory Usage 수집하기</h1>
 
     <div class="card mb-4">
-        <div class="card-header"> <i class="fas fa-terminal me-1"></i>SSH와 shell Script file 선택</div>
+        <div class="card-header"> <i class="fas fa-terminal me-1"></i>SSH 선택</div>
         <div class="card-body">
-            <form method="post" action="{% url 'asct:serverinfo_select' %}" >
+            <form method="post" action="{% url 'asct:memory_usage_select' %}">
                 {% csrf_token %}
                 <div class="mb-3">
                     <label for="ssh_id" class="form-label">SSH 선택</label>
@@ -27,10 +27,12 @@
                     <input type="file" name="script_file" class="form-control">
                 </div>
                 <button type="submit" class="btn btn-primary"><i class="fas fa-play me-1"></i> Run</button>
-                <a href="{% url 'asct:serverinfo_list' %}" class="btn btn-secondary">Cancel</a>
+                <a href="{% url 'asct:memory_usage_select' %}" class="btn btn-secondary">Cancel</a>
             </form>
         </div>
     </div>
+
+    <!-- Loading Overlay -->
     {% include 'asct/loading.html' %}
 </div>
 {% endblock %}

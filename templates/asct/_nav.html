@@ -26,9 +26,11 @@
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> 자원정보 </a>
                 <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'asct:cpu_usage_select' %}">GET CPU Usage</a></li>
+                    <li><a class="dropdown-item" href="{% url 'asct:cpu_usage_list' %}">CPU Usage</a></li>
+                    <li><a class="dropdown-item" href="{% url 'asct:memory_usage_select' %}">GET Memory Usage</a></li>
+                    <li><a class="dropdown-item" href="{% url 'asct:memory_usage_list' %}">Memory Usage</a></li>
                     <li><a class="dropdown-item" href="#">Traffic</a></li>
-                    <li><a class="dropdown-item" href="#">CPU</a></li>
-                    <li><a class="dropdown-item" href="#">Memory</a></li>
                 </ul>
             </li>
         </ul>

@@ -1,38 +1,36 @@
-{% if is_paginated or page_obj %}
+{% if is_paginated or page_obj.has_other_pages %}
 <style>
     .pagination a { margin: 0; padding: 4px 12px; }
 </style>
 <nav aria-label="Page navigation example">
     <ul class="pagination justify-content-center pagination-md">
-        {% with search_val=request.GET.searched|default:"" category_val=request.GET.category|default:"" %}
-        {% with search_param=search_val|yesno:"&searched=,"|add:search_val category_param=category_val|yesno:"&category=,"|add:category_val %}
         {% if page_obj.has_previous %}
         <li class="page-item">
-        <a class="page-link" href="?page=1&searched={{ request.GET.searched }}&category={{ request.GET.category }}" aria-label="Previous">« </a>
+            <a class="page-link" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.searched %}&searched={{ request.GET.searched }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="First">«</a>
         </li>
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{{ search_param }}{{ category_param }}" aria-label="Previous">←</a>
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.searched %}&searched={{ request.GET.searched }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="Previous">←</a>
         </li>
         {% endif %}
         {% for num in page_obj.paginator.page_range %}
             {% if page_obj.number == num %}
             <li class="page-item active">
-                <a class="page-link" href="?page={{ num }}{{ search_param }}{{ category_param }}">{{ num }}</a></li>
+                <span class="page-link">{{ num }}</span>
+            </li>
             {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'4' %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ num }}{{ search_param }}{{ category_param }}">{{ num }}</a></li>
+                    <a class="page-link" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.searched %}&searched={{ request.GET.searched }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">{{ num }}</a>
+                </li>
             {% endif %}
         {% endfor %}
         {% if page_obj.has_next %}
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}{{ search_param }}{{ category_param }}" aria-label="Next">→</a>
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.searched %}&searched={{ request.GET.searched }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="Next">→</a>
         </li>
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{{ search_param }}{{ category_param }}" aria-label="Next">»</a>
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.searched %}&searched={{ request.GET.searched }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="Last">»</a>
         </li>
         {% endif %}
-        {% endwith %}
-        {% endwith %}
     </ul>
 </nav>
 {% endif %}

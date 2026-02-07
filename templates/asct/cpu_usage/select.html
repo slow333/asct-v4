@@ -3,12 +3,12 @@
 {% block content %}
 <div class="container-fluid px-4">
     {% include 'asct/_nav.html' %}
-    <h1 class="mt-4">Server Info 수집하기</h1>
+    <h1 class="mt-4">CPU Usage 수집하기</h1>
 
     <div class="card mb-4">
         <div class="card-header"> <i class="fas fa-terminal me-1"></i>SSH와 shell Script file 선택</div>
         <div class="card-body">
-            <form method="post" action="{% url 'asct:serverinfo_select' %}" >
+            <form method="post" action="{% url 'asct:cpu_usage_select' %}">
                 {% csrf_token %}
                 <div class="mb-3">
                     <label for="ssh_id" class="form-label">SSH 선택</label>

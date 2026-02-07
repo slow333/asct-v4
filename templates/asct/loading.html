@@ -1,0 +1,19 @@
+<div id="loadingOverlay" class="d-none position-fixed top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center z-9999" style="background-color: rgba(0,0,0,0.5);">
+    <div class="card p-4 shadow-lg" style="min-width: 300px;">
+        <div class="text-center mb-3">
+            <h5 class="card-title">데이터 수집 중</h5>
+            <p class="card-text text-muted">서버 접속 및 데이터 수집 중입니다.<br>잠시만 기다려주세요.</p>
+        </div>
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelector('.card-body form').addEventListener('submit', function(e) {
+        if (this.checkValidity()) {
+            document.getElementById('loadingOverlay').classList.remove('d-none');
+        }
+    });
+</script>

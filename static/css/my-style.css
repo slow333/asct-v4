@@ -1,0 +1,19 @@
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+.flex-start {
+    display: flex;
+    justify-content: start;
+    align-items: baseline;
+}
+.flex-end {
+    display: flex;
+    justify-content: end;
+    align-items: baseline;
+}
+/* custom.css */
+.h-31px {
+    height: 31px !important; /* Bootstrap의 기본 스타일을 덮어써야 할 경우 !important를 사용합니다. */
+}

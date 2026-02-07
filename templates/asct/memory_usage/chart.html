@@ -1,0 +1,44 @@
+{% extends 'base/base.html' %}
+{% block title %}Memory Usage Chart{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    {% include 'asct/_nav.html' %}
+    
+    <div class="flex-between flex-wrap flex-md-nowrap align-items-center mb-3 border-bottom">
+        <h1 class="h2">Memory Usage Trends</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <form class="d-flex me-2" method="get">
+                {% if period %}<input type="hidden" name="period" value="{{ period }}">{% endif %}
+                <select class="form-select form-select-sm me-2" name="q" onchange="this.form.submit()">
+                    <option value="">All Hosts</option>
+                    {% for host in host_list %}
+                    <option value="{{ host }}" {% if query == host %}selected{% endif %}>{{ host }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+            <div class="btn-group me-2">
+                <a href="?period=1w{% if query %}&q={{ query|urlencode }}{% endif %}" class="btn btn-sm btn-primary h-31px {% if period == '1w' %}active{% endif %}">1주</a>
+                <a href="?period=1m{% if query %}&q={{ query|urlencode }}{% endif %}" class="btn btn-sm btn-primary h-31px {% if period == '1m' %}active{% endif %}">1개월</a>
+                <a href="?period=3m{% if query %}&q={{ query|urlencode }}{% endif %}" class="btn btn-sm btn-primary h-31px {% if period == '3m' %}active{% endif %}">3개월</a>
+                <a href="?period=all{% if query %}&q={{ query|urlencode }}{% endif %}" class="btn btn-sm btn-primary h-31px {% if period == 'all' %}active{% endif %}">전체</a>
+            </div>
+            <a href="{% url 'asct:memory_usage_list' %}" class="btn btn-sm btn-secondary h-31px">
+                <i class="bi bi-list-ul"></i> 목록으로
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="chart-area" style="text-align: center;">
+                {% if chart_graphic %}
+                <img src="data:image/png;base64,{{ chart_graphic }}" alt="Memory Usage Chart" style="max-width: 100%; height: auto;" />
+                {% else %}
+                <p class="text-center py-5">데이터가 없습니다.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -184,21 +184,7 @@ code {
   font-size:14px; 
   padding: 2px 10px; 
 }
-.flex-between {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-}
-.flex-start {
-  display: flex;
-  justify-content: start;
-  align-items: baseline;
-}
-.flex-end {
-  display: flex;
-  justify-content: end;
-  align-items: baseline;
-}
+
 #scrollTopBtn {
   display: none; 
   position: fixed; 

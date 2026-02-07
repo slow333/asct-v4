@@ -1,9 +1,6 @@
 #!/bin/bash
 
-# Ensure generic locale for parsing
 export LC_ALL=C
-
-# Hostname
 HOSTNAME=$(hostname)
 
 # IP Addresses
@@ -28,7 +25,7 @@ else
     OS_VERSION=$(uname -sr)
 fi
 # Remove quotes if any
-OS_VERSION=$(echo "$OS_VERSION" | sed 's/"//g')
+OS_VERSION=$(echo "$OS_VERSION" | sed 's/"//g' | sed 's/Red Hat Enterprise Linux/RHEL/g' | sed 's/ Server//g' |sed 's/ release//g')
 
 # Kernel Version
 KERNEL_VERSION=$(uname -r)
@@ -40,19 +37,7 @@ else
     CPU_CORES=$(grep -c ^processor /proc/cpuinfo)
 fi
 
-# CPU Usage (%) - using /proc/stat for 1 second interval
-get_cpu_usage() {
-    read cpu a b c idle rest < /proc/stat
-    prev_total=$((a+b+c+idle))
-    prev_idle=$idle
-    sleep 1
-    read cpu a b c idle rest < /proc/stat
-    total=$((a+b+c+idle))
-    let "diff_total=$total-$prev_total"
-    let "diff_idle=$idle-$prev_idle"
-    awk -v diff_total="$diff_total" -v diff_idle="$diff_idle" 'BEGIN { if(diff_total==0) print 0; else printf "%.1f", (diff_total-diff_idle)/diff_total*100 }'
-}
-CPU_USAGE=$(get_cpu_usage)
+CPU_USAGE=$(sar -u 1 1 | awk 'END {printf "%.1f", 100-$NF}')
 
 # Memory (GB)
 # Get total memory in kB and convert to GB (rounding)
@@ -99,11 +84,11 @@ fi
 DATA_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 # Save to CSV
-CHECK_DATE=$(date +%Y%m%d)
-CSV_FILE="/tmp/${HOSTNAME}_${IP1}_${CHECK_DATE}.csv"
+# CHECK_DATE=$(date +%Y%m%d)
+# CSV_FILE="/tmp/${HOSTNAME}_${IP1}_${CHECK_DATE}.csv"
 
-echo "hostname,ip1,ip2,os_version,kernel_version,cpu_cores,memory,total_disk,uptime,data_time,is_virtual,cpu_usage,memory_usage,disk_usage" > "$CSV_FILE"
-echo "$HOSTNAME,$IP1,$IP2,\"$OS_VERSION\",$KERNEL_VERSION,$CPU_CORES,$MEMORY,$TOTAL_DISK,$UPTIME_DAYS,\"$DATA_TIME\",$IS_VIRTUAL,$CPU_USAGE,$MEM_USAGE,$DISK_USAGE" >> "$CSV_FILE"
+# echo "hostname,ip1,ip2,os_version,kernel_version,cpu_cores,memory,total_disk,uptime,data_time,is_virtual,cpu_usage,memory_usage,disk_usage" > "$CSV_FILE"
+# echo "$HOSTNAME,$IP1,$IP2,\"$OS_VERSION\",$KERNEL_VERSION,$CPU_CORES,$MEMORY,$TOTAL_DISK,$UPTIME_DAYS,\"$DATA_TIME\",$IS_VIRTUAL,$CPU_USAGE,$MEM_USAGE,$DISK_USAGE" >> "$CSV_FILE"
 
 # Output JSON
 cat <<EOF
