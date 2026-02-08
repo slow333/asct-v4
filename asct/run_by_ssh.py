@@ -5,267 +5,109 @@ import paramiko, os, json, csv, io
 from django.utils.timezone import make_aware
 from datetime import datetime
 
-# ========= Paramiko 실행:  파일이용 traffic usage 수집 ==========
-def run_ssh_traffic_usage(request, ssh_obj):
-    error_msg = ""
+def get_ssh_connection(ssh_obj):
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect(
+        hostname=ssh_obj.ip,
+        port=ssh_obj.port,
+        username=ssh_obj.login_id,
+        password=ssh_obj.password,
+        timeout=10
+    )
+    return client
 
-    try:
-        client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(
-            hostname=ssh_obj.ip,
-            port=ssh_obj.port,
-            username=ssh_obj.login_id,
-            password=ssh_obj.password,
-            timeout=10
-        )
-        # 4. 명령어 실행
-        sftp = client.open_sftp()
-        remote_script = f'/tmp/month_traffic_usage_{ssh_obj.id}.sh' # type: ignore
+def common_sftp_result(request, client, ssh_obj, default_script_name, remote_script_prefix):
+    sftp = client.open_sftp()
+    remote_script = f'/tmp/{remote_script_prefix}_{ssh_obj.id}.sh'
 
-        if request.method == 'POST' and request.FILES.get('script_file'):
-            script_file = request.FILES['script_file']
-            sftp.putfo(script_file, remote_script)
-        else:
-            script_path = os.path.join(settings.BASE_DIR, 'static', 'script_files', 'get_month_traffic_usage.sh')
-            if os.path.exists(script_path):
-                sftp.put(script_path, remote_script)
-            else:
-                raise FileNotFoundError("Default script file not found.")
-        
-        sftp.chmod(remote_script, 0o755)
-        sftp.close()
-        # 3. Execute Script (Fix windows line endings first)
-        client.exec_command(f"sed -i 's/\r$//' {remote_script}")
-        
-        stdin, stdout, stderr = client.exec_command(remote_script)
-        exit_status = stdout.channel.recv_exit_status()
-        
-        output = stdout.read().decode('utf-8')
-        error_msg = stderr.read().decode('utf-8')
-
-        if exit_status != 0:
-            client.exec_command(f"rm {remote_script}")
-            client.close()
-            return None, False, {}, f"Script execution failed: {error_msg}"
-
-        # Parse output to find CSV filename
-        csv_file_path = ""
-        for line in output.splitlines():
-            if "Successfully generated Traffic statistic CSV:" in line:
-                csv_file_path = line.split(": ")[1].strip()
-        if not csv_file_path:
-            client.exec_command(f"rm {remote_script}")
-            client.close()
-            return None, False, {}, "CSV file path not found in script output."
-
-        # Read CSV content
-        stdin, stdout, stderr = client.exec_command(f"cat {csv_file_path}")
-        csv_content = stdout.read().decode('utf-8')
-        
-        # Cleanup remote files
-        client.exec_command(f"rm {remote_script} {csv_file_path}")
-        client.close()
-
-        # Parse CSV and Save to DB
-        f = io.StringIO(csv_content)
-        reader = csv.DictReader(f)
-        
-        saved_count = 0
-        for row in reader:
-            # CSV hostname,IP,Date,IFACE,Speed,rxkB/s,txkB/s
-            try:
-                # Make datetime aware to avoid RuntimeWarning
-                # Handle RHEL 10 / Modern sysstat formats (ISO 8601 with T, quotes)
-                # Replace T with space and take first 19 chars to ignore timezone/garbage
-                date_str = row['Date'].strip().replace('"', '').replace("'", "").replace('T', ' ')[:19]
-                dt_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
-                aware_dt = make_aware(dt_obj)
-                
-                rx_val = row.get('rxkB/s', '').strip()
-                tx_val = row.get('txkB/s', '').strip()
-                if len(row['IFACE']) > 20:
-                    continue
-
-                NetworkUsage.objects.update_or_create(
-                    hostname=row['hostname'].strip(),
-                    ip=row['IP'].strip(),
-                    data_time=aware_dt,
-                    if_name=row['IFACE'].strip(),
-                    speed=row['Speed'].strip(),
-                    defaults={
-                        'ssh_info': ssh_obj,
-                        'rxkB_s': float(rx_val) if rx_val else 0.0,
-                        'txkB_s': float(tx_val) if tx_val else 0.0,
-                        'is_confirmed': True
-                    }
-                )
-                saved_count += 1
-            except ValueError as e:
-                print(f"Date parse error for {row.get('hostname')}: {row.get('Date')} - {e}")
-                continue
-            
-        return None, False, {'count': saved_count}, error_msg
-        
-    except Exception as e:
-        return None, False, {}, f"## 연결실패: {str(e)} ##"
-
-# ========= Paramiko 실행:  파일이용 cpu usage 수집 ==========
-def run_ssh_cpu_usage(request, ssh_obj):
-    error_msg = ""
-
-    try:
-        client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(
-            hostname=ssh_obj.ip,
-            port=ssh_obj.port,
-            username=ssh_obj.login_id,
-            password=ssh_obj.password,
-            timeout=10
-        )
-        # 4. 명령어 실행
-        sftp = client.open_sftp()
-        remote_script = f'/tmp/month_cpu_usage_{ssh_obj.id}.sh' # type: ignore
-
-        if request.method == 'POST' and request.FILES.get('script_file'):
-            script_file = request.FILES['script_file']
-            sftp.putfo(script_file, remote_script)
-        else:
-            script_path = os.path.join(settings.BASE_DIR, 'static', 'script_files', 'get_month_cpu_usage.sh')
-            if os.path.exists(script_path):
-                sftp.put(script_path, remote_script)
-            else:
-                raise FileNotFoundError("Default script file not found.")
-        
-        sftp.chmod(remote_script, 0o755)
-        sftp.close()
-        # 3. Execute Script (Fix windows line endings first)
-        client.exec_command(f"sed -i 's/\r$//' {remote_script}")
-        
-        stdin, stdout, stderr = client.exec_command(remote_script)
-        exit_status = stdout.channel.recv_exit_status()
-        
-        output = stdout.read().decode('utf-8')
-        error_msg = stderr.read().decode('utf-8')
-
-        if exit_status != 0:
-            client.exec_command(f"rm {remote_script}")
-            client.close()
-            return None, False, {}, f"Script execution failed: {error_msg}"
-
-        # Parse output to find CSV filename
-        csv_file_path = ""
-        for line in output.splitlines():
-            if "Successfully generated CSV:" in line:
-                csv_file_path = line.split(": ")[1].strip()
-        
-        if not csv_file_path:
-            client.exec_command(f"rm {remote_script}")
-            client.close()
-            return None, False, {}, "CSV file path not found in script output."
-
-        # Read CSV content
-        stdin, stdout, stderr = client.exec_command(f"cat {csv_file_path}")
-        csv_content = stdout.read().decode('utf-8')
-        
-        # Cleanup remote files
-        client.exec_command(f"rm {remote_script} {csv_file_path}")
-        client.close()
-
-        # Parse CSV and Save to DB
-        f = io.StringIO(csv_content)
-        reader = csv.DictReader(f)
-        
-        saved_count = 0
-        for row in reader:
-            # CSV Headers: hostname,IP,Date,Cpu_cores,Total_Usage(%)
-            
-            try:
-                # Make datetime aware to avoid RuntimeWarning
-                # Handle RHEL 10 / Modern sysstat formats (ISO 8601 with T, quotes)
-                # Replace T with space and take first 19 chars to ignore timezone/garbage
-                date_str = row['Date'].strip().replace('"', '').replace("'", "").replace('T', ' ')[:19]
-                dt_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
-                aware_dt = make_aware(dt_obj)
-                
-                CPUUsage.objects.update_or_create(
-                    hostname=row['hostname'].strip(),
-                    ip=row['IP'].strip(),
-                    data_time=aware_dt,
-                    defaults={
-                        'ssh_info': ssh_obj,
-                        'cpu_cores': int(row['Cpu_cores']) if row.get('Cpu_cores') else 1,
-                        'usage_p': float(row['Total_Usage(%)']),
-                        'is_confirmed': True
-                    }
-                )
-                saved_count += 1
-            except ValueError as e:
-                print(f"Date parse error for {row.get('hostname')}: {row.get('Date')} - {e}")
-                continue
-            
-        return None, False, {'count': saved_count}, error_msg
-        
-    except Exception as e:
-        return None, False, {}, f"## 연결실패: {str(e)} ##"
-
-# ========= Paramiko 실행:  파일이용 memory usage 수집 ==========
-def run_ssh_memory_usage(request, ssh_obj):
-    error_msg = ""
-
-    try:
-        client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(
-            hostname=ssh_obj.ip,
-            port=ssh_obj.port,
-            username=ssh_obj.login_id,
-            password=ssh_obj.password,
-            timeout=10
-        )
-        
-        sftp = client.open_sftp()
-        remote_script = f'/tmp/month_memory_usage_{ssh_obj.id}.sh'
-
-        script_path = os.path.join(settings.BASE_DIR, 'static', 'script_files', 'get_month_memory_usage.sh')
+    if request.method == 'POST' and request.FILES.get('script_file'):
+        script_file = request.FILES['script_file']
+        sftp.putfo(script_file, remote_script)
+    else:
+        script_path = os.path.join(settings.BASE_DIR, 'static', 'script_files', default_script_name)
         if os.path.exists(script_path):
             sftp.put(script_path, remote_script)
         else:
             raise FileNotFoundError("Default script file not found.")
-        
-        sftp.chmod(remote_script, 0o755)
-        sftp.close()
-        
-        client.exec_command(f"sed -i 's/\r$//' {remote_script}")
-        
-        stdin, stdout, stderr = client.exec_command(remote_script)
-        exit_status = stdout.channel.recv_exit_status()
-        
-        output = stdout.read().decode('utf-8')
-        error_msg = stderr.read().decode('utf-8')
+    
+    sftp.chmod(remote_script, 0o755)
+    sftp.close()
+    # 3. Execute Script (Fix windows line endings first)
+    client.exec_command(f"sed -i 's/\r$//' {remote_script}")
+    
+    stdin, stdout, stderr = client.exec_command(remote_script)
+    exit_status = stdout.channel.recv_exit_status()
+    
+    output = stdout.read().decode('utf-8')
+    error_msg = stderr.read().decode('utf-8')
 
-        if exit_status != 0:
-            client.exec_command(f"rm {remote_script}")
-            client.close()
-            return None, False, {}, f"Script execution failed: {error_msg}"
+    if exit_status != 0:
+        client.exec_command(f"rm {remote_script}")
+        client.close()
+        return None, f"Script execution failed: {error_msg}", None
+    
+    return output, error_msg, remote_script
 
+def common_ssh_usage_collector(request, ssh_obj, default_script_name, remote_script_prefix, row_processor):
+    error_msg = ""
+    try:
+        client = get_ssh_connection(ssh_obj)
+        # 4. 명령어 실행
+        output, error_msg, remote_script = common_sftp_result(request, client, ssh_obj, default_script_name, remote_script_prefix) # type: ignore
+        
+        if output is None:
+            return None, False, {}, error_msg
+        # sftp = client.open_sftp()
+        # remote_script = f'/tmp/{remote_script_prefix}_{ssh_obj.id}.sh'
+
+        # if request.method == 'POST' and request.FILES.get('script_file'):
+        #     script_file = request.FILES['script_file']
+        #     sftp.putfo(script_file, remote_script)
+        # else:
+        #     script_path = os.path.join(settings.BASE_DIR, 'static', 'script_files', default_script_name)
+        #     if os.path.exists(script_path):
+        #         sftp.put(script_path, remote_script)
+        #     else:
+        #         raise FileNotFoundError("Default script file not found.")
+        
+        # sftp.chmod(remote_script, 0o755)
+        # sftp.close()
+        # # 3. Execute Script (Fix windows line endings first)
+        # client.exec_command(f"sed -i 's/\r$//' {remote_script}")
+        
+        # stdin, stdout, stderr = client.exec_command(remote_script)
+        # exit_status = stdout.channel.recv_exit_status()
+        
+        # output = stdout.read().decode('utf-8')
+        # error_msg = stderr.read().decode('utf-8')
+
+        # if exit_status != 0:
+        #     client.exec_command(f"rm {remote_script}")
+        #     client.close()
+        #     return None, False, {}, f"Script execution failed: {error_msg}"
+
+        # Parse output to find CSV filename
         csv_file_path = ""
-        for line in output.splitlines():
-            if "Successfully generated CSV:" in line:
-                csv_file_path = line.split(": ")[1].strip()
-        
+        for line in output.splitlines(): # type: ignore
+            if "Successfully generated" in line and "CSV:" in line:
+                parts = line.split(": ")
+                if len(parts) > 1:
+                    csv_file_path = parts[1].strip()
         if not csv_file_path:
             client.exec_command(f"rm {remote_script}")
             client.close()
             return None, False, {}, "CSV file path not found in script output."
 
+        # Read CSV content
         stdin, stdout, stderr = client.exec_command(f"cat {csv_file_path}")
         csv_content = stdout.read().decode('utf-8')
         
+        # Cleanup remote files
         client.exec_command(f"rm {remote_script} {csv_file_path}")
         client.close()
 
+        # Parse CSV and Save to DB
         f = io.StringIO(csv_content)
         reader = csv.DictReader(f)
         
@@ -276,25 +118,77 @@ def run_ssh_memory_usage(request, ssh_obj):
                 dt_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
                 aware_dt = make_aware(dt_obj)
                 
-                MemoryUsage.objects.update_or_create(
-                    hostname=row['Hostname'].strip(),
-                    ip=row['IP'].strip(),
-                    data_time=aware_dt,
-                    defaults={
-                        'ssh_info': ssh_obj,
-                        'total_memory': int(row['Total_Mem']) if row.get('Total_Mem') else 0,
-                        'usage_p': float(row['Usage(%)']),
-                        'is_confirmed': True
-                    }
-                )
-                saved_count += 1
-            except ValueError:
+                if row_processor(row, ssh_obj, aware_dt):
+                    saved_count += 1
+            except ValueError as e:
+                # print(f"Date parse error: {e}")
                 continue
             
         return None, False, {'count': saved_count}, error_msg
         
     except Exception as e:
         return None, False, {}, f"## 연결실패: {str(e)} ##"
+
+# ========= Paramiko 실행:  파일이용 traffic usage 수집 ==========
+def run_ssh_traffic_usage(request, ssh_obj):
+    def processor(row, ssh_obj, aware_dt):
+        rx_val = row.get('rxkB/s', '').strip()
+        tx_val = row.get('txkB/s', '').strip()
+        if len(row['IFACE']) > 20:
+            return False
+
+        NetworkUsage.objects.update_or_create(
+            hostname=row['hostname'].strip(),
+            ip=row['IP'].strip(),
+            data_time=aware_dt,
+            if_name=row['IFACE'].strip(),
+            speed=row['Speed'].strip(),
+            defaults={
+                'ssh_info': ssh_obj,
+                'rxkB_s': float(rx_val) if rx_val else 0.0,
+                'txkB_s': float(tx_val) if tx_val else 0.0,
+                'is_confirmed': True
+            }
+        )
+        return True
+
+    return common_ssh_usage_collector(request, ssh_obj, 'get_month_traffic_usage.sh', 'month_traffic_usage', processor)
+
+# ========= Paramiko 실행:  파일이용 cpu usage 수집 ==========
+def run_ssh_cpu_usage(request, ssh_obj):
+    def processor(row, ssh_obj, aware_dt):
+        CPUUsage.objects.update_or_create(
+            hostname=row['hostname'].strip(),
+            ip=row['IP'].strip(),
+            data_time=aware_dt,
+            defaults={
+                'ssh_info': ssh_obj,
+                'cpu_cores': int(row['Cpu_cores']) if row.get('Cpu_cores') else 1,
+                'usage_p': float(row['Total_Usage(%)']),
+                'is_confirmed': True
+            }
+        )
+        return True
+
+    return common_ssh_usage_collector(request, ssh_obj, 'get_month_cpu_usage.sh', 'month_cpu_usage', processor)
+
+# ========= Paramiko 실행:  파일이용 memory usage 수집 ==========
+def run_ssh_memory_usage(request, ssh_obj):
+    def processor(row, ssh_obj, aware_dt):
+        MemoryUsage.objects.update_or_create(
+            hostname=row['Hostname'].strip(),
+            ip=row['IP'].strip(),
+            data_time=aware_dt,
+            defaults={
+                'ssh_info': ssh_obj,
+                'total_memory': int(row['Total_Mem']) if row.get('Total_Mem') else 0,
+                'usage_p': float(row['Usage(%)']),
+                'is_confirmed': True
+            }
+        )
+        return True
+
+    return common_ssh_usage_collector(request, ssh_obj, 'get_month_memory_usage.sh', 'month_memory_usage', processor)
 
 # ========= Paramiko 실행 command이용 수집, 파일이용 server info 수집 ==========
 def run_ssh_cmd_serverinfo(request, ssh_obj, cmd_obj=None):
@@ -304,17 +198,7 @@ def run_ssh_cmd_serverinfo(request, ssh_obj, cmd_obj=None):
 
     try:
         # 1. SSH 클라이언트 생성
-        client = paramiko.SSHClient()
-        # 2. 호스트 키 정책 설정 (알려지지 않은 호스트도 자동 허용 - 보안상 주의 필요)
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        # 3. 서버 접속
-        client.connect(
-            hostname=ssh_obj.ip,
-            port=ssh_obj.port,
-            username=ssh_obj.login_id,
-            password=ssh_obj.password,
-            timeout=10
-        )
+        client = get_ssh_connection(ssh_obj)
 
         # 4. 명령어 실행
         if cmd_obj:
@@ -333,37 +217,41 @@ def run_ssh_cmd_serverinfo(request, ssh_obj, cmd_obj=None):
             return result, error
             
         else:
-            sftp = client.open_sftp()
-            remote_script = f'/tmp/get_svinfo_{ssh_obj.id}.sh' # type: ignore
+            # sftp = client.open_sftp()
+            # remote_script = f'/tmp/get_svinfo_{ssh_obj.id}.sh' # type: ignore
 
-            if request.method == 'POST' and request.FILES.get('script_file'):
-                script_file = request.FILES['script_file']
-                sftp.putfo(script_file, remote_script)
-            else:
-                script_path = os.path.join(settings.BASE_DIR, 'static', 'script_files', 'get_svinfo.sh')
-                if os.path.exists(script_path):
-                    sftp.put(script_path, remote_script)
-                else:
-                    raise FileNotFoundError("Default script file not found.")
+            # if request.method == 'POST' and request.FILES.get('script_file'):
+            #     script_file = request.FILES['script_file']
+            #     sftp.putfo(script_file, remote_script)
+            # else:
+            #     script_path = os.path.join(settings.BASE_DIR, 'static', 'script_files', 'get_svinfo.sh')
+            #     if os.path.exists(script_path):
+            #         sftp.put(script_path, remote_script)
+            #     else:
+            #         raise FileNotFoundError("Default script file not found.")
             
-            sftp.chmod(remote_script, 0o755)
-            sftp.close()# 3. Execute Script (Fix windows line endings first)
+            # sftp.chmod(remote_script, 0o755)
+            # sftp.close()# 3. Execute Script (Fix windows line endings first)
             
-            client.exec_command(f"sed -i 's/\r$//' {remote_script}")
+            # client.exec_command(f"sed -i 's/\r$//' {remote_script}")
             
-            stdin, stdout, stderr = client.exec_command(remote_script)
-            exit_status = stdout.channel.recv_exit_status()
+            # stdin, stdout, stderr = client.exec_command(remote_script)
+            # exit_status = stdout.channel.recv_exit_status()
             
-            # 4. Cleanup
-            client.exec_command(f"rm {remote_script}")
+            # # 4. Cleanup
+            # client.exec_command(f"rm {remote_script}")
             
-            # 5. 결과 읽기 (bytes를 utf-8로 디코딩)
-            result = stdout.read().decode('utf-8')
-            error = stderr.read().decode('utf-8')
+            # # 5. 결과 읽기 (bytes를 utf-8로 디코딩)
+            # result = stdout.read().decode('utf-8')
+            # error = stderr.read().decode('utf-8')
+            output, error_msg, remote_script = common_sftp_result(request, client, ssh_obj, 'get_svinfo.sh', "get_svinfo_") # type: ignore
+            
+            if output is None:
+                return None, False, {}, error_msg
             client.close()
             
             # 6. JSON 파싱 (출력 중 JSON 부분만 추출)
-            json_str = result[result.find('{'):result.rfind('}')+1]
+            json_str = output[output.find('{'):output.rfind('}')+1] # type: ignore
             data = json.loads(json_str)
             
             # 결과 저장 (ServerInfo 업데이트 또는 생성)
@@ -386,7 +274,10 @@ def run_ssh_cmd_serverinfo(request, ssh_obj, cmd_obj=None):
                     'disk_usage': data.get('disk_usage'),
                 }
             )
-            return server_info_obj, created, data, error
+            return server_info_obj, created, data, error_msg
         
     except Exception as e:
-        return ("", f"## 연결실패: {str(e)} ##")
+        if cmd_obj:
+            return "", f"## 연결실패: {str(e)} ##"
+        else:
+            return None, False, {}, f"## 연결실패: {str(e)} ##"

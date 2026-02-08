@@ -2,12 +2,10 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Count
-from django.http import HttpResponse
 from .models_basic import Command, SSHInfo, CommandHistory, ServerInfo
 from .forms_basic import CommandForm, SSHInfoForm, ServerInfoForm
-import openpyxl
 from .run_by_ssh import run_ssh_cmd_serverinfo
+from .views_resource import common_export
 
 # =============== command 관련 CRUD ===============
 def cmd_list(request):
@@ -200,8 +198,11 @@ def serverinfo_update(request, pk):
     if request.method == 'POST':
         if 'refresh_server' in request.POST:
             ssh_info = server_info.sshinfos
-            server_info_obj, created, data, error = run_ssh_cmd_serverinfo(request, ssh_info )
-            messages.success(request, f"{server_info_obj.hostname} 갱신 성공")
+            server_info_obj, _, _, error = run_ssh_cmd_serverinfo(request, ssh_info )
+            if error:
+                messages.error(request, f"갱신 실패: {error}")
+            else:
+                messages.success(request, f"{server_info_obj.hostname} 갱신 성공") # type: ignore
             return redirect('asct:serverinfo_update', pk=pk)
 
         form = ServerInfoForm(request.POST, instance=server_info)
@@ -214,41 +215,39 @@ def serverinfo_update(request, pk):
 
 @login_required
 def serverinfo_export(request):
-    # 1. 응답 객체 생성 (Excel 파일 설정)
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = 'attachment; filename="server_info_list.xlsx"'
-
-    # 2. 워크북 및 워크시트 생성
-    wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.title = "Server Info" # type: ignore
-
-    # 3. 헤더 작성
     headers = ['Hostname', 'IP1', 'IP2', 'OS Version', 'Kernel', 'CPU Cores', 'CPU(%)', 'Memory(GB)', 'Mem(%)', 'Disk(GB)', 'Disk(%)', 'Uptime(days)', 'Last Updated']
-    ws.append(headers) # type: ignore
-
-    # 4. 데이터 작성
-    servers = ServerInfo.objects.all().order_by('hostname')
-    for server in servers:
-        # Timezone 정보가 있는 datetime은 Excel 호환성을 위해 tzinfo 제거
-        data_time_val = server.data_time.replace(tzinfo=None) if server.data_time else ''
+    
+    def mapper(obj, dt_val):
+        return [
+            obj.hostname,
+            obj.ip1,
+            obj.ip2,
+            obj.os_version_display,
+            obj.kernel_version,
+            obj.cpu_cores,
+            obj.cpu_usage,
+            obj.memory,
+            obj.memory_usage,
+            obj.total_disk,
+            obj.disk_usage,
+            obj.uptime,
+            dt_val
+        ]
         
-        ws.append([ # type: ignore
-            server.hostname,
-            server.ip1,
-            server.ip2,
-            server.os_version_display,
-            server.kernel_version,
-            server.cpu_cores,
-            server.cpu_usage,
-            server.memory,
-            server.memory_usage,
-            server.total_disk,
-            server.disk_usage,
-            server.uptime,
-            data_time_val
-        ])
+    return common_export("server_info_list.xlsx", "Server Info", headers, ServerInfo, mapper)
 
-    # 5. 저장 및 반환
-    wb.save(response)
-    return response
+# ws.append([ # type: ignore
+#             server.hostname,
+#             server.ip1,
+#             server.ip2,
+#             server.os_version_display,
+#             server.kernel_version,
+#             server.cpu_cores,
+#             server.cpu_usage,
+#             server.memory,
+#             server.memory_usage,
+#             server.total_disk,
+#             server.disk_usage,
+#             server.uptime,
+#             data_time_val
+#         ])

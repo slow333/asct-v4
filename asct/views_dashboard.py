@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import io
 import base64
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from .models import ServerInfo
 from django.db.models import Count
 # 참고: 차트에 한글을 사용하려면 시스템에 맞는 한글 폰트를 설정해야 합니다.
