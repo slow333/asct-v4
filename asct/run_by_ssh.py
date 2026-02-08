@@ -1,10 +1,114 @@
 from django.conf import settings
 from .models_basic import CommandHistory, ServerInfo
-from .models_resource import CPUUsage, MemoryUsage
-from .forms_resource import CPUUsageForm
+from .models_resource import CPUUsage, MemoryUsage,NetworkUsage
 import paramiko, os, json, csv, io
 from django.utils.timezone import make_aware
 from datetime import datetime
+
+# ========= Paramiko 실행:  파일이용 traffic usage 수집 ==========
+def run_ssh_traffic_usage(request, ssh_obj):
+    error_msg = ""
+
+    try:
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(
+            hostname=ssh_obj.ip,
+            port=ssh_obj.port,
+            username=ssh_obj.login_id,
+            password=ssh_obj.password,
+            timeout=10
+        )
+        # 4. 명령어 실행
+        sftp = client.open_sftp()
+        remote_script = f'/tmp/month_traffic_usage_{ssh_obj.id}.sh' # type: ignore
+
+        if request.method == 'POST' and request.FILES.get('script_file'):
+            script_file = request.FILES['script_file']
+            sftp.putfo(script_file, remote_script)
+        else:
+            script_path = os.path.join(settings.BASE_DIR, 'static', 'script_files', 'get_month_traffic_usage.sh')
+            if os.path.exists(script_path):
+                sftp.put(script_path, remote_script)
+            else:
+                raise FileNotFoundError("Default script file not found.")
+        
+        sftp.chmod(remote_script, 0o755)
+        sftp.close()
+        # 3. Execute Script (Fix windows line endings first)
+        client.exec_command(f"sed -i 's/\r$//' {remote_script}")
+        
+        stdin, stdout, stderr = client.exec_command(remote_script)
+        exit_status = stdout.channel.recv_exit_status()
+        
+        output = stdout.read().decode('utf-8')
+        error_msg = stderr.read().decode('utf-8')
+
+        if exit_status != 0:
+            client.exec_command(f"rm {remote_script}")
+            client.close()
+            return None, False, {}, f"Script execution failed: {error_msg}"
+
+        # Parse output to find CSV filename
+        csv_file_path = ""
+        for line in output.splitlines():
+            if "Successfully generated Traffic statistic CSV:" in line:
+                csv_file_path = line.split(": ")[1].strip()
+        if not csv_file_path:
+            client.exec_command(f"rm {remote_script}")
+            client.close()
+            return None, False, {}, "CSV file path not found in script output."
+
+        # Read CSV content
+        stdin, stdout, stderr = client.exec_command(f"cat {csv_file_path}")
+        csv_content = stdout.read().decode('utf-8')
+        
+        # Cleanup remote files
+        client.exec_command(f"rm {remote_script} {csv_file_path}")
+        client.close()
+
+        # Parse CSV and Save to DB
+        f = io.StringIO(csv_content)
+        reader = csv.DictReader(f)
+        
+        saved_count = 0
+        for row in reader:
+            # CSV hostname,IP,Date,IFACE,Speed,rxkB/s,txkB/s
+            try:
+                # Make datetime aware to avoid RuntimeWarning
+                # Handle RHEL 10 / Modern sysstat formats (ISO 8601 with T, quotes)
+                # Replace T with space and take first 19 chars to ignore timezone/garbage
+                date_str = row['Date'].strip().replace('"', '').replace("'", "").replace('T', ' ')[:19]
+                dt_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+                aware_dt = make_aware(dt_obj)
+                
+                rx_val = row.get('rxkB/s', '').strip()
+                tx_val = row.get('txkB/s', '').strip()
+                if len(row['IFACE']) > 20:
+                    continue
+
+                NetworkUsage.objects.update_or_create(
+                    hostname=row['hostname'].strip(),
+                    ip=row['IP'].strip(),
+                    data_time=aware_dt,
+                    if_name=row['IFACE'].strip(),
+                    speed=row['Speed'].strip(),
+                    defaults={
+                        'ssh_info': ssh_obj,
+                        'rxkB_s': float(rx_val) if rx_val else 0.0,
+                        'txkB_s': float(tx_val) if tx_val else 0.0,
+                        'is_confirmed': True
+                    }
+                )
+                saved_count += 1
+            except ValueError as e:
+                print(f"Date parse error for {row.get('hostname')}: {row.get('Date')} - {e}")
+                continue
+            
+        return None, False, {'count': saved_count}, error_msg
+        
+    except Exception as e:
+        return None, False, {}, f"## 연결실패: {str(e)} ##"
 
 # ========= Paramiko 실행:  파일이용 cpu usage 수집 ==========
 def run_ssh_cpu_usage(request, ssh_obj):
@@ -75,7 +179,7 @@ def run_ssh_cpu_usage(request, ssh_obj):
         
         saved_count = 0
         for row in reader:
-            # CSV Headers: Hostname,IP,Date,Cpu_cores,Total_Usage(%)
+            # CSV Headers: hostname,IP,Date,Cpu_cores,Total_Usage(%)
             
             try:
                 # Make datetime aware to avoid RuntimeWarning
@@ -86,7 +190,7 @@ def run_ssh_cpu_usage(request, ssh_obj):
                 aware_dt = make_aware(dt_obj)
                 
                 CPUUsage.objects.update_or_create(
-                    hostname=row['Hostname'].strip(),
+                    hostname=row['hostname'].strip(),
                     ip=row['IP'].strip(),
                     data_time=aware_dt,
                     defaults={
@@ -98,7 +202,7 @@ def run_ssh_cpu_usage(request, ssh_obj):
                 )
                 saved_count += 1
             except ValueError as e:
-                print(f"Date parse error for {row.get('Hostname')}: {row.get('Date')} - {e}")
+                print(f"Date parse error for {row.get('hostname')}: {row.get('Date')} - {e}")
                 continue
             
         return None, False, {'count': saved_count}, error_msg

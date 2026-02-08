@@ -2,29 +2,23 @@
 
 export LC_ALL=C
 
-HOSTNAME=$(hostname)
 IP_ADDR=$(hostname -I | awk '{print $1}')
 [ -z "$IP_ADDR" ] && IP_ADDR="127.0.0.1"
 # Total Memory in MB
 TOTAL_MEM=$(free -m | awk '/^Mem:/{print $2}')
 OUTPUT_FILE="/tmp/${HOSTNAME}_memory_usage_$(date +%Y%m%d).csv"
+HEADER_WRITTEN=false
 
-echo "Hostname,IP,Date,Total_Mem,Usage(%)" > "$OUTPUT_FILE"
+echo "hostname,IP,Date,Total_Mem,Usage(%)" > "$OUTPUT_FILE"
 
 SA_DIR="/var/log/sa"
 
 if [ -d "$SA_DIR" ]; then
-    if ! command -v sadf >/dev/null 2>&1; then
-        echo "Error: sysstat (sadf) is not installed."
-        exit 1
-    fi
-
     for file in $(ls $SA_DIR/sa[0-9][0-9] 2>/dev/null | sort); do
         if sadf -d "$file" -- -r >/dev/null 2>&1; then
             # sadf -d output header starts with #
             # We need to find which field number is %memused or %mem.
-            
-            sadf -d -t "$file" -- -r | awk -F';' -v host="$HOSTNAME" -v ip="$IP_ADDR" -v tot_mem="$TOTAL_MEM" '
+            sadf -d -t "$file" -- -r | awk -F';' -v  ip="$IP_ADDR" -v tot_mem="$TOTAL_MEM" '
             BEGIN { mem_idx = 0 }
             /^#/ {
                 for (i=1; i<=NF; i++) {
@@ -41,7 +35,7 @@ if [ -d "$SA_DIR" ]; then
                         timestamp = strftime("%Y-%m-%d %H:%M:%S", timestamp)
                     }
                     usage = $mem_idx
-                    printf "%s,\"%s\",%s,%s,%.2f\n", host, ip, timestamp, tot_mem, usage
+                    printf "%s,\"%s\",%s,%s,%.2f\n", $1, ip, timestamp, tot_mem, usage
                 }
             }' >> "$OUTPUT_FILE"
         fi

@@ -8,7 +8,7 @@ IP_ADDR=$(hostname -I | awk '{print $1}')
 CPU_CORES=$(nproc --all)
 OUTPUT_FILE="/tmp/${HOSTNAME}_cpu_usage_$(date +%Y%m%d).csv"
 
-echo "Hostname,IP,Date,Cpu_cores,Total_Usage(%)" > "$OUTPUT_FILE"
+echo "hostname,IP,Date,Cpu_cores,Total_Usage(%)" > "$OUTPUT_FILE"
 
 SA_DIR="/var/log/sa"
 

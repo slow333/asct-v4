@@ -41,6 +41,27 @@ class MemoryUsage(models.Model):
         ordering = ['hostname','-data_time']
         unique_together = ('hostname','ip','data_time')
 
+class NetworkUsage(models.Model):
+    ssh_info = models.ForeignKey(SSHInfo, on_delete=models.CASCADE)
+    
+    hostname = models.CharField(max_length=50, null=True)
+    ip = models.GenericIPAddressField(default="127.0.0.0", null=False)
+    if_name = models.CharField(max_length=20, default='eth0', null=False)
+    speed = models.CharField(max_length=10, default='1G', null=False)
+    rxkB_s = models.DecimalField(max_digits=20, decimal_places=2, null=False)
+    txkB_s = models.DecimalField(max_digits=20, decimal_places=2, null=False)
+    data_time = models.DateTimeField(null=False)
+    
+    comment = models.TextField(null=True, blank=True)
+    is_confirmed = models.BooleanField(default=False)
+    
+    def __str__(self) -> str:
+        return f'Network Usage : {self.hostname} => {self.rxkB_s} per second , {self.txkB_s} per second'
+    
+    class Meta:
+        ordering = ['hostname','-data_time']
+        unique_together = ('hostname','ip', 'data_time')
+
 # class DiskUsage(models.Model):
 #     serverinfo = models.OneToOneField(ServerInfo, on_delete=models.CASCADE)
     
@@ -58,26 +79,6 @@ class MemoryUsage(models.Model):
 #         ordering = ['serverinfo__hostname','-data_time']
 #         unique_together = ('serverinfo', 'data_time')
 
-# class NetworkUsage(models.Model):
-#     serverinfo = models.OneToOneField(ServerInfo, on_delete=models.CASCADE)
-    
-#     network_type = [
-#         ('100M','100M'),('1G','1G'), ('10G','10G'), ('40G','40G'), ('100G','100G'), 
-#         ('8G','8G FC'), ('16G','16G FC'), ('32G','32G FC'), ('64G','64G FC')]
-#     network_service = models.CharField(max_length=10, choices=network_type, default='1G', null=False)
-#     in_bytes = models.DecimalField(max_digits=20, decimal_places=2, null=False)
-#     out_bytes = models.DecimalField(max_digits=20, decimal_places=2, null=False)
-#     data_time = models.DateTimeField(null=False)
-    
-#     comment = models.TextField(null=True, blank=True)
-#     is_confirmed = models.BooleanField(default=False)
-    
-#     def __str__(self) -> str:
-#         return f'Network Usage for {self.serverinfo.hostname}'
-    
-#     class Meta:
-#         ordering = ['serverinfo__hostname','-data_time']
-#         unique_together = ('serverinfo', 'data_time')
 
 # class SysctlSetting(models.Model):
 #     serverinfo = models.OneToOneField(ServerInfo, on_delete=models.CASCADE)

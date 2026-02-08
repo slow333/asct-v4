@@ -3,12 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.http import HttpResponse
-from .models_resource import CPUUsage, MemoryUsage
+from .models_resource import CPUUsage, MemoryUsage, NetworkUsage
 from .models_basic import SSHInfo
-from .run_by_ssh import run_ssh_cpu_usage, run_ssh_memory_usage
+from .run_by_ssh import run_ssh_cpu_usage, run_ssh_memory_usage, run_ssh_traffic_usage
 import openpyxl
-import json
-from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 from datetime import timedelta
 import matplotlib
@@ -16,6 +14,138 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
 import base64
+
+# =============== Traffic usage 관련 CRUD ===============
+@login_required
+def traffic_usage_select(request):
+    if request.method == 'POST':
+        ssh_id = request.POST.get('ssh_id')
+        if ssh_id:
+            return redirect('asct:traffic_usage_run', ssh_id=ssh_id)
+    sshinfos = SSHInfo.objects.filter(operators=request.user)
+    return render(request, 'asct/traffic_usage/select.html', {'sshinfos': sshinfos})
+
+@login_required
+def traffic_usage_run(request, ssh_id):
+    ssh_info = get_object_or_404(SSHInfo, id=ssh_id)
+    _, _, data, error = run_ssh_traffic_usage(request, ssh_info)
+    
+    if error:
+        messages.error(request, f"Error: {error}")
+    else:
+        messages.success(request, f"Successfully collected {data.get('count', 0)} records.")
+    return redirect('asct:traffic_usage_list')
+
+def traffic_usage_list(request):
+    query = request.GET.get('q', '')
+    host_list = NetworkUsage.objects.exclude(hostname__isnull=True).values_list('hostname', flat=True).distinct().order_by('hostname')
+
+    if query:
+        network_usage = NetworkUsage.objects.filter(hostname=query)
+    else:
+        network_usage = NetworkUsage.objects.all()
+    
+    pagenator = Paginator(network_usage, 10)
+    page = request.GET.get("page")
+    page_obj = pagenator.get_page(page)
+    
+    return render(request, 'asct/traffic_usage/list.html', {'page_obj': page_obj, 'query': query, 'host_list': host_list})
+
+@login_required
+def traffic_usage_export(request):
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="traffic_usage_list.xlsx"'
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Traffic Usage" # type: ignore
+
+    headers = ['Hostname', 'IP', 'Date Time', 'Interface', 'Speed', 'RX(kB/s)', 'TX(kB/s)', 'Confirmed', 'Comment']
+    ws.append(headers) # type: ignore
+
+    traffics = NetworkUsage.objects.all().order_by('hostname', '-data_time')
+    for t in traffics:
+        data_time_val = t.data_time.replace(tzinfo=None) if t.data_time else ''
+        ws.append([ # type: ignore
+            t.hostname,
+            t.ip,
+            data_time_val,
+            t.if_name,
+            t.speed,
+            t.rxkB_s,
+            t.txkB_s,
+            "Yes" if t.is_confirmed else "No",
+            t.comment
+        ])
+
+    wb.save(response)
+    return response
+
+@login_required
+def traffic_usage_chart(request):
+    period = request.GET.get('period', '1m')
+    query = request.GET.get('q', '')
+    
+    host_list = NetworkUsage.objects.exclude(hostname__isnull=True).values_list('hostname', flat=True).distinct().order_by('hostname')
+    
+    queryset = NetworkUsage.objects.all().order_by('data_time')
+    
+    if query:
+        queryset = queryset.filter(hostname=query)
+    
+    if period == '1w':
+        queryset = queryset.filter(data_time__gte=timezone.now() - timedelta(days=7))
+    elif period == '1m':
+        queryset = queryset.filter(data_time__gte=timezone.now() - timedelta(days=30))
+    elif period == '3m':
+        queryset = queryset.filter(data_time__gte=timezone.now() - timedelta(days=90))
+        
+    fig, ax = plt.subplots(figsize=(12, 6))
+    
+    data_map = {}
+    for entry in queryset:
+        # 인터페이스별 RX/TX 구분
+        rx_key = f"{entry.hostname} - {entry.if_name} (RX)"
+        tx_key = f"{entry.hostname} - {entry.if_name} (TX)"
+        
+        if rx_key not in data_map: data_map[rx_key] = {'x': [], 'y': []}
+        if tx_key not in data_map: data_map[tx_key] = {'x': [], 'y': []}
+            
+        data_map[rx_key]['x'].append(entry.data_time)
+        data_map[rx_key]['y'].append(float(entry.rxkB_s))
+        
+        data_map[tx_key]['x'].append(entry.data_time)
+        data_map[tx_key]['y'].append(float(entry.txkB_s))
+
+    for label, data in data_map.items():
+        ax.plot(data['x'], data['y'], label=label, marker='o', markersize=3)
+        
+    ax.set_title(f'Traffic Usage ({period})')
+    ax.set_xlabel('Date Time')
+    ax.set_ylabel('Speed (kB/s)')
+    
+    # 범례가 너무 많으면 가독성을 해치므로 데이터가 적을 때만 표시
+    if len(data_map) > 0 and len(data_map) < 20:
+        ax.legend()
+        
+    ax.grid(True)
+    fig.tight_layout()
+    
+    buffer = io.BytesIO()
+    fig.savefig(buffer, format='png')
+    buffer.seek(0)
+    image_png = buffer.getvalue()
+    buffer.close()
+    plt.close(fig)
+    
+    graphic = base64.b64encode(image_png).decode('utf-8')
+    
+    context = {
+        'chart_graphic': graphic,
+        'period': period,
+        'query': query,
+        'host_list': host_list
+    }
+    return render(request, 'asct/traffic_usage/chart.html', context)
 
 # =============== Memory usage 관련 CRUD ===============
 @login_required
