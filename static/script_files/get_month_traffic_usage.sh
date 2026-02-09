@@ -40,7 +40,7 @@ if [ -d "$SA_DIR" ]; then
             print $1, ip, timestamp, $4, spd, $7, $8
         }' >> "$OUTPUT_FILE"
     done
-    echo "Successfully generated Traffic statistic CSV: $OUTPUT_FILE"
+    echo "Successfully generated CSV: $OUTPUT_FILE"
 else
     echo "Directory $SA_DIR not found."
     exit 1

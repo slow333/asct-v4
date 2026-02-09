@@ -62,22 +62,26 @@ class NetworkUsage(models.Model):
         ordering = ['hostname','-data_time']
         unique_together = ('hostname','ip', 'data_time')
 
-# class DiskUsage(models.Model):
-#     serverinfo = models.OneToOneField(ServerInfo, on_delete=models.CASCADE)
+class DiskUsage(models.Model):
+    ssh_info = models.ForeignKey(SSHInfo, on_delete=models.CASCADE)
     
-#     storage_local_total = models.IntegerField(null=False) 
-#     storage_local_usage_p = models.DecimalField(max_digits=4, decimal_places=2, null=False)
-#     data_time = models.DateTimeField(null=False)
+    hostname = models.CharField(max_length=50, null=True)
+    ip = models.GenericIPAddressField(default="127.0.0.0", null=False)
     
-#     comment = models.TextField(null=True, blank=True)
-#     is_confirmed = models.BooleanField(default=False, null=False)
+    storage_type = models.CharField(max_length=20, default='ssd')
+    local_total = models.IntegerField(null=False) 
+    local_usage_p = models.DecimalField(max_digits=5, decimal_places=2, null=False)
+    checked_at = models.DateTimeField(null=False)
     
-#     def __str__(self) -> str:
-#         return f'Disk Usage for {self.serverinfo.hostname}'
+    comment = models.TextField(null=True, blank=True)
+    is_confirmed = models.BooleanField(default=False)
     
-#     class Meta:
-#         ordering = ['serverinfo__hostname','-data_time']
-#         unique_together = ('serverinfo', 'data_time')
+    def __str__(self) -> str:
+        return f'Disk Usage for {self.hostname}'
+    
+    class Meta:
+        ordering = ['hostname','-checked_at']
+        unique_together = ('hostname','ip', 'checked_at')
 
 
 # class SysctlSetting(models.Model):

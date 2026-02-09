@@ -1,6 +1,6 @@
 from django.conf import settings
 from .models_basic import CommandHistory, ServerInfo
-from .models_resource import CPUUsage, MemoryUsage,NetworkUsage
+from .models_resource import CPUUsage, MemoryUsage,NetworkUsage, DiskUsage
 import paramiko, os, json, csv, io
 from django.utils.timezone import make_aware
 from datetime import datetime
@@ -58,36 +58,6 @@ def common_ssh_usage_collector(request, ssh_obj, default_script_name, remote_scr
         
         if output is None:
             return None, False, {}, error_msg
-        # sftp = client.open_sftp()
-        # remote_script = f'/tmp/{remote_script_prefix}_{ssh_obj.id}.sh'
-
-        # if request.method == 'POST' and request.FILES.get('script_file'):
-        #     script_file = request.FILES['script_file']
-        #     sftp.putfo(script_file, remote_script)
-        # else:
-        #     script_path = os.path.join(settings.BASE_DIR, 'static', 'script_files', default_script_name)
-        #     if os.path.exists(script_path):
-        #         sftp.put(script_path, remote_script)
-        #     else:
-        #         raise FileNotFoundError("Default script file not found.")
-        
-        # sftp.chmod(remote_script, 0o755)
-        # sftp.close()
-        # # 3. Execute Script (Fix windows line endings first)
-        # client.exec_command(f"sed -i 's/\r$//' {remote_script}")
-        
-        # stdin, stdout, stderr = client.exec_command(remote_script)
-        # exit_status = stdout.channel.recv_exit_status()
-        
-        # output = stdout.read().decode('utf-8')
-        # error_msg = stderr.read().decode('utf-8')
-
-        # if exit_status != 0:
-        #     client.exec_command(f"rm {remote_script}")
-        #     client.close()
-        #     return None, False, {}, f"Script execution failed: {error_msg}"
-
-        # Parse output to find CSV filename
         csv_file_path = ""
         for line in output.splitlines(): # type: ignore
             if "Successfully generated" in line and "CSV:" in line:
@@ -114,20 +84,54 @@ def common_ssh_usage_collector(request, ssh_obj, default_script_name, remote_scr
         saved_count = 0
         for row in reader:
             try:
-                date_str = row['Date'].strip().replace('"', '').replace("'", "").replace('T', ' ')[:19]
-                dt_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
-                aware_dt = make_aware(dt_obj)
+                aware_dt = ''
+                if row['Date']:
+                    date_str = row['Date'].strip().replace('"', '').replace("'", "").replace('T', ' ')[:19]
+                    dt_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+                    aware_dt = make_aware(dt_obj)
                 
                 if row_processor(row, ssh_obj, aware_dt):
                     saved_count += 1
             except ValueError as e:
-                # print(f"Date parse error: {e}")
+                print(f"Date parse error: {e}")
                 continue
             
         return None, False, {'count': saved_count}, error_msg
         
     except Exception as e:
         return None, False, {}, f"## 연결실패: {str(e)} ##"
+
+# ========= Paramiko 실행:  파일이용 disk usage 수집 ==========
+def run_ssh_disk_usage(request, ssh_obj):
+    
+    client = get_ssh_connection(ssh_obj)
+    output, error_msg, remote_script = common_sftp_result(request, client, ssh_obj, 'get_disk_usage_df.sh', "get_disk_usage_df_") # type: ignore
+
+    if output is None:
+        return None, False, {}, error_msg
+    client.close()
+    
+    # 6. JSON 파싱 (출력 중 JSON 부분만 추출)
+    json_str = output[output.find('{'):output.rfind('}')+1] # type: ignore
+    data = json.loads(json_str)
+    
+    # 결과 저장 (ServerInfo 업데이트 또는 생성)
+    total_val = data.get('local_total', 0)
+    disk_usage_val = data.get('local_usage_p', 0.0)
+    
+    disk_usage_obj, created = DiskUsage.objects.update_or_create(
+        hostname=data['hostname'],
+        ip=data['ip_addr'],
+        checked_at=datetime.now(),
+        storage_type=data['storage_type'],
+        defaults={
+            'ssh_info': ssh_obj,
+            'local_total': int(total_val) if total_val else 0,
+            'local_usage_p': int(disk_usage_val) if disk_usage_val else 0,
+            'is_confirmed': True
+        }
+    )
+    return disk_usage_obj, created, data, error_msg
 
 # ========= Paramiko 실행:  파일이용 traffic usage 수집 ==========
 def run_ssh_traffic_usage(request, ssh_obj):
@@ -217,33 +221,6 @@ def run_ssh_cmd_serverinfo(request, ssh_obj, cmd_obj=None):
             return result, error
             
         else:
-            # sftp = client.open_sftp()
-            # remote_script = f'/tmp/get_svinfo_{ssh_obj.id}.sh' # type: ignore
-
-            # if request.method == 'POST' and request.FILES.get('script_file'):
-            #     script_file = request.FILES['script_file']
-            #     sftp.putfo(script_file, remote_script)
-            # else:
-            #     script_path = os.path.join(settings.BASE_DIR, 'static', 'script_files', 'get_svinfo.sh')
-            #     if os.path.exists(script_path):
-            #         sftp.put(script_path, remote_script)
-            #     else:
-            #         raise FileNotFoundError("Default script file not found.")
-            
-            # sftp.chmod(remote_script, 0o755)
-            # sftp.close()# 3. Execute Script (Fix windows line endings first)
-            
-            # client.exec_command(f"sed -i 's/\r$//' {remote_script}")
-            
-            # stdin, stdout, stderr = client.exec_command(remote_script)
-            # exit_status = stdout.channel.recv_exit_status()
-            
-            # # 4. Cleanup
-            # client.exec_command(f"rm {remote_script}")
-            
-            # # 5. 결과 읽기 (bytes를 utf-8로 디코딩)
-            # result = stdout.read().decode('utf-8')
-            # error = stderr.read().decode('utf-8')
             output, error_msg, remote_script = common_sftp_result(request, client, ssh_obj, 'get_svinfo.sh', "get_svinfo_") # type: ignore
             
             if output is None:

@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from .models_basic import Command, SSHInfo, CommandHistory, ServerInfo
 from .forms_basic import CommandForm, SSHInfoForm, ServerInfoForm
 from .run_by_ssh import run_ssh_cmd_serverinfo
-from .views_resource import common_export
+from .views_common import common_export
 
 # =============== command 관련 CRUD ===============
 def cmd_list(request):
