@@ -146,3 +146,69 @@ EMAIL_HOST_USER = 'ml.python.ai@gmail.com'
 EMAIL_HOST_PASSWORD = 'dtty tgfa lxzm bhue'
 
 CART_ID = 'cart_in_session'
+
+# settings.py
+CELERY_BEAT_SCHEDULE = {
+    "collect-disk-usage-every-10-min": {
+        "task": "asct.tasks.schedule_disk_usage_collection",
+        "schedule": 600.0,  # 10분
+    },
+}
+
+# Celery Configuration
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+
+# 로깅 설정
+LOG_DIR = BASE_DIR / 'logs'
+LOG_DIR.mkdir(exist_ok=True)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[{asctime}] {levelname} [{name}:{lineno}] {message}',
+            'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': LOG_DIR / 'asct_system.log', # logs 폴더에 로그 파일 생성
+            'when': 'midnight',           # 매일 자정에 로테이션
+            'interval': 1,
+            'backupCount': 30,            # 30일치 보관
+            'encoding': 'utf-8',
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        # 'asct' 앱에 대한 로거 설정
+        'asct': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}

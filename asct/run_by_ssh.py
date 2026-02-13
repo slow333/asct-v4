@@ -25,7 +25,7 @@ def common_sftp_result(request, client, ssh_obj, default_script_name, remote_scr
         script_file = request.FILES['script_file']
         sftp.putfo(script_file, remote_script)
     else:
-        script_path = os.path.join(settings.BASE_DIR, 'static', 'script_files', default_script_name)
+        script_path = os.path.join(settings.BASE_DIR, 'asct', 'script_files', default_script_name)
         if os.path.exists(script_path):
             sftp.put(script_path, remote_script)
         else:
@@ -60,7 +60,7 @@ def common_ssh_usage_collector(request, ssh_obj, default_script_name, remote_scr
             return None, False, {}, error_msg
         csv_file_path = ""
         for line in output.splitlines(): # type: ignore
-            if "Successfully generated" in line and "CSV:" in line:
+            if "Successfully generated CSV:" in line:
                 parts = line.split(": ")
                 if len(parts) > 1:
                     csv_file_path = parts[1].strip()
@@ -118,7 +118,7 @@ def run_ssh_disk_usage(request, ssh_obj):
     # 결과 저장 (ServerInfo 업데이트 또는 생성)
     total_val = data.get('local_total', 0)
     disk_usage_val = data.get('local_usage_p', 0.0)
-    
+
     disk_usage_obj, created = DiskUsage.objects.update_or_create(
         hostname=data['hostname'],
         ip=data['ip_addr'],

@@ -68,10 +68,11 @@ class DiskUsage(models.Model):
     hostname = models.CharField(max_length=50, null=True)
     ip = models.GenericIPAddressField(default="127.0.0.0", null=False)
     
-    storage_type = models.CharField(max_length=20, default='ssd')
-    local_total = models.IntegerField(null=False) 
-    local_usage_p = models.DecimalField(max_digits=5, decimal_places=2, null=False)
-    checked_at = models.DateTimeField(null=False)
+    device = models.CharField(max_length=255, default='/dev')
+    mounted = models.CharField(max_length=255, default='/')
+    size = models.FloatField(null=False, default=0.0) 
+    use_p = models.IntegerField(null=False, default=0)
+    checked_at = models.DateTimeField(auto_now_add=True)
     
     comment = models.TextField(null=True, blank=True)
     is_confirmed = models.BooleanField(default=False)

@@ -1,0 +1,112 @@
+{% extends 'base/base.html' %}
+{% load custom_filters %}
+{% block title %}SSH 접속정보 리스트{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    {% include 'asct/_nav.html' %}
+    <!-- Page Heading -->
+    <h1 class="h2">disk Usage (Celery로 자동수집:10분)</h1>
+    <div class="flex-between flex-wrap flex-md-nowrap mb-3 border-bottom">
+        <form class="d-flex me-2" method="get">
+            <select class="form-select form-select-sm me-2" name="q" onchange="this.form.submit()">
+                <option value="">All Hosts</option>
+                {% for host in host_list %}
+                <option value="{{ host }}" {% if query == host %}selected{% endif %}>{{ host }}</option>
+                {% endfor %}
+            </select>
+            <div class="col-auto">
+                <div class="input-group">
+                    <span class="input-group-text">Min Usage %</span>
+                    <input type="number" name="usage_threshold" class="form-control" value="{{ usage_threshold|default:'' }}" min="0" max="100" style="width: 80px;">
+                    <button class="btn btn-secondary" type="submit">Apply</button>
+                </div>
+            </div>
+        </form>
+        <div class="btn-group me-2">
+            <a href="{% url 'asct:disk_usage_chart' %}" class="btn btn-sm btn-info text-white h-31px">
+                <i class="bi bi-graph-up"></i> Chart View
+            </a>
+            <a href="{% url 'asct:disk_usage_export' %}" class="btn btn-sm btn-success h-31px">
+                <i class="fas fa-file-excel"></i> Excel Export
+            </a>
+            {% comment %}
+            {% endcomment %}
+        </div>
+    </div>
+
+    <style>
+        .table-disk-usage th:nth-child(1) { width: 15%; } /* Hostname */
+        .table-disk-usage th:nth-child(2) { width: 12%; } /* IP Address */
+        .table-disk-usage th:nth-child(3) { width: 20%; } /* Date Time */
+        .table-disk-usage th:nth-child(4) { width: 10%; } /* device */
+        .table-disk-usage th:nth-child(5) { width: 10%; } /* mounted */
+        .table-disk-usage th:nth-child(6) { width: 8%; }  /* size */
+        .table-disk-usage th:nth-child(7) { width: 15%; } /* Usage (%) */
+        .table-disk-usage th:nth-child(8) { width: 10%; } /* Confirmed */
+
+        .table-disk-usage th a {
+            text-decoration: none;
+            color: inherit;
+        }
+        .table-disk-usage th a .fas {
+            font-size: 0.8em;
+            margin-left: 4px;
+            color: #6c757d;
+        }
+    </style>
+    <!-- Content Row -->
+    <div class="card shadow mb-4">
+        <table class="table table-bordered table-hover table-disk-usage" cellspacing="0">
+            <thead class="table-light">
+                <tr>
+                    <th><a href="?sort=hostname&dir={% if current_sort == 'hostname' and current_dir == 'asc' %}desc{% else %}asc{% endif %}&q={{ query }}">Hostname{% if current_sort == 'hostname' %}<i class="fas fa-sort-{% if current_dir == 'asc' %}up{% else %}down{% endif %}"></i>{% endif %}</a></th>
+                    <th><a href="?sort=ip&dir={% if current_sort == 'ip' and current_dir == 'asc' %}desc{% else %}asc{% endif %}&q={{ query }}">IP Address{% if current_sort == 'ip' %}<i class="fas fa-sort-{% if current_dir == 'asc' %}up{% else %}down{% endif %}"></i>{% endif %}</a></th>
+                    <th><a href="?sort=checked_at&dir={% if current_sort == 'checked_at' and current_dir == 'asc' %}desc{% else %}asc{% endif %}&q={{ query }}">Date Time{% if current_sort == 'checked_at' %}<i class="fas fa-sort-{% if current_dir == 'asc' %}up{% else %}down{% endif %}"></i>{% endif %}</a></th>
+                    <th><a href="?sort=device&dir={% if current_sort == 'device' and current_dir == 'asc' %}desc{% else %}asc{% endif %}&q={{ query }}">device{% if current_sort == 'device' %}<i class="fas fa-sort-{% if current_dir == 'asc' %}up{% else %}down{% endif %}"></i>{% endif %}</a></th>
+                    <th><a href="?sort=mounted&dir={% if current_sort == 'mounted' and current_dir == 'asc' %}desc{% else %}asc{% endif %}&q={{ query }}">mounted{% if current_sort == 'mounted' %}<i class="fas fa-sort-{% if current_dir == 'asc' %}up{% else %}down{% endif %}"></i>{% endif %}</a></th>
+                    <th><a href="?sort=size&dir={% if current_sort == 'size' and current_dir == 'asc' %}desc{% else %}asc{% endif %}&q={{ query }}">size{% if current_sort == 'size' %}<i class="fas fa-sort-{% if current_dir == 'asc' %}up{% else %}down{% endif %}"></i>{% endif %}</a></th>
+                    <th><a href="?sort=use_p&dir={% if current_sort == 'use_p' and current_dir == 'asc' %}desc{% else %}asc{% endif %}&q={{ query }}">Usage (%){% if current_sort == 'use_p' %}<i class="fas fa-sort-{% if current_dir == 'asc' %}up{% else %}down{% endif %}"></i>{% endif %}</a></th>
+                    <th><a href="?sort=is_confirmed&dir={% if current_sort == 'is_confirmed' and current_dir == 'asc' %}desc{% else %}asc{% endif %}&q={{ query }}">Confirmed{% if current_sort == 'is_confirmed' %}<i class="fas fa-sort-{% if current_dir == 'asc' %}up{% else %}down{% endif %}"></i>{% endif %}</a></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for disk in page_obj %}
+                <tr>
+                    <td>{{ disk.hostname }}</td>
+                    <td>{{ disk.ip }}</td>
+                    <td>{{ disk.checked_at|date:"Y-m-d H:i" }}</td>
+                    <td>{{ disk.device|replace:"/dev/mapper/rhel-,/dev/" }}</td>
+                    <td>{{ disk.mounted }}</td>
+                    <td>{{ disk.size }}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span class="me-2 fw-bold">{{ disk.use_p }}%</span>
+                            <div class="progress flex-grow-1 h-10">
+                                <div class="progress-bar {% if disk.use_p >= 80 %}bg-danger{% elif disk.use_p >= 50 %}bg-warning{% else %}bg-success{% endif %}" 
+                                    role="progressbar" 
+                                    style="width: {{ disk.use_p|default:0 }}%" 
+                                    aria-valuenow="{{ disk.use_p }}" 
+                                    aria-valuemin="0" 
+                                    aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        {% if disk.is_confirmed %}
+                        <span class="badge bg-success">Confirmed</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Pending</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-4">데이터가 없습니다. 수집을 실행해주세요.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

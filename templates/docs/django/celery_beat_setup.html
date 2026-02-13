@@ -1,0 +1,171 @@
+{% extends 'base/base.html' %}
+
+{% block title %} Django Celery 설정 및 실행 {% endblock %}
+
+{% block content %}
+{% include 'docs/django/sub_nav.html' %}
+<h1 class="doc-title">Celery 설정 및 실행</h1>
+
+<section class="doc-section">
+    <h2 class="doc-header">실행 순서</h2>
+    <ol>
+        <li>docker start, venv start</li>
+        <li>.\venv\Script\activate </li>
+        <li>py .\manage.py runserver </li>
+        <li> celery -A config worker -l info -P eventlet</li>
+        <li>celery -A config beat -l info</li>
+    </ol>
+</section>
+<section class="doc-section">
+    <h2 class="doc-header">1. Docker 설치 및 Redis 실행</h2>
+    <ol>
+        <li>Docker 설치 및 실행</li>
+        <li>Redis 이미지 Pull: <code>docker pull redis</code></li>
+        <li>Redis 컨테이너 실행: <code>docker run --name my-redis -p 6379:6379 -d redis</code></li>
+        <li>실행 확인: <code>docker ps</code></li>
+        <li>서비스 체크: <code>docker exec -it my-redis redis-cli ping</code> &gt; <strong>PONG</strong></li>
+    </ol>
+</section>
+
+<section class="doc-section">
+    <h2 class="doc-header">2. Python 패키지 설치 (venv)</h2>
+    <pre>pip install redis
+pip install eventlet</pre>
+</section>
+
+<section class="doc-section">
+    <h2 class="doc-header">3. Django Config 설정</h2>
+    
+    <h3 class="doc-subheader">config/celery.py</h3>
+<pre>
+import os
+from celery import Celery
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+
+app = Celery('config')
+app.config_from_object('django.conf:settings', namespace='CELERY')
+app.autodiscover_tasks()</pre>
+
+    <h3 class="doc-subheader">config/__init__.py</h3>
+<pre>
+from .celery import app as celery_app
+
+__all__ = ('celery_app',)</pre>
+
+    <h3 class="doc-subheader">settings.py</h3>
+<pre># settings.py
+CELERY_BEAT_SCHEDULE = {
+    "collect-disk-usage-every-10-min": {
+        "task": "asct.tasks.schedule_disk_usage_collection",
+        "schedule": 600.0,  # 10분 (초 단위)
+    },
+}
+
+# Celery Configuration
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE</pre>
+
+    <h3 class="doc-subheader">asct/tasks.py</h3>
+<pre>
+from celery import shared_task
+import paramiko, json, os
+from django.conf import settings
+from .run_by_ssh import get_ssh_connection
+
+@shared_task
+def schedule_disk_usage_collection():
+    # 작업을 실행할 때 모델을 임포트하여 앱 레지스트리 문제를 방지합니다.
+    from .models_basic import SSHInfo
+    
+    ssh_infos = SSHInfo.objects.all()
+    server_list = [
+        (info.ip, info.login_id, info.password, info.port) for info in ssh_infos
+    ]
+    if server_list:
+        collect_disk_usage.delay(server_list)
+
+@shared_task
+def collect_disk_usage(server_list):
+    from .models_basic import SSHInfo
+    from .models_resource import DiskUsage
+
+    for ssh_info in server_list:
+        try:
+            ip, username, password, port = ssh_info
+            
+            ssh_obj = SSHInfo.objects.filter(ip=ip).first()
+            if not ssh_obj:
+                continue
+            ssh = get_ssh_connection(ssh_obj)
+
+            stdin, hostname, stderr = ssh.exec_command("hostname")
+            hostname = hostname.read().decode().strip()
+
+            stdin, ip_list, stderr = ssh.exec_command("hostname -I")
+            ip_list = ip_list.read().decode().strip().split()
+            ip_address = ip_list[0] if ip_list else ip
+
+            stdin, disk_usage, stderr = ssh.exec_command("df -h")
+            lines = disk_usage.read().decode().strip().split("\n")[1:]  # 헤더 제외
+
+            for line in lines:
+                parts = line.split()
+                if len(parts) &lt; 6:
+                    continue
+                device, mount, use_p, size_str = parts[0], parts[5], parts[4], parts[1]
+                use_p = int(use_p.strip("%"))
+                if device.strip() in ['tmpfs', 'devtmpfs'] or device.startswith('/dev/loop'):
+                    continue
+                size = 0
+                if size_str.endswith('G'):
+                    size = int(float(size_str.strip('G')))
+                elif size_str.endswith('M'):
+                    size = int(float(size_str.strip('M')) / 1024)
+                elif size_str.endswith('T'):
+                    size = int(float(size_str.strip('T')) * 1024)
+
+                DiskUsage.objects.create(
+                    ssh_info=ssh_obj,
+                    hostname=hostname,
+                    ip=ip_address,
+                    device=device,
+                    mounted=mount,
+                    size=size,
+                    use_p=use_p,
+                )
+
+            ssh.close()
+        except Exception as e:
+            print(f"Error collecting disk usage for {ip}: {e}")</pre>
+</section>
+
+<section class="doc-section">
+    <h2 class="doc-header">4. Celery 실행 (venv 환경)</h2>
+    <h3 class="doc-subheader">Terminal 1: Worker 실행</h3>
+<pre># 일반 실행 (Linux 등) - Windows에서는 권한 오류 발생 가능
+celery -A config worker -l info
+
+# Windows 환경 (eventlet 사용 필수)
+celery -A config worker -l info -P eventlet
+
+# 개발 환경 (단일 스레드)
+celery -A config worker -l info -P solo</pre>
+
+    <h3 class="doc-subheader">Terminal 2: Beat 실행 (스케줄러)</h3>
+<pre>celery -A config beat -l info</pre>
+
+    <div class="alert alert-danger mt-3">
+        <h5 class="alert-heading">Troubleshooting</h5>
+        <p>Redis 연결 오류가 발생하면 다음을 확인하세요:</p>
+        <ul>
+            <li><code>pip install redis</code> 및 <code>pip install eventlet</code> 설치 여부</li>
+            <li>Docker에서 Redis 컨테이너가 실행 중인지 확인</li>
+        </ul>
+    </div>
+</section>
+{% endblock %}

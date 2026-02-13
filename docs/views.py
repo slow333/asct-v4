@@ -15,6 +15,9 @@ def project_intro(requst):
 def django_setup(requst):
     return render(requst, 'docs/django/setup.html')
 
+def django_celery(requst):
+    return render(requst, 'docs/django/celery_beat_setup.html')
+
 def django_orm(requst):
     return render(requst, 'docs/django/django-orm.html')
 

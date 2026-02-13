@@ -14,24 +14,32 @@ import base64
 # ================= common def ==================
 def filter_by_days(request, queryset):
     period = request.GET.get('period', '1m')
+    
+    date_field = 'data_time'
+    if hasattr(queryset.model, 'checked_at'):
+        date_field = 'checked_at'
+
     if period == '1w':
-        queryset = queryset.filter(data_time__gte=timezone.now() - timedelta(days=7))
+        queryset = queryset.filter(**{f'{date_field}__gte': timezone.now() - timedelta(days=7)})
     elif period == '1m':
-        queryset = queryset.filter(data_time__gte=timezone.now() - timedelta(days=30))
+        queryset = queryset.filter(**{f'{date_field}__gte': timezone.now() - timedelta(days=30)})
     elif period == '3m':
-        queryset = queryset.filter(data_time__gte=timezone.now() - timedelta(days=90))
+        queryset = queryset.filter(**{f'{date_field}__gte': timezone.now() - timedelta(days=90)})
     return queryset, period
 
 def filter_by_q_and_hostlist(request, model_obj):
-    queryset = model_obj.objects.all().order_by('data_time')
+    queryset = model_obj.objects.all()
     host_list = model_obj.objects.exclude(hostname__isnull=True).values_list('hostname', flat=True).distinct().order_by('hostname')
     
     query = request.GET.get('q', '')
     if query:
-        queryset = model_obj.objects.filter(hostname=query)
-    else:
-        queryset = model_obj.objects.all()
-    
+        queryset = queryset.filter(hostname=query)
+
+    if hasattr(model_obj, 'data_time'):
+        queryset = queryset.order_by('data_time')
+    elif hasattr(model_obj, 'checked_at'):
+        queryset = queryset.order_by('checked_at')
+
     return queryset, query, host_list
 
 # 차트를 생성하고 base64로 인코딩하는 헬퍼 함수
@@ -64,9 +72,14 @@ def common_export(filename, sheet_title, headers, model_class, row_mapper):
     ws.title = sheet_title # type: ignore
     ws.append(headers) # type: ignore
     
-    queryset = model_class.objects.all().order_by('hostname', '-data_time')
+    date_field = 'data_time'
+    if hasattr(model_class, 'checked_at'):
+        date_field = 'checked_at'
+
+    queryset = model_class.objects.all().order_by('hostname', f'-{date_field}')
     for obj in queryset:
-        data_time_val = obj.data_time.replace(tzinfo=None) if obj.data_time else ''
+        dt = getattr(obj, date_field)
+        data_time_val = dt.replace(tzinfo=None) if dt else ''
         ws.append(row_mapper(obj, data_time_val)) # type: ignore
         
     wb.save(response)
@@ -75,15 +88,19 @@ def common_export(filename, sheet_title, headers, model_class, row_mapper):
 def common_chart(request, model_class, title_prefix, y_label, data_extractor, template_name):
     queryset, query, host_list = filter_by_q_and_hostlist(request, model_class)
     queryset, period = filter_by_days(request, queryset)
-    
+
+    date_field = 'data_time'
+    if hasattr(model_class, 'checked_at'):
+        date_field = 'checked_at'
+
     fig, ax = plt.subplots(figsize=(12, 6))
-    
+
     data_map = {}
     for entry in queryset:
         for label, value in data_extractor(entry):
             if label not in data_map: 
                 data_map[label] = {'x': [], 'y': []}
-            data_map[label]['x'].append(entry.data_time)
+            data_map[label]['x'].append(getattr(entry, date_field))
             data_map[label]['y'].append(float(value))
 
     for label, data in data_map.items():

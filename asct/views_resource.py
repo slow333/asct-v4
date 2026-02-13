@@ -1,30 +1,56 @@
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404, render
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models_resource import CPUUsage, MemoryUsage, NetworkUsage
+from django.core.paginator import Paginator
+from .models_resource import CPUUsage, MemoryUsage, NetworkUsage, DiskUsage
 from .models_basic import SSHInfo
-from .run_by_ssh import run_ssh_cpu_usage, run_ssh_memory_usage, run_ssh_traffic_usage, run_ssh_disk_usage
-from .views_common import common_chart, common_export, common_list, common_usage_select
+from .run_by_ssh import run_ssh_cpu_usage, run_ssh_memory_usage, run_ssh_traffic_usage
+from .views_common import common_chart, common_export, common_list, common_usage_select, filter_by_q_and_hostlist
 
-# =============== Disk usage 관련 CRUD ===============
-@login_required
-def disk_usage_select(request):
-    return common_usage_select(request, 'asct:disk_usage_run', 'asct/disk_usage/select.html')
-
-@login_required
-def disk_usage_run(request, ssh_id):
-    ssh_info = get_object_or_404(SSHInfo, id=ssh_id)
-    _, _, data, error = run_ssh_disk_usage(request, ssh_info)
-    
-    if error:
-        messages.error(request, f"Error: {error}")
-    else:
-        messages.success(request, f"Successfully collected {data.get('count', 0)} records.")
-    return redirect('asct:disk_usage_list')
-
+# =============== Disk usage 관련 Celery ===============
 @login_required
 def disk_usage_list(request):
-    return common_list(request, NetworkUsage, 'asct/disk_usage/list.html')
+    queryset, query, host_list = filter_by_q_and_hostlist(request, DiskUsage)
+    
+    usage_threshold = request.GET.get('usage_threshold')
+    if usage_threshold:
+        try:
+            threshold = int(usage_threshold)
+            queryset = queryset.filter(use_p__gte=threshold)
+        except ValueError:
+            pass
+            
+    paginator = Paginator(queryset, 10)
+    page = request.GET.get("page")
+    page_obj = paginator.get_page(page)
+    
+    context = {
+        'page_obj': page_obj, 
+        'query': query, 
+        'host_list': host_list,
+        'usage_threshold': usage_threshold
+    }
+    return render(request, 'asct/disk_usage/list.html', context)
+
+@login_required
+def disk_usage_export(request):
+    headers = ['Hostname', 'IP', 'Device', 'Mounted', 'Size(GB)', 'Usage(%)', 'Checked At', 'Confirmed', 'Comment']
+    
+    def mapper(obj, dt_val):
+        return [
+            obj.hostname, obj.ip, obj.device, obj.mounted, 
+            obj.size, obj.use_p, dt_val,
+            "Yes" if obj.is_confirmed else "No", obj.comment
+        ]
+        
+    return common_export("disk_usage_list.xlsx", "Disk Usage", headers, DiskUsage, mapper)
+
+@login_required
+def disk_usage_chart(request):
+    def extractor(entry):
+        return [(f"{entry.hostname}:{entry.mounted}({entry.size}G) ", entry.use_p)]
+
+    return common_chart(request, DiskUsage, 'Disk Usage', 'Usage (%)', extractor, 'asct/disk_usage/chart.html')
 
 # =============== Traffic usage 관련 CRUD ===============
 @login_required

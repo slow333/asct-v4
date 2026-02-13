@@ -49,4 +49,8 @@ urlpatterns = [
     path('traffic_usage/select/', views_resource.traffic_usage_select, name='traffic_usage_select'),
     path('traffic_usage/chart/', views_resource.traffic_usage_chart, name='traffic_usage_chart'),
     path('traffic_usage/run/<int:ssh_id>/', views_resource.traffic_usage_run, name='traffic_usage_run'),
+    
+    path('disk_usage/list/', views_resource.disk_usage_list, name='disk_usage_list'),
+    path('disk_usage/export/', views_resource.disk_usage_export, name='disk_usage_export'),
+    path('disk_usage/chart/', views_resource.disk_usage_chart, name='disk_usage_chart'),
 ]
