@@ -167,5 +167,54 @@ celery -A config worker -l info -P solo</pre>
             <li>Docker에서 Redis 컨테이너가 실행 중인지 확인</li>
         </ul>
     </div>
+    <h3 class="doc-subheader">애러 발생: 하나의 로그에 대해 여러 프로세스가 날짜별 백업 파일로 이름을 변경할 때</h3>
+    <p>Windows 환경에서 여러 프로세스(Django Runserver, Celery Worker, Celery Beat)가 동시에 동일한 로그 파일(asct_system.log)을 회전(Rotation)시키려 할 때 발생합니다. Windows 파일 시스템은 파일이 열려 있는 동안 이름 변경(Rename)을 허용하지 않기 때문에, 한 프로세스가 로그 파일을 잡고 있으면 다른 프로세스가 날짜별 백업 파일로 이름을 변경하려 할 때 PermissionError: [WinError 32]가 발생합니다.<br>
+이 문제를 해결하는 가장 확실한 방법은 각 프로세스별로 별도의 로그 파일을 생성하도록 설정하는 것입니다.<br>
+이를 위해 start.ps1 스크립트를 수정하여 각 프로세스 실행 시 SERVICE_TYPE이라는 환경 변수를 주입하고, Django 설정(settings.py)에서 이 변수를 활용해 로그 파일명을 분리하도록 안내해 드립니다.</p>
+    <h4>start.ps1 </h4>
+    <pre># 3. Celery Worker (새 창에서 실행 - Windows 환경을 위한 eventlet 옵션 포함)
+Write-Host "Launching Celery Worker (Hidden)..."
+Start-Process powershell -ArgumentList "-Command", "$env:SERVICE_TYPE='worker'; 
+        . $venvPath; celery -A config worker -l info -P eventlet *> celery_worker.log" -WindowStyle Hidden
+
+# 로그 확인을 위한 대기
+Write-Host "Waiting for Celery Worker to initialize..."
+
+# 4. Celery Beat (새 창에서 실행)
+Write-Host "Launching Celery Beat (Hidden)..."
+Start-Process powershell -ArgumentList "-Command", "$env:SERVICE_TYPE='beat'; 
+        . $venvPath; celery -A config beat -l info *> celery_beat.log" -WindowStyle Hidden #변경
+
+# 로그 확인을 위한 대기
+Write-Host "Waiting for Celery Beat to initialize..."
+# 2. Django Runserver (현재 창에서 실행)
+Write-Host "Launching Django Runserver..."
+Write-Host "All background services started. Running Django..."
+. $venvPath
+$env:SERVICE_TYPE='web' # 추가
+python manage.py runserver</pre>
+    <h4>config/settings.py 수정</h4>
+    <pre># 환경 변수에서 서비스 타입 가져오기 (기본값: web)
+SERVICE_TYPE = os.environ.get('SERVICE_TYPE', 'web')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            # 파일명에 서비스 타입을 포함시켜 충돌 방지
+            # 예: asct_system_web.log, asct_system_worker.log, asct_system_beat.log
+            'filename': os.path.join(BASE_DIR, 'logs', f'asct_system_{SERVICE_TYPE}.log'),
+            'when': 'midnight',
+            'interval': 1,
+            'backupCount': 10,
+            'encoding': 'utf-8',
+        },
+        # ... 다른 핸들러들 ...
+    },
+    # ... loggers 설정 ...
+}</pre>
 </section>
 {% endblock %}

@@ -5,7 +5,6 @@ from . import views_dashboard
 app_name = 'asct'
 
 urlpatterns = [
-    # path('', views_basic.index, name='index'),
     path('', views_dashboard.dashboard, name='index'),
     
     path('command/list/', views_basic.cmd_list, name='cmd_list'),
@@ -34,23 +33,26 @@ urlpatterns = [
     
     path('cpu_usage/list/', views_resource.cpu_usage_list, name='cpu_usage_list'),
     path('cpu_usage/export/', views_resource.cpu_usage_export, name='cpu_usage_export'),
-    path('cpu_usage/select/', views_resource.cpu_usage_select, name='cpu_usage_select'),
     path('cpu_usage/chart/', views_resource.cpu_usage_chart, name='cpu_usage_chart'),
-    path('cpu_usage/run/<int:ssh_id>/', views_resource.cpu_usage_run, name='cpu_usage_run'),
     
     path('memory_usage/list/', views_resource.memory_usage_list, name='memory_usage_list'),
     path('memory_usage/export/', views_resource.memory_usage_export, name='memory_usage_export'),
-    path('memory_usage/select/', views_resource.memory_usage_select, name='memory_usage_select'),
     path('memory_usage/chart/', views_resource.memory_usage_chart, name='memory_usage_chart'),
-    path('memory_usage/run/<int:ssh_id>/', views_resource.memory_usage_run, name='memory_usage_run'),
     
     path('traffic_usage/list/', views_resource.traffic_usage_list, name='traffic_usage_list'),
     path('traffic_usage/export/', views_resource.traffic_usage_export, name='traffic_usage_export'),
-    path('traffic_usage/select/', views_resource.traffic_usage_select, name='traffic_usage_select'),
     path('traffic_usage/chart/', views_resource.traffic_usage_chart, name='traffic_usage_chart'),
-    path('traffic_usage/run/<int:ssh_id>/', views_resource.traffic_usage_run, name='traffic_usage_run'),
     
     path('disk_usage/list/', views_resource.disk_usage_list, name='disk_usage_list'),
     path('disk_usage/export/', views_resource.disk_usage_export, name='disk_usage_export'),
     path('disk_usage/chart/', views_resource.disk_usage_chart, name='disk_usage_chart'),
+
+
+    # path('', views_basic.index, name='index'),
+    # path('cpu_usage/select/', views_resource.cpu_usage_select, name='cpu_usage_select'),
+    # path('cpu_usage/run/<int:ssh_id>/', views_resource.cpu_usage_run, name='cpu_usage_run'),
+    # path('memory_usage/select/', views_resource.memory_usage_select, name='memory_usage_select'),
+    # path('memory_usage/run/<int:ssh_id>/', views_resource.memory_usage_run, name='memory_usage_run'),
+    # path('traffic_usage/select/', views_resource.traffic_usage_select, name='traffic_usage_select'),
+    # path('traffic_usage/run/<int:ssh_id>/', views_resource.traffic_usage_run, name='traffic_usage_run'),
 ]

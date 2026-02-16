@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from .models_resource import CPUUsage, MemoryUsage, NetworkUsage, DiskUsage
 from .models_basic import SSHInfo
-from .run_by_ssh import run_ssh_cpu_usage, run_ssh_memory_usage, run_ssh_traffic_usage
+# from .run_by_ssh import run_ssh_cpu_usage, run_ssh_memory_usage, run_ssh_traffic_usage
 from .views_common import common_chart, common_export, common_list, common_usage_select, filter_by_q_and_hostlist
 
 # =============== Disk usage 관련 Celery ===============
@@ -54,21 +54,6 @@ def disk_usage_chart(request):
 
 # =============== Traffic usage 관련 CRUD ===============
 @login_required
-def traffic_usage_select(request):
-    return common_usage_select(request, 'asct:traffic_usage_run', 'asct/traffic_usage/select.html')
-
-@login_required
-def traffic_usage_run(request, ssh_id):
-    ssh_info = get_object_or_404(SSHInfo, id=ssh_id)
-    _, _, data, error = run_ssh_traffic_usage(request, ssh_info)
-    
-    if error:
-        messages.error(request, f"Error: {error}")
-    else:
-        messages.success(request, f"Successfully collected {data.get('count', 0)} records.")
-    return redirect('asct:traffic_usage_list')
-
-@login_required
 def traffic_usage_list(request):
     return common_list(request, NetworkUsage, 'asct/traffic_usage/list.html')
 
@@ -106,21 +91,6 @@ def memory_usage_chart(request):
     return common_chart(request, MemoryUsage, 'Memory Usage', 'Usage (%)', extractor, 'asct/memory_usage/chart.html')
 
 @login_required
-def memory_usage_select(request):
-    return common_usage_select(request, 'asct:memory_usage_run', 'asct/memory_usage/select.html')
-
-@login_required
-def memory_usage_run(request, ssh_id):
-    ssh_info = get_object_or_404(SSHInfo, id=ssh_id)
-    _, _, data, error = run_ssh_memory_usage(request, ssh_info)
-    
-    if error:
-        messages.error(request, f"Error: {error}")
-    else:
-        messages.success(request, f"Successfully collected {data.get('count', 0)} records.")
-    return redirect('asct:memory_usage_list')
-
-@login_required
 def memory_usage_export(request):
     headers = ['Hostname', 'IP', 'Date Time', 'Total Memory(MB)', 'Usage(%)', 'Confirmed', 'Comment']
     
@@ -143,23 +113,6 @@ def cpu_usage_chart(request):
         return [(entry.hostname, entry.usage_p)]
     return common_chart(request, CPUUsage, 'CPU Usage', 'Usage (%)', extractor, 'asct/cpu_usage/chart.html')
 
-# =============== Paramiko 실행 예시 ===============
-@login_required
-def cpu_usage_select(request):
-    return common_usage_select(request, 'asct:cpu_usage_run', 'asct/cpu_usage/select.html')
-
-@login_required
-def cpu_usage_run(request, ssh_id):
-    ssh_info = get_object_or_404(SSHInfo, id=ssh_id)
-    _, _, data, error = run_ssh_cpu_usage(request, ssh_info)
-    
-    if error:
-        messages.error(request, f"Error: {error}")
-    else:
-        messages.success(request, f"Successfully collected {data.get('count', 0)} records.")
-        
-    return redirect('asct:cpu_usage_list')
-
 @login_required
 def cpu_usage_export(request):
     headers = ['Hostname', 'IP', 'Date Time', 'CPU Cores', 'Usage(%)', 'Confirmed', 'Comment']
@@ -171,3 +124,52 @@ def cpu_usage_export(request):
         ]
         
     return common_export("cpu_usage_list.xlsx", "CPU Usage", headers, CPUUsage, mapper)
+
+
+# @login_required
+# def traffic_usage_select(request):
+#     return common_usage_select(request, 'asct:traffic_usage_run', 'asct/traffic_usage/select.html')
+
+# @login_required
+# def traffic_usage_run(request, ssh_id):
+#     ssh_info = get_object_or_404(SSHInfo, id=ssh_id)
+#     _, _, data, error = run_ssh_traffic_usage(request, ssh_info)
+    
+#     if error:
+#         messages.error(request, f"Error: {error}")
+#     else:
+#         messages.success(request, f"Successfully collected {data.get('count', 0)} records.")
+#     return redirect('asct:traffic_usage_list')
+
+
+# @login_required
+# def memory_usage_select(request):
+#     return common_usage_select(request, 'asct:memory_usage_run', 'asct/memory_usage/select.html')
+
+# @login_required
+# def memory_usage_run(request, ssh_id):
+#     ssh_info = get_object_or_404(SSHInfo, id=ssh_id)
+#     _, _, data, error = run_ssh_memory_usage(request, ssh_info)
+    
+#     if error:
+#         messages.error(request, f"Error: {error}")
+#     else:
+#         messages.success(request, f"Successfully collected {data.get('count', 0)} records.")
+#     return redirect('asct:memory_usage_list')
+
+
+# @login_required
+# def cpu_usage_select(request):
+#     return common_usage_select(request, 'asct:cpu_usage_run', 'asct/cpu_usage/select.html')
+
+# @login_required
+# def cpu_usage_run(request, ssh_id):
+#     ssh_info = get_object_or_404(SSHInfo, id=ssh_id)
+#     _, _, data, error = run_ssh_cpu_usage(request, ssh_info)
+    
+#     if error:
+#         messages.error(request, f"Error: {error}")
+#     else:
+#         messages.success(request, f"Successfully collected {data.get('count', 0)} records.")
+        
+#     return redirect('asct:cpu_usage_list')

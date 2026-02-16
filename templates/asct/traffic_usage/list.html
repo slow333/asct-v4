@@ -5,7 +5,7 @@
 <div class="container-fluid">
     {% include 'asct/_nav.html' %}
     <div class="flex-between flex-wrap flex-md-nowrap mb-3 border-bottom">
-        <h1 class="h2">Traffic Usage </h1>
+        <h1 class="h2">Traffic Usage(매일 1시 자동수집) </h1>
         <div class="btn-toolbar mb-md-0">
             <form class="d-flex me-2" method="get">
                 <select class="form-select form-select-sm me-2" name="q" onchange="this.form.submit()">
@@ -19,9 +19,11 @@
                 <a href="{% url 'asct:traffic_usage_chart' %}" class="btn btn-sm btn-info text-white h-31px">
                     <i class="bi bi-graph-up"></i> Chart View
                 </a>
+                {% comment %}
                 <a href="{% url 'asct:traffic_usage_select' %}" class="btn btn-sm btn-primary h-31px">
                     <i class="fas fa-server"></i> 수집 실행
                 </a>
+                {% endcomment %}
                 <a href="{% url 'asct:traffic_usage_export' %}" class="btn btn-sm btn-success h-31px">
                     <i class="fas fa-file-excel"></i> Excel Export
                 </a>

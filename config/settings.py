@@ -1,4 +1,5 @@
 from pathlib import Path
+from celery.schedules import crontab
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     # "allauth.socialaccount.providers.facebook",
     # "allauth.socialaccount.providers.linkedin_oauth2",
     # "allauth.socialaccount.providers.instagram",
+    "django_celery_beat",
 ]
 
 MIDDLEWARE = [
@@ -151,7 +153,28 @@ CART_ID = 'cart_in_session'
 CELERY_BEAT_SCHEDULE = {
     "collect-disk-usage-every-10-min": {
         "task": "asct.tasks.schedule_disk_usage_collection",
-        "schedule": 600.0,  # 10분
+        "schedule": crontab(minute='*/10'),
+    },
+    "collect-server-info-every-1-hour": {
+        "task": "asct.tasks.schedule_server_info_collection",
+        "schedule": crontab(minute=0),  # 매 시간 정각
+    },
+    "collect-cpu-usage-daily-01": {
+        "task": "asct.tasks.schedule_cpu_usage_collection",
+        "schedule": crontab(hour=1, minute=0),
+    },
+    "collect-memory-usage-daily-01": {
+        "task": "asct.tasks.schedule_memory_usage_collection",
+        "schedule": crontab(hour=1, minute=0),
+    },
+    "collect-traffic-usage-daily-01": {
+        "task": "asct.tasks.schedule_traffic_usage_collection",
+        "schedule": crontab(hour=1, minute=0),
+    },
+    "cleanup-old-data-daily-03": {
+        "task": "asct.tasks.cleanup_old_data",
+        "schedule": crontab(hour=3, minute=0),
+        "args": (30,),  # 30일 경과 데이터 삭제
     },
 }
 
@@ -162,11 +185,16 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
+# DB 기반 스케줄러 사용 (django-celery-beat)
+# 이 설정을 추가하면 위쪽의 CELERY_BEAT_SCHEDULE 딕셔너리는 무시되고 DB의 내용을 따릅니다.
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 # 로깅 설정
 LOG_DIR = BASE_DIR / 'logs'
 LOG_DIR.mkdir(exist_ok=True)
 
+import os
+SERVICE_TYPE = os.environ.get('SERVICE_TYPE', 'web')
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -180,17 +208,18 @@ LOGGING = {
             'format': '{levelname} {message}',
             'style': '{',
         },
-    },
+    }, 
     'handlers': {
         'file': {
             'level': 'INFO',
             'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': LOG_DIR / 'asct_system.log', # logs 폴더에 로그 파일 생성
-            'when': 'midnight',           # 매일 자정에 로테이션
+            # 파일명에 서비스 타입을 포함시켜 충돌 방지
+            # 예: asct_system_web.log, asct_system_worker.log, asct_system_beat.log
+            'filename': str(LOG_DIR / f'asct_system_{SERVICE_TYPE}.log'),
+            'when': 'midnight',
             'interval': 1,
-            'backupCount': 30,            # 30일치 보관
+            'backupCount': 10,
             'encoding': 'utf-8',
-            'formatter': 'verbose',
         },
         'console': {
             'level': 'DEBUG',

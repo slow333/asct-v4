@@ -235,19 +235,3 @@ def serverinfo_export(request):
         ]
         
     return common_export("server_info_list.xlsx", "Server Info", headers, ServerInfo, mapper)
-
-# ws.append([ # type: ignore
-#             server.hostname,
-#             server.ip1,
-#             server.ip2,
-#             server.os_version_display,
-#             server.kernel_version,
-#             server.cpu_cores,
-#             server.cpu_usage,
-#             server.memory,
-#             server.memory_usage,
-#             server.total_disk,
-#             server.disk_usage,
-#             server.uptime,
-#             data_time_val
-#         ])

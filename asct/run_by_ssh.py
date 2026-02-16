@@ -21,7 +21,7 @@ def common_sftp_result(request, client, ssh_obj, default_script_name, remote_scr
     sftp = client.open_sftp()
     remote_script = f'/tmp/{remote_script_prefix}_{ssh_obj.id}.sh'
 
-    if request.method == 'POST' and request.FILES.get('script_file'):
+    if request and request.method == 'POST' and request.FILES.get('script_file'):
         script_file = request.FILES['script_file']
         sftp.putfo(script_file, remote_script)
     else:
