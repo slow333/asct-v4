@@ -1,10 +1,10 @@
 {% load humanize %}
 {% load static %}
-<nav class="navbar navbar-expand-lg navbar-light rounded-3 shadow-sm z-3 nav_custom">
+<nav class="navbar navbar-expand navbar-light mb-3 rounded-3 shadow-sm p-2  custom-nav-bg z-3 nav_custom">
     <div class="container-fluid">
         <a class="navbar-brand fw-bold text-primary" href="{% url 'eshop:product_list' %}">
             <i class="bi bi-bag-heart-fill"></i> e-shop</a>
-        <div class="navbar-nav justify-content-end">
+        <div class="navbar-nav justify-content-end flex-wrap">
             <div class="nav-item active">
                 <a class="nav-link btn btn-outline-success" href="{% url 'eshop:cart_details' %}">장바구니:
                     {% if cart|length > 0 %}
@@ -14,7 +14,7 @@
                     {% endif %}
                 </a>
             </div>
-            <button class="btn btn-secondary btn-sm ms-2 w-auto" type="button" data-bs-toggle="collapse" data-bs-target="#filters-sidebar" >분류<i class="bi bi-arrow-bar-down"></i></button>
+            <button class="btn btn-secondary btn-sm ms-2 w-auto" type="button" data-bs-toggle="collapse" data-bs-target="#filters-sidebar" ><i class="bi bi-arrow-bar-down"></i></button>
         </div>
     </div>
 </nav>

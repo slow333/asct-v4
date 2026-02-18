@@ -32,9 +32,9 @@ body::after {
     radial-gradient(circle at 20px 30px, #eee 1px, transparent 2.5px),
     radial-gradient(circle at 40px 70px, #fff 1px, transparent 2.5px),
     radial-gradient(circle at 50px 160px, #ddd 1px, transparent 2.5px),
-    radial-gradient(circle at 90px 40px, #fff 1px, transparent 2.5px),
+    radial-gradient(circle at 90px 40px, #fff 2px, transparent 2.5px),
     radial-gradient(circle at 130px 80px, #fff 1px, transparent 2.5px),
-    radial-gradient(circle at 160px 120px, #ddd 1px, transparent 2.5px);
+    radial-gradient(circle at 160px 120px, #ddd 3px, transparent 2.5px);
   background-repeat: repeat;
   background-size: 200px 200px;
   animation: twinkle 60s linear infinite;
@@ -235,20 +235,20 @@ code {
 */
 
 /* 1. 기본 xl breakpoint(1200px)에서 가로 정렬 동작을 다시 세로로 초기화 */
-@media (min-width: 1024px) and (max-width: 1200px) {
+@media (min-width: 1440px) and (max-width: 1600px) {
   .list-group-horizontal-lg {
     flex-direction: column;
   }
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 16000px) {
   .list-group-horizontal-xl {
     flex-direction: column;
   }
 }
 
 /* 2. 새로운 breakpoint(1300px)에서 정렬 스타일 적용 */
-@media (min-width: 1300px) {
+@media (min-width: 1920px) {
   .list-group-horizontal-xxl {
     flex-direction: row;
   }

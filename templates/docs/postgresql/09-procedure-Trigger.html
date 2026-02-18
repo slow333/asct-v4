@@ -1,12 +1,12 @@
-{% extends 'base/base.html' %}
+{% extends 'docs/base_docs.html' %}
 {% block title %} PostgreSQL {% endblock %}
 
-{% block content %}
+{% block doc_content %}
 {% include 'docs/postgresql/sub_nav.html' %}
 <h1 class="doc-title">STORED PROCEDURE</h1>
 <section class="doc-section">
   <h2 class="doc-header">STORED PROCEDURE: 자주 쓰는 SQL을 함수로 저장</h2>
-  <pre>
+  <pre><code class="language-sql">
   DELIMITER $$ -- delimiter 를 $$ 임시로 변경 procedure에서 ;를 쓸 수 있도록 함
   CREATE PROCEDURE procedure_name ()
   BEGIN
@@ -16,8 +16,8 @@
   END $$
   DELIMITER ; -- 다시 delimiter를 ;로 변경
   -- 프로시저 호출
-  CALL procedure_name('value1', @output);</pre>
-  <pre>
+  CALL procedure_name('value1', @output);</code></pre>
+  <pre><code class="language-sql">
   -- 프로시저에 OUT 파라미터가 있는 경우, @output 변수에 결과를 저장함
   DELIMITER $$
   CREATE PROCEDURE procedure_name (IN param1 datatype, OUT param2 datatype)
@@ -45,11 +45,11 @@
   CALL find_customer_full_name("abc", "cde"); -- 프로시저 호출
 
   DROP PROCEDURE IF EXISTS procedure_name; -- 프로시저 삭제
-  </pre>
+  </code></pre>
    <!--*********** TRIGGERS ******************--> 
   <h1 class="doc-title">TRIGGERS</h1>
   <h3 class="doc-subheader">뭔가를 한 후에 수행할 주로 업데이트할 내용을 정의</h3>
-  <pre>
+  <pre><code class="language-sql">
   SHOW TRIGGERS; -- 트리거 목록 보기
   DROP TRIGGER IF EXISTS trigger_name; -- 트리거 삭제
   -- ########## 트리거 생성 #############
@@ -58,8 +58,8 @@
   FOR EACH ROW
   BEGIN
     INSERT INTO log_table (action, action_time) VALUES ('insert', NOW());
-  END;  </pre>
-  <pre>--exercise
+  END;  </code></pre>
+  <pre><code class="language-sql">--exercise
     ALTER TABLE employees
     ADD COLUMN salary DECIMAL(10, 2) NOT NULL DEFAULT 0.00
     AFTER hourly_pay;
@@ -77,9 +77,9 @@
       SET NEW.salary = NEW.hourly_pay * 40 * 4; -- 월급으로 변환
 
     insert into employees values(29, "신입","직원", "worker", 18, null, DATE(NOW()), 3);
-  </pre>
+  </code></pre>
   <h2 class="doc-header">예제</h2>
-  <pre>
+  <pre><code class="language-sql">
   CREATE TABLE IF NOT EXISTS expenses (
     id INT AUTO_INCREMENT PRIMARY KEY,
     expense_name varchar(20),
@@ -111,6 +111,6 @@
   FOR EACH ROW
     UPDATE expenses 
     SET expense_total = expense_total + (NEW.salary - OLD.salary) -- 새로운 값에서 이전 값을 뺌
-    WHERE expense_name = "salaries"; </pre>
+    WHERE expense_name = "salaries"; </code></pre>
 </section>
 {% endblock %}

@@ -6,6 +6,7 @@ app_name = 'asct'
 
 urlpatterns = [
     path('', views_dashboard.dashboard, name='index'),
+    path('celery/status/', views_dashboard.check_celery_status, name='celery_status'),
     
     path('command/list/', views_basic.cmd_list, name='cmd_list'),
     path('command/add/', views_basic.cmd_add, name='cmd_add'),

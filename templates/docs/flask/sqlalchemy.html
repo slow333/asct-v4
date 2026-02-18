@@ -1,21 +1,21 @@
-{% extends 'base/base.html' %}
+{% extends 'docs/base_docs.html' %}
 {% block title %} SqlAlchemy ORM{% endblock %}
 
-{% block content %}
+{% block doc_content %}
 {% include 'docs/flask/sub_nav.html' %}
 <h1 class="doc-title">SqlAlchemy ORM</h1>
 <section class="doc-section">
   <h2 class="doc-header"># Select</h2>
-  <pre>
+  <pre><code class="language-python">
 blog = Blog.query.get(1)
 blog = Blog.query.filter_by(id=1).first()
 
 blogs = Blog.query.all()
 blogs = db.session.qury(Blog).all()
 
-blog = db.session.qury(Blog).filter(Blog.author_id=1).first()</pre>
+blog = db.session.qury(Blog).filter(Blog.author_id=1).first()</code></pre>
 <h2 class="doc-header"># Insert, Update, Delete</h2>
-<pre># Create
+<pre><code class="language-python"># Create
 blog = Blog(title=title, content=content, author_id=current_user.id)
 db.session.add(blog)
 db.session.commit()
@@ -28,9 +28,9 @@ db.session.commit()
 
 # Delete
 db.session.delete(blog)
-db.session.commit()</pre>
+db.session.commit()</code></pre>
 <h2 class="doc-header"># Join</h2>
-<pre># SQLAlchemy automatically knows how to join based on the relationship defined in the model.
+<pre><code class="language-python"># SQLAlchemy automatically knows how to join based on the relationship defined in the model.
 # This returns a list of Blog objects where the author's username is 'john'.
 blogs_by_john = db.session.query(Blog).join(Blog.author).filter(User.username == 'john').all()
 
@@ -39,9 +39,9 @@ blogs_by_john = db.session.query(Blog).join(Blog.author).filter(User.username ==
 # This returns tuples of (Blog, User) objects.
 blogs_with_authors = db.session.query(Blog, User).join(User, Blog.author_id == User.id).all()
 for blog, author in blogs_with_authors:
-    print(f"Blog: {blog.title}, Author: {author.username}")</pre>
+    print(f"Blog: {blog.title}, Author: {author.username}")</code></pre>
 <h2 class="doc-header"># Pagination</h2>
-<pre>># limit, order_by 
+<pre><code class="language-python"># limit, order_by 
 profile_page = (
   db.session.query(Profile)
     .order_by(Profile.id.desc())
@@ -50,10 +50,10 @@ profile_page = (
     .all()
 )
 # count
-count = db.session.query(Profile).count()</pre>
+count = db.session.query(Profile).count()</code></pre>
 
 <h2 class="doc-header"># Aggregate Functions</h2>
-<pre># group_by example
+<pre><code class="language-python"># group_by example
 # To count the number of blogs each user has written.
 # We need to import `func` from sqlalchemy for aggregate functions like count().
 from sqlalchemy import func
@@ -65,7 +65,6 @@ user_blog_counts = db.session.query(
 
 # The result will be a list of tuples, e.g., [('john', 5), ('jane', 3)]
 for username, count in user_blog_counts:
-    print(f"User: {username} has {count} blogs.")
-  </pre>
+    print(f"User: {username} has {count} blogs.")</code></pre>
 </section>
 {% endblock %}

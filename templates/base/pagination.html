@@ -1,17 +1,52 @@
 {% if is_paginated or page_obj.has_other_pages %}
 <style>
-    .pagination a { margin: 0; padding: 4px 12px; }
+    .pagination .page-link {
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 4px;
+        color: #555;
+        background-color: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(5px);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        transition: all 0.2s ease-in-out;
+        font-weight: 500;
+    }
+    .pagination .page-link:hover {
+        background-color: #fff;
+        color: #0d6efd;
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .pagination .page-item.active .page-link {
+        background-color: #0d6efd;
+        color: #fff;
+        box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+    }
+    .pagination .page-item:first-child .page-link, 
+    .pagination .page-item:last-child .page-link {
+        border-radius: 50%; /* Override bootstrap default */
+    }
 </style>
-<nav aria-label="Page navigation example">
-    <ul class="pagination justify-content-center pagination-md">
+<nav aria-label="Page navigation" class="mt-4 mb-5">
+    <ul class="pagination justify-content-center align-items-center">
         {% if page_obj.has_previous %}
         <li class="page-item">
-            <a class="page-link" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.searched %}&searched={{ request.GET.searched }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="First">«</a>
+            <a class="page-link" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.searched %}&searched={{ request.GET.searched }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="First" title="First Page">
+                <i class="bi bi-chevron-double-left"></i>
+            </a>
         </li>
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.searched %}&searched={{ request.GET.searched }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="Previous">←</a>
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.searched %}&searched={{ request.GET.searched }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="Previous" title="Previous Page">
+                <i class="bi bi-chevron-left"></i>
+            </a>
         </li>
         {% endif %}
+        
         {% for num in page_obj.paginator.page_range %}
             {% if page_obj.number == num %}
             <li class="page-item active">
@@ -23,12 +58,17 @@
                 </li>
             {% endif %}
         {% endfor %}
+        
         {% if page_obj.has_next %}
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.searched %}&searched={{ request.GET.searched }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="Next">→</a>
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.searched %}&searched={{ request.GET.searched }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="Next" title="Next Page">
+                <i class="bi bi-chevron-right"></i>
+            </a>
         </li>
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.searched %}&searched={{ request.GET.searched }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="Last">»</a>
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.searched %}&searched={{ request.GET.searched }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="Last" title="Last Page">
+                <i class="bi bi-chevron-double-right"></i>
+            </a>
         </li>
         {% endif %}
     </ul>

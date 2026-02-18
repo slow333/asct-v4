@@ -1,7 +1,7 @@
-{% extends 'base/base.html' %}
+{% extends 'docs/base_docs.html' %}
 {% block title %} PostgreSQL {% endblock %}
 
-{% block content %}
+{% block doc_content %}
 {% include 'docs/postgresql/sub_nav.html' %}
 <h1 class="doc-title">SQL Aggregate</h1>
 <section class="doc-section">
@@ -15,26 +15,26 @@
   </ul>
 
   <h2 class="doc-header">Min and Max</h2>
-<pre>SELECT MIN(Price) FROM Product WHERE condition; 
+<pre><code class="language-sql">SELECT MIN(Price) FROM Product WHERE condition; 
 SELECT MAX(Price) FROM Product WHERE condition; 
 SELECT categoryID, 
   min(price) AS min_price,
   max(price) AS max_price,
   avg(price) AS avg_price
   FROM product
-  GROUP BY categoryid;</pre>
+  GROUP BY categoryid;</code></pre>
 
   <h2 class="doc-header">COUNT</h2>
-  <pre>SELECT COUNT(*) FROM Product WHERE condition;
+  <pre><code class="language-sql">SELECT COUNT(*) FROM Product WHERE condition;
   SELECT COUNT(country) FROM customer;
   중복 제거안하면 값이 있는 모든 ROW를 샘
   SELECT count(city) as cityCount, count(DISTINCT country) as 'Country Count' 
     FROM customer WHERE id  < 33;
   SELECT country, count(*) as '전체 레코드 숫자' 
-    FROM customer GROUP BY country;</pre>
+    FROM customer GROUP BY country;</code></pre>
 
   <h2 class="doc-header">SUM</h2>
-<pre>SELECT SUM(price) FROM Product WHERE condition;
+<pre><code class="language-sql">SELECT SUM(price) FROM Product WHERE condition;
 SELECT sum(quantity) FROM order_detail WHERE order_id = 1;
 SELECT order_id as OrderID, sum(quantity) 
     as Quantity, sum(price) as Price
@@ -46,14 +46,14 @@ SELECT order_id, SUM(quantity * price) AS total_sales
   GROUP BY order_id;
 SELECT SUM(quantity * od.price) AS total_sales
   FROM order_detail od
-  LEFT JOIN product ON od.product_id = product.id;</pre>
+  LEFT JOIN product ON od.product_id = product.id;</code></pre>
 
   <h2 class="doc-header">AVG</h2>
-<pre>SELECT AVG(price) FROM Product WHERE condition;
+<pre><code class="language-sql">SELECT AVG(price) FROM Product WHERE condition;
 SELECT CategoryID, AVG(price)
   AS average_price FROM product GROUP BY CategoryID;
 SELECT AVG(price) AS average_price FROM product WHERE CategoryID = 1;
 SELECT * FROM product
-WHERE price > (SELECT AVG(price) FROM product)</pre>
+WHERE price > (SELECT AVG(price) FROM product)</code></pre>
 </section>
 {% endblock %}

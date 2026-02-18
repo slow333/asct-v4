@@ -34,6 +34,7 @@
     position: relative;
     margin-bottom: 1rem;
     color: #333333;
+    width: 100% !important;
 }
 .filter-item {
     display: flex;

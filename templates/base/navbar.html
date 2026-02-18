@@ -5,8 +5,8 @@
     }
 </style>
 
-<nav class="navbar navbar-expand-lg fixed-top navbar-light shadow-sm py-0 mb-1 navbar-custom">
-    <div class="container-lg">
+<nav class="navbar fixed-top navbar-light shadow-sm py-0 mb-0 navbar-custom navbar-expand">
+    <div class="container-fluid">
         <div class="d-flex align-items-center">
             <button class="btn btn-link text-dark p-0 me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarCol" aria-controls="sidebarCol">
                 <i class="bi bi-list fs-3"></i>
@@ -20,8 +20,8 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         
-        <div class="collapse navbar-collapse" id="navbarToggle">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-medium">
+        <div class="collapse navbar-collapse flex-wrap" id="navbarToggle">
+            <ul class="navbar-nav me-auto mb-0 fw-medium flex-wrap">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle px-3 {% if '/docs/' in request.path %} active text-primary {% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Docs</a>
                     <ul class="dropdown-menu shadow border-0 rounded-3">

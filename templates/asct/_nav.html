@@ -2,42 +2,44 @@
 {% comment %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<li><a class="dropdown-item" href="{% url 'asct:serverinfo_select' %}">Server 정보 수집</a></li>
 {% endcomment %}
 
-<nav class="navbar navbar-expand-lg navbar-light mb-4 rounded-3 shadow-sm p-2 z-3 nav_custom">
-    <div class="container-fluid d-flex align-items-center">
+<nav class="navbar navbar-expand navbar-light mb-3 rounded-3 shadow-sm p-2 z-3 nav_custom w-100">
+    <div class="container-fluid flex-center w-100">
         <a class="navbar-brand fw-bold text-primary" href="{% url 'asct:index' %}">Home</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
         <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <div class="collapse navbar-collapse flex-wrap" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 flex-wrap">
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> 접속정보 </a>
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="{% url 'asct:sshinfo_list' %}">SSH 정보</a></li>
                     <li><a class="dropdown-item" href="{% url 'asct:cmd_list' %}">Command</a></li>
                     <li><a class="dropdown-item" href="{% url 'asct:cmd_select' %}">CMD로 정보 수집</a></li>
-                    <li><a class="dropdown-item" href="{% url 'asct:serverinfo_select' %}">Server 정보 수집</a></li>
-                    <li><a class="dropdown-item" href="{% url 'asct:serverinfo_list' %}">Server 정보 List</a></li>
                 </ul>
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> 자원정보 </a>
                 <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'asct:serverinfo_list' %}">Server 정보</a></li>
+                    <li><a class="dropdown-item" href="{% url 'asct:cpu_usage_list' %}">CPU 사용량</a></li>
+                    <li><a class="dropdown-item" href="{% url 'asct:memory_usage_list' %}">Memory 사용량</a></li>
+                    <li><a class="dropdown-item" href="{% url 'asct:traffic_usage_list' %}">Traffic 사용량</a></li>
+                    <li><a class="dropdown-item" href="{% url 'asct:disk_usage_list' %}">Disck 사용량</a></li>
+                    {% comment %}
                     <li><a class="dropdown-item" href="{% url 'asct:cpu_usage_select' %}">CPU 사용량 수집</a></li>
-                    <li><a class="dropdown-item" href="{% url 'asct:cpu_usage_list' %}">CPU 사용량 List</a></li>
                     <li><a class="dropdown-item" href="{% url 'asct:memory_usage_select' %}">Memory 사용량 수집</a></li>
-                    <li><a class="dropdown-item" href="{% url 'asct:memory_usage_list' %}">Memory 사용량 List</a></li>
                     <li><a class="dropdown-item" href="{% url 'asct:traffic_usage_select' %}">Traffic 사용량 수집</a></li>
-                    <li><a class="dropdown-item" href="{% url 'asct:traffic_usage_list' %}">Traffic 사용량 List</a></li>
-                    <li><a class="dropdown-item" href="{% url 'asct:disk_usage_list' %}">Disck 사용량 List</a></li>
+                    {% endcomment %}
                 </ul>
             </li>
         </ul>
-        <form class="d-flex mb-0" role="search" >
-            <input class="form-control me-2 py-1" type="search" placeholder="Search..." name='searched' aria-label="Search" value="{{ searched|default:'' }}"/>
-            <button class="btn btn-outline-success btn-sm py-1" type="submit">Search</button>
+        <form class="d-flex mb-0 gap-2" role="search" >
+            <input class="form-control form-control-sm rounded-pill px-3 py-0" type="search" placeholder="Search" name='q' aria-label="Search" value="{{ searched|default:'' }}"/>
+            <button class="btn btn-outline-success btn-sm rounded-pill px-3 py-0" type="submit"><i class="bi bi-search"></i></button>
         </form>
         </div>
     </div>

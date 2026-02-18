@@ -1,11 +1,11 @@
-{% extends 'base/base.html' %}
+{% extends 'docs/base_docs.html' %}
 {% block title %} Python {% endblock %}
 
-{% block content %}
+{% block doc_content %}
 {% include 'docs/python/sub_nav.html' %}
 <h1 class="doc-title">try, except, finally</h1>
 <section class="doc-section">
-<pre>def say_nick(nick):
+<pre><code class="language-python">def say_nick(nick):
     if nick == &#39;바보&#39;:
         raise MyError()
     print(nick)
@@ -18,9 +18,9 @@ try:
     say_nick(&#39;천사&#39;)
     say_nick(&#39;바보&#39;)
 except MyError as e:
-    print(e)</pre>
+    print(e)</code></pre>
 <h2 class="doc-header">else, finally</h2>
-<pre>file = None
+<pre><code class="language-python">file = None
 try:
     file = open("my_file.txt", "r")
     # ... do something with the file
@@ -30,10 +30,10 @@ else:
     print("File was successfully opened and processed.")
 finally:
     if file:
-        file.close() # Always close the file</pre>
+        file.close() # Always close the file</code></pre>
 <h3 class="doc-subheader">모든 예외를 처리하려면 except: 처럼 애러 타입을 지정하지 않으면됨</h3>
 <h2 class="doc-header">애러 종류</h2>
-<pre>try:
+<pre><code class="language-python">try:
     # Code that might raise any error
     result = int("abc")
 except:
@@ -56,6 +56,6 @@ try:
     value = 10 / 0 
 except ZeroDivisionError:
     # Code to handle the specific error
-    print("Cannot divide by zero!")</pre>
+    print("Cannot divide by zero!")</code></pre>
 </section>
 {% endblock %}

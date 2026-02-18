@@ -1,4 +1,4 @@
-from celery import shared_task
+from celery import shared_task # type: ignore
 import paramiko, json, os
 from datetime import timedelta
 from django.utils import timezone
@@ -16,7 +16,7 @@ def schedule_server_info_collection():
     # 모든 SSHInfo에 대해 개별적으로 Task 실행
     for ssh_info in SSHInfo.objects.all():
         collect_server_info_task.delay(ssh_info.id) # type: ignore
-        
+
 @shared_task
 def collect_server_info_task(ssh_id):
     from .models_basic import SSHInfo, ServerInfo
@@ -37,7 +37,7 @@ def collect_server_info_task(ssh_id):
         # SFTP로 스크립트 전송
         sftp = client.open_sftp()
         remote_script = f'/tmp/get_svinfo_{ssh_info.id}.sh' # type: ignore
-        sftp.put(script_path, remote_script)
+        sftp.put(script_path, remote_script, confirm=False)
         sftp.chmod(remote_script, 0o755)
         sftp.close()
 
@@ -183,7 +183,7 @@ def refresh_server_info_task(server_info_id):
 
         sftp = client.open_sftp()
         remote_script = f'/tmp/get_svinfo_{ssh_info.id}.sh' # type: ignore
-        sftp.put(script_path, remote_script)
+        sftp.put(script_path, remote_script, confirm=False)
         sftp.chmod(remote_script, 0o755)
         sftp.close()
 
@@ -248,9 +248,11 @@ def collect_metric_task(ssh_id, metric_type):
         _, _, data, error = handler(None, ssh_info)
         
         if error:
+            logger.error(f"Error collecting {metric_type} usage for {ssh_info}: {error}")
             return f"Error collecting {metric_type} usage for {ssh_info}: {error}"
         return f"Successfully collected {metric_type} usage for {ssh_info}: {data}"
     except Exception as e:
+        logger.error(f"Exception for {ssh_id} ({metric_type}): {e}", exc_info=True)
         return f"Exception for {ssh_id} ({metric_type}): {e}"
 
 @shared_task
@@ -262,6 +264,7 @@ def schedule_cpu_usage_collection():
 @shared_task
 def schedule_memory_usage_collection():
     from .models_basic import SSHInfo
+    logger.info("########### run tasks: memory usage collection started =========")
     for ssh_info in SSHInfo.objects.all():
         collect_metric_task.delay(ssh_info.id, 'memory') # type: ignore
 

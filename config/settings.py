@@ -7,7 +7,7 @@ SECRET_KEY = 'django-insecure-sc%u%h2dap2jwnm2y9-#2*@cr54j1)9-2wh306x(j!+_ra-4#o
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-    # "allauth.socialaccount.providers",
+    "allauth.socialaccount.providers",
     "allauth.socialaccount.providers.naver",
     # "allauth.socialaccount.providers.kakao",
     # "allauth.socialaccount.providers.github",
@@ -149,34 +149,34 @@ EMAIL_HOST_PASSWORD = 'dtty tgfa lxzm bhue'
 
 CART_ID = 'cart_in_session'
 
-# settings.py
-CELERY_BEAT_SCHEDULE = {
-    "collect-disk-usage-every-10-min": {
-        "task": "asct.tasks.schedule_disk_usage_collection",
-        "schedule": crontab(minute='*/10'),
-    },
-    "collect-server-info-every-1-hour": {
-        "task": "asct.tasks.schedule_server_info_collection",
-        "schedule": crontab(minute=0),  # 매 시간 정각
-    },
-    "collect-cpu-usage-daily-01": {
-        "task": "asct.tasks.schedule_cpu_usage_collection",
-        "schedule": crontab(hour=1, minute=0),
-    },
-    "collect-memory-usage-daily-01": {
-        "task": "asct.tasks.schedule_memory_usage_collection",
-        "schedule": crontab(hour=1, minute=0),
-    },
-    "collect-traffic-usage-daily-01": {
-        "task": "asct.tasks.schedule_traffic_usage_collection",
-        "schedule": crontab(hour=1, minute=0),
-    },
-    "cleanup-old-data-daily-03": {
-        "task": "asct.tasks.cleanup_old_data",
-        "schedule": crontab(hour=3, minute=0),
-        "args": (30,),  # 30일 경과 데이터 삭제
-    },
-}
+
+# CELERY_BEAT_SCHEDULE = {
+#     "collect-disk-usage-every-10-min": {
+#         "task": "asct.tasks.schedule_disk_usage_collection",
+#         "schedule": crontab(minute='*/10'),
+#     },
+#     "collect-server-info-every-1-hour": {
+#         "task": "asct.tasks.schedule_server_info_collection",
+#         "schedule": crontab(minute=0),  # 매 시간 정각
+#     },
+#     "collect-cpu-usage-daily-01": {
+#         "task": "asct.tasks.schedule_cpu_usage_collection",
+#         "schedule": crontab(hour=1, minute=0),
+#     },
+#     "collect-memory-usage-daily-01": {
+#         "task": "asct.tasks.schedule_memory_usage_collection",
+#         "schedule": crontab(hour=1, minute=0),
+#     },
+#     "collect-traffic-usage-daily-01": {
+#         "task": "asct.tasks.schedule_traffic_usage_collection",
+#         "schedule": crontab(hour=1, minute=0),
+#     },
+#     "cleanup-old-data-daily-03": {
+#         "task": "asct.tasks.cleanup_old_data",
+#         "schedule": crontab(hour=3, minute=0),
+#         "args": (30,),  # 30일 경과 데이터 삭제
+#     },
+# }
 
 # Celery Configuration
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
@@ -194,7 +194,31 @@ LOG_DIR = BASE_DIR / 'logs'
 LOG_DIR.mkdir(exist_ok=True)
 
 import os
-SERVICE_TYPE = os.environ.get('SERVICE_TYPE', 'web')
+import sys
+
+if 'SERVICE_TYPE' in os.environ:
+    SERVICE_TYPE = os.environ['SERVICE_TYPE']
+elif len(sys.argv) > 0 and 'celery' in sys.argv[0].lower():
+    if 'worker' in sys.argv:
+        SERVICE_TYPE = 'worker'
+    elif 'beat' in sys.argv:
+        SERVICE_TYPE = 'beat'
+    else:
+        SERVICE_TYPE = 'celery'
+else:
+    SERVICE_TYPE = 'web'
+
+# 운영체제에 따른 로깅 핸들러 설정 분기
+# Windows: 개발 편의를 위해 Django가 직접 회전 (TimedRotatingFileHandler)
+# Linux: Gunicorn 멀티 프로세스 환경에서의 충돌 방지를 위해 외부 logrotate 사용 (WatchedFileHandler)
+if os.name == 'nt':
+    LOG_HANDLER_CLASS = 'logging.FileHandler'
+    # Windows 환경에서 파일 잠금(WinError 32) 방지를 위해 Log Rotation 중지
+    LOG_HANDLER_KWARGS = {}
+else:
+    LOG_HANDLER_CLASS = 'logging.handlers.WatchedFileHandler'
+    LOG_HANDLER_KWARGS = {}
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -212,14 +236,10 @@ LOGGING = {
     'handlers': {
         'file': {
             'level': 'INFO',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            # 파일명에 서비스 타입을 포함시켜 충돌 방지
-            # 예: asct_system_web.log, asct_system_worker.log, asct_system_beat.log
+            'class': LOG_HANDLER_CLASS,
             'filename': str(LOG_DIR / f'asct_system_{SERVICE_TYPE}.log'),
-            'when': 'midnight',
-            'interval': 1,
-            'backupCount': 10,
             'encoding': 'utf-8',
+            **LOG_HANDLER_KWARGS,
         },
         'console': {
             'level': 'DEBUG',

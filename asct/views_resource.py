@@ -1,11 +1,11 @@
-from django.shortcuts import redirect, get_object_or_404, render
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
+# from django.contrib import messages
 from django.core.paginator import Paginator
 from .models_resource import CPUUsage, MemoryUsage, NetworkUsage, DiskUsage
-from .models_basic import SSHInfo
+# from .models_basic import SSHInfo
 # from .run_by_ssh import run_ssh_cpu_usage, run_ssh_memory_usage, run_ssh_traffic_usage
-from .views_common import common_chart, common_export, common_list, common_usage_select, filter_by_q_and_hostlist
+from .views_common import common_chart, common_export, common_list, filter_by_q_and_hostlist
 
 # =============== Disk usage 관련 Celery ===============
 @login_required
@@ -82,6 +82,7 @@ def traffic_usage_chart(request):
 # =============== Memory usage 관련 CRUD ===============
 @login_required
 def memory_usage_list(request):
+    print("######################### run views ===========================")
     return common_list(request, MemoryUsage, 'asct/memory_usage/list.html')
 
 @login_required

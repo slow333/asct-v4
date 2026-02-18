@@ -1,13 +1,13 @@
-{% extends 'base/base.html' %}
+{% extends 'docs/base_docs.html' %}
 {% block title %} Flask {% endblock %}
 
-{% block content %}
+{% block doc_content %}
 {% include 'docs/flask/sub_nav.html' %}
 <h1 class="doc-title">Core CRUD</h1>
 <section class="doc-section">
   <h4 class="doc-h4">sqlalchemy 1.3.2 기준, 1.4부터는 많이 다름</h4>
   <h2 class="doc-header">INSERT(create)</h2>
-  <pre>from sqlalchemy import insert
+  <pre><code class="language-python">from sqlalchemy import insert
 from db_config import engine, users, addresses
 
 ins = users.insert().values([
@@ -22,43 +22,40 @@ ins_add = addresses.insert().values([
 ])
 with engine.connect() as conn:
   conn.execute(ins)
-  conn.execute(ins_add) </pre>
+  conn.execute(ins_add) </code></pre>
 </section>
 <section class="doc-section">
   <h2 class="doc-header">SELECT(read)</h2>
-  <pre>from sqlalchemy import select
+  <pre><code class="language-python">from sqlalchemy import select
 from db_config import engine, users, addresses
 
 select_all = select([users])
 users_select = select([users]).where(users.c.name == 'Jane')
 with engine.connect() as conn:
   for row in conn.execute(select_all): print(row)
-  for row in conn.execute(users_select): print(row)
-</pre>
+  for row in conn.execute(users_select): print(row)</code></pre>
 </section>
 <section class="doc-section">
   <h2 class="doc-header">UPDATE(update)</h2>
-  <pre>from sqlalchemy import update
+  <pre><code class="language-python">from sqlalchemy import update
 from db_config import engine, users
 
 stmt = users.update().where(users.c.name == 'Jane').values(fullname='Jane Doe Updated')
 with engine.connect() as conn:
-  conn.execute(stmt)
-  </pre>
+  conn.execute(stmt)</code></pre>
 </section>
 <section class="doc-section">
   <h2 class="doc-header">DELETE(delete)</h2>
-  <pre>from sqlalchemy import delete
+  <pre><code class="language-python">from sqlalchemy import delete
 from db_config import engine, users
 
 stmt = users.delete().where(users.c.name == 'Jane')
 with engine.connect() as conn:
-  conn.execute(stmt)
-  </pre>
+  conn.execute(stmt)</code></pre>
 </section>
 <section class="doc-section">
   <h2 class="doc-header">JOIN(read)</h2>
-  <pre>from sqlalchemy import select, join
+  <pre><code class="language-python">from sqlalchemy import select, join
 from db_config import engine, users, addresses
 import sqlalchemy
 
@@ -79,7 +76,6 @@ with engine.connect() as conn:
   for row in result:
     print(row)
   for row in conn.execute(left_outer_join):
-    print(row)
-</pre>
+    print(row)</code></pre>
 </section>
 {% endblock %}

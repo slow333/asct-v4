@@ -1,11 +1,11 @@
-{% extends 'base/base.html' %}
+{% extends 'docs/base_docs.html' %}
 {% block title %} Flask {% endblock %}
 
-{% block content %}
+{% block doc_content %}
 {% include 'docs/flask/sub_nav.html' %}
 <h1 class="doc-title">psycopg2를 통한 db 연결</h1>
 <section class="doc-section"> 
-  <pre>
+  <pre><code class="language-python">
 import os
 import psycopg2
 import psycopg2.extras
@@ -42,14 +42,13 @@ def close_db(e=None):
 
 def init_app(app):
   """Register database functions with the Flask app."""
-  app.teardown_appcontext(close_db)
-</pre>
+  app.teardown_appcontext(close_db)</code></pre>
 </section>
 
 <section class="doc-section">
   <h2 class="doc-header">DB Setup(postgresql): SqlAlchemy Core 방식(ORM 방식 아님)</h2>
   <h3 class="doc-subheader">DB 연결 및 테이블 생성, 주입 : sqlalchemy 1.3.2 기준</h3>
-  <pre>from sqlalchemy import create_engine, MetaData
+  <pre><code class="language-python">from sqlalchemy import create_engine, MetaData
 from sqlalchemy import Table, Column, String, insert, Integer, ForeignKey
 
 engine = create_engine('postgresql://postgres:1234@192.168.219.101:5432/mydb', echo=True)
@@ -66,7 +65,7 @@ addresses = Table('addresses', metadata,
   Column('user_id', Integer, ForeignKey('users.id', ondelete='CASCADE')),
   Column('email_address', String(100), nullable=False)
 )
-metadata.create_all(engine)  </pre>
+metadata.create_all(engine)  </code></pre>
 </section>
 
 <h1 class="doc-title">flask session 관리</h1>
@@ -94,16 +93,16 @@ metadata.create_all(engine)  </pre>
 
 <h3 class="doc-subheader"> 세션 사용을 위한 필수 설정: SECRET_KEY</h3>
 <p> 세션 데이터를 안전하게 암호화하기 위해서는 반드시 SECRET_KEY를 설정해야 합니다. 이 키는 외부에 노출되지 않도록 안전하게 관리해야 합니다.</p>
-<pre>
+<pre><code class="language-python">
 from flask import Flask
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_super_secret_key_here'</pre>
+app.config['SECRET_KEY'] = 'your_super_secret_key_here'</code></pre>
 
 <h3 class="doc-subheader">세션 사용 예제</h3>
 <p>세션을 사용하려면 Flask의 session 객체를 임포트해야 합니다. session은 g 객체처럼 현재 요청의 컨텍스트에 바인딩된 프록시 객체입니다.</p>
 <h4 class="doc-h4">사용자 아이디를 세션에 저장하여 로그인 상태를 유지하는 예시입니다.</h4>
-<pre>
+<pre><code class="language-python">
 from flask import Flask, session, redirect, url_for, request, render_template
 
 app = Flask(__name__)
@@ -132,8 +131,7 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
-</pre>
+    app.run(debug=True)</code></pre>
 <h3 class="doc-subheader">세션 설정 옵션</h3>
 <ul>
   <li>app.config를 통해 세션의 동작을 제어할 수 있습니다.</li>
@@ -142,8 +140,8 @@ if __name__ == '__main__':
   <li>PERMANENT_SESSION_LIFETIME: 세션의 유효 기간(초 단위)을 설정합니다. session.permanent = True로 설정해야 적용됩니다. 기본값은 31일입니다.</li>
   <li>SESSION_COOKIE_DOMAIN: 쿠키를 사용할 도메인을 지정합니다.</li>
 </ul>
-<pre>
+<pre><code class="language-python">
 app.config['SESSION_COOKIE_SECURE'] = True
-app.config['PERMANENT_SESSION_LIFETIME'] = 3600 # 1시간  </pre>
+app.config['PERMANENT_SESSION_LIFETIME'] = 3600 # 1시간  </code></pre>
 </section>
 {% endblock %}

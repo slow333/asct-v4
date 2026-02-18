@@ -11,6 +11,8 @@ urlpatterns = [
     path('django/datetime', views.django_datetime, name='django-datetime'),
     path('django/django-tips', views.django_django_tips, name='django-tips'),
     path('django/celery', views.django_celery, name='django-celery'),
+    path('django/log-rotate/', views.log_rotate, name='log-rotate'),
+
 
     path('psql/note', views.psql_note, name='docs-psql-note'),
     path('psql/datatype', views.psql_datatype, name='docs-psql-datatype'),

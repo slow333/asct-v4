@@ -1,8 +1,8 @@
-{% extends 'base/base.html' %}
+{% extends 'docs/base_docs.html' %}
 
 {% block title %} Django model field TYPE {% endblock %}
 
-{% block content %}
+{% block doc_content %}
 {% include 'docs/django/sub_nav.html' %}
 <h1 class="doc-title">Django model field TYPE</h1>
 <section class="doc-section">
@@ -43,18 +43,18 @@
     <h2 class="doc-header">Model에서 사용하는 주요 메서드</h2>
     <ul>    
         <li>get_absolute_url : 모델의 특정 인스턴스에 대한 URL을 반환합니다.
-            <pre>def get_absolute_url(self):
-    return reverse('model-detail-view', args=[str(self.id)])</pre>
+            <pre><code class="language-python">def get_absolute_url(self):
+    return reverse('model-detail-view', args=[str(self.id)])</code></pre>
         </li>
         <li>save : save에 대한 override를 통해 저장시 기본 액션을 수정
-            <pre>def save(self, *args, **kwargs):
+            <pre><code class="language-python">def save(self, *args, **kwargs):
     instance = super().save(*args, **kwargs).list_related('author')
-    return instance</pre>
+    return instance</code></pre>
         </li>
         <li>delete : delete에 대한 override를 통해 삭제시 기본 액션을 수정
-            <pre>def delete(self, *args, **kwargs):
+            <pre><code class="language-python">def delete(self, *args, **kwargs):
     instance = super().delete(*args, **kwargs).filter(pk__gte=3)
-    return instance</pre>
+    return instance</code></pre>
         </li>
     </ul>
     <h2 class="doc-header">Queryset filter options</h2>

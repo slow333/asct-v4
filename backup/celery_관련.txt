@@ -123,8 +123,56 @@ celery -A config worker -l info -P eventlet # 윈도우 환경에서는 이걸�
 celery -A config worker -l info -P solo  # 개발환경에서 단일 스레스로 처리
 
 terminal 2:
-celery -A config beat -l info  # 이개 스캐쥴 관련 
+celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler # DB 스케줄러 사용
 
 error redis 없다고 나옮
 ==> pip install redis, pip install eventlet 설치 안해서 발생
 
+
+# ======================================
+Docker 환경(공식 Redis 이미지)에서는 로그가 파일로 저장되지 않고 **표준 출력(Standard Output)**으로 전송됩니다. 따라서 파일 탐색기가 아닌 Docker 명령어로 로그를 확인해야 합니다.
+
+또한, 말씀하신 Connection closed by server 에러는 Docker 환경에서 Redis의 Protected Mode 때문에 발생하는 전형적인 문제입니다.
+
+해결 방법과 로그 확인 방법을 안내해 드립니다.
+
+1. Redis 로그 확인 방법 (Docker)
+PowerShell 또는 터미널에서 다음 명령어를 입력하세요.
+
+powershell
+docker logs my-redis
+아마도 로그 끝부분에 다음과 같은 메시지가 있을 것입니다:
+
+DENIED Redis is running in protected mode because protected mode is enabled and no password is set for the default user. In this mode connections are only accepted from the loopback interface...
+
+2. 원인 및 해결 방법
+원인: Redis 컨테이너 입장에서 볼 때, 호스트(Windows)에서 들어오는 연결은 localhost(127.0.0.1)가 아니라 Docker 네트워크 게이트웨이 IP로 인식됩니다. Redis는 기본적으로 외부 접속을 차단하는 protected-mode가 켜져 있어 연결을 즉시 끊어버립니다.
+
+해결: start.ps1 스크립트에서 Redis 컨테이너를 실행할 때 --protected-mode no 옵션을 추가해야 합니다.
+
+3. 코드 수정 (start.ps1)
+b:\ASCT_dj_v4_1\start.ps1 파일을 다음과 같이 수정하여 Redis 실행 시 보안 모드를 해제하도록 변경합니다.
+
+start.ps1
+-1
++1
+$redisContainer = docker ps -a -q -f "name=^my-redis$"
+if (-not $redisContainer) {
+    Write-Host "Container 'my-redis' not found. Creating and starting..."
+    docker run --name my-redis -p 6379:6379 -d redis
+    docker run --name my-redis -p 6379:6379 -d redis redis-server --protected-mode no
+} else {
+    Write-Host "Starting Redis (Docker)..."
+    docker start my-redis
+4. 중요: 기존 컨테이너 삭제 후 재실행
+스크립트를 수정한 것만으로는 이미 생성된 컨테이너(my-redis)의 설정이 바뀌지 않습니다. 반드시 기존 컨테이너를 삭제한 뒤 스크립트를 다시 실행해 주세요.
+
+PowerShell에서 다음 명령어를 순서대로 실행하세요:
+
+powershell
+# 1. 기존 컨테이너 강제 삭제
+docker rm -f my-redis
+
+# 2. 수정된 스크립트 실행 (Redis가 새로운 설정으로 다시 생성됨)
+.\start.ps1
+이제 Celery가 정상적으로 Redis에 연결될 것입니다.

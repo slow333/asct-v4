@@ -30,6 +30,12 @@ def django_regexp(requst):
 def django_datetime(requst):
     return render(requst, 'docs/django/datetime.html')
 
+def log_rotate(request):
+    """
+    Django 로그 회전 이슈 및 해결 방법 문서 뷰
+    """
+    return render(request, 'docs/django/log_rotate.html')
+
 # ============= flask ========================
 def flask_install(requst):
     return render(requst, 'docs/flask/install.html')

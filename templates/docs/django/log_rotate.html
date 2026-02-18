@@ -1,0 +1,125 @@
+{% extends 'docs/base_docs.html' %}
+
+{% block doc_content %}
+{% include 'docs/django/sub_nav.html' %}
+<div class="container mt-4">
+    <h1 class="mb-4">Django 로그 회전(Log Rotation) 이슈 및 해결 방법</h1>
+    
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">에러 발생 상황</h4>
+        <p class="mb-0"><code>PermissionError: [WinError 32] 다른 프로세스가 파일을 사용 중이기 때문에 프로세스가 액세스 할 수 없습니다: '...asct_system_web.log'</code></p>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            <strong>원인 분석</strong>
+        </div>
+        <div class="card-body">
+            <p>Windows 환경에서 Django 실행 시 다음과 같은 이유로 로그 파일(<code>asct_system_web.log</code>)에 대한 동시 접근 충돌이 발생합니다.</p>
+            <ul>
+                <li><strong>Celery와 Web 서버 충돌:</strong> Celery Worker/Beat와 Django Runserver가 동일한 로그 파일을 사용하려고 할 때 발생합니다.</li>
+                <li><strong>Runserver Auto-reload:</strong> Django 개발 서버는 코드 변경 감지를 위해 2개의 프로세스(메인, 감시자)를 띄우는데, 이들이 동시에 로그 파일을 회전(Rotation)시키려 할 때 락(Lock)이 걸립니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2 class="mt-5">해결 방법 1: 서비스별 로그 파일 분리 (settings.py)</h2>
+    <p>환경 변수나 실행 명령어를 분석하여 <code>SERVICE_TYPE</code>을 구분하고, 로그 파일명을 분리합니다.</p>
+    
+    <pre><code class="language-python"># config/settings.py
+
+import os
+import sys
+
+# SERVICE_TYPE 결정 로직
+if 'SERVICE_TYPE' in os.environ:
+    SERVICE_TYPE = os.environ['SERVICE_TYPE']
+elif len(sys.argv) > 0 and 'celery' in sys.argv[0].lower():
+    if 'worker' in sys.argv:
+        SERVICE_TYPE = 'worker'
+    elif 'beat' in sys.argv:
+        SERVICE_TYPE = 'beat'
+    else:
+        SERVICE_TYPE = 'celery'
+else:
+    SERVICE_TYPE = 'web'
+
+# 로그 설정 부분
+LOGGING = {
+    # ...
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': LOG_HANDLER_CLASS,  # OS별 분기 처리 (아래 참조)
+            'filename': str(LOG_DIR / f'asct_system_{SERVICE_TYPE}.log'), # 파일명 분리
+            'encoding': 'utf-8',
+            **LOG_HANDLER_KWARGS,
+        },
+    },
+}</code></pre>
+
+    <h2 class="mt-5">해결 방법 2: Windows 개발 시 Auto-reload 비활성화</h2>
+    <p>로그 파일을 분리해도 <code>runserver</code> 자체의 멀티 프로세스 문제를 피하기 위해 <code>--noreload</code> 옵션을 사용합니다. (단, 코드 수정 시 수동 재시작 필요)</p>
+    
+    <pre><code class="language-powershell"># start.ps1 또는 실행 명령어
+python manage.py runserver 0.0.0.0:8000 --noreload</code></pre>
+
+    <h2 class="mt-5">해결 방법 3: Log Rotation 중지 (가장 확실한 방법)</h2>
+    <p>Windows 개발 환경에서는 로그 회전(Rotation) 기능 자체를 끄고 단일 파일을 사용하는 것이 파일 잠금 문제를 피하는 가장 확실한 방법입니다.</p>
+    <pre><code class="language-python"># config/settings.py
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            # TimedRotatingFileHandler 대신 FileHandler 사용 (Log Rotate 중지)
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'asct_system.log'),
+            'encoding': 'utf-8',
+        },
+        # ...
+    },
+    # ...
+}</code></pre>
+
+    <h2 class="mt-5">운영 환경(Linux) 배포 전략</h2>
+    <p>Linux(Gunicorn) 환경에서는 멀티 프로세스 안전성을 위해 Django가 아닌 OS의 <code>logrotate</code> 도구를 사용해야 합니다.</p>
+
+    <h3>1. settings.py OS별 분기</h3>
+    <pre><code class="language-python"># Windows: 개발 편의를 위해 Django가 직접 회전 (TimedRotatingFileHandler)
+# Linux: 외부 logrotate 사용을 위해 파일 감시 핸들러 사용 (WatchedFileHandler)
+if os.name == 'nt':
+    LOG_HANDLER_CLASS = 'logging.handlers.TimedRotatingFileHandler'
+    LOG_HANDLER_KWARGS = {
+        'when': 'midnight',
+        'interval': 1,
+        'backupCount': 10,
+    }
+else:
+    LOG_HANDLER_CLASS = 'logging.handlers.WatchedFileHandler'
+    LOG_HANDLER_KWARGS = {}</code></pre>
+
+    <h3>2. Linux logrotate 설정 예시</h3>
+    <p><code>/etc/logrotate.d/asct_web</code> 파일을 생성하여 설정합니다.</p>
+    <pre><code class="language-bash">/path/to/your/project/logs/*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create 0640 www-data www-data
+    sharedscripts
+    postrotate
+        # Gunicorn에게 로그를 다시 열라는 신호 전송
+        [ -f /run/gunicorn.pid ] && kill -USR1 `cat /run/gunicorn.pid`
+    endscript
+}</code></pre>
+
+    <div class="mt-5">
+        <a href="{% url 'main-index' %}" class="btn btn-secondary">메인으로 돌아가기</a>
+    </div>
+</div>
+{% endblock %}

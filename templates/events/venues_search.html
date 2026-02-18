@@ -6,7 +6,7 @@
 {% include 'events/_nav.html' %}
     <h1>Searched Venues for "{{ searched }}"</h1>
     {% for venue in venues %}
-    <div class="card w-75">
+    <div class="card glass-card w-75">
         <h3 class="card-title text-center">{{ venue.name }}</h3>
         <ul class="list-group list-group-flush">
             <li class="list-group-item">{{ venue.address }}</li>

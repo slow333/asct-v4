@@ -13,7 +13,7 @@
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
     {% for book in page_obj %}
     <div class="col">
-        <div class="card h-100 shadow-sm hover-shadow">
+        <div class="card glass-card h-100 shadow-sm hover-shadow">
             <div class="card-body">
                 <h5 class="card-title text-truncate">
                     <a href="{% url 'library:book-detail' book.id %}" class="text-decoration-none text-dark stretched-link" title="{{ book.title }}">

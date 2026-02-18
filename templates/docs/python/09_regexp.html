@@ -1,11 +1,11 @@
-{% extends 'base/base.html' %}
+{% extends 'docs/base_docs.html' %}
 {% block title %} Python {% endblock %}
 
-{% block content %}
+{% block doc_content %}
 {% include 'docs/python/sub_nav.html' %}
 <h1 class="doc-title">정규 표현식</h1>
 <section class="doc-section">
-<pre># 정규식을 안쓰면
+<pre><code class="language-python"># 정규식을 안쓰면
 data = """
 park 800905-1049118
 kim  700905-1059119
@@ -19,7 +19,7 @@ for line in data.split("\n"):
             word = word[:6] + "-" + "*******"
         word_result.append(word)
     result.append(" ".join(word_result))
-print("\n".join(result))</pre>
+print("\n".join(result))</code></pre>
 <h2 class="doc-header">메타 문자</h2>
 <h3 class="doc-subheader">. ^ $ * + ? { } [ ]  | ( )</h3>
 <p>[] #[a-zA-zA-Z0-9] 문자 숫자 , [^a-zA-Z0-9] 반대<br />
@@ -33,38 +33,38 @@ $ # $a a로 끝난다.<br />
 a|b # a 또는 b ? # 0번 또는 1번 반복 ^는 []안에서는 not, 밖에서는 시작을
 의미한다.</p>
 <h2 class="doc-header">정규식을 이용한 문자열 검색</h2>
-<pre>match() 문자열의 처음부터 정규식과 매치되는지 조사한다.
+<pre><code class="language-python">match() 문자열의 처음부터 정규식과 매치되는지 조사한다.
 search()    문자열 전체를 검색하여 정규식과 매치되는지 조사한다.
 findall()   정규식과 매치되는 모든 문자열(substring)을 리스트로 리턴한다.
-finditer()  정규식과 매치되는 모든 문자열(substring)을 반복 가능한 객체로 리턴한다.</pre>
+finditer()  정규식과 매치되는 모든 문자열(substring)을 반복 가능한 객체로 리턴한다.</code></pre>
 <h3 class="doc-subheader">match : 첫번째 매치되는 문자열 리턴(시작 검색 후 리턴)</h3>
-<pre>import re
+<pre><code class="language-python">import re
 p = re.compile('[a-z]+')
 m = p.match( '33 python language for flask' )
 if m:
     print('Match found: ', m.group())
 else:
     print('No match')
-# No match</pre>
+# No match</code></pre>
 <h3 class="doc-subheader">search : 첫번째 매치되는 문자열 리턴(전체 검색후 리턴)</h3>
-<pre>import re
+<pre><code class="language-python">import re
 p = re.compile('[a-z]+')
 m = p.search( '333 python language for flask' )
 if m:
     print('Match found: ', m.group())
 else:
-    print('No match')</pre>
+    print('No match')</code></pre>
 <h3 class="doc-subheader">findall : 리스트로 리턴</h3>
-<pre>import re
+<pre><code class="language-python">import re
 p = re.compile('[a-z]+')
 result = p.findall( '333 python language for flask' )
-print(result)</pre>
+print(result)</code></pre>
 <h3 class="doc-subheader">finditer : 반복 가능한 객체로 리턴</h3>
-<pre>import re
+<pre><code class="language-python">import re
 p = re.compile('[a-z]+')
 result = p.finditer( '333 python language for flask' )
 for r in result:
-  print(r)</pre>
+  print(r)</code></pre>
 <h3 class="doc-subheader">math method</h3>
 <p>group() 매치된 문자열을 리턴한다.<br />
 start() 매치된 문자열의 시작 위치를 리턴한다.<br />
@@ -76,16 +76,16 @@ span() 매치된 문자열의 (시작, 끝)에 해당하는 튜플을 리턴한�
 =< not digits<br />
 =< not space<br />
 =< not words < : 단어 경계(공백, 구두점 등과 단어 사이)</p>
-<pre>import re
+<pre><code class="language-python">import re
 
 text = "python is easy. 123 abc_def"
 pattern = re.compile(r'\b\w+')
 result = pattern.findall(text)
 print(result)
 # ['python', 'is', 'easy', 'abc_def']
-즉, 각 단어의 시작 위치에서 단어 전체를 추출합니다.</pre>
+즉, 각 단어의 시작 위치에서 단어 전체를 추출합니다.</code></pre>
 <h3 class="doc-subheader">compile option</h3>
-<pre>p = re.compile('a.b', re.DOTALL) # \n 포함
+<pre><code class="language-python">p = re.compile('a.b', re.DOTALL) # \n 포함
 m = p.match('a\nb')
 print(m)
 # _sre.SRE_Match object; span=(0, 5), match='a\nb'
@@ -112,21 +112,21 @@ p = re.compile("^python\s\w+", re.MULTILINE)
 
 import re
 p = re.compile('[a-z]+', re.M)
-m = p.match( '33 python language for flask')</pre>
+m = p.match( '33 python language for flask')</code></pre>
 <h3 class="doc-subheader">grouping</h3>
-<pre>(ABC)+  
+<pre><code class="language-python">(ABC)+  
 p = re.compile('(ABC)+')  
 m = p.search('ABCABCABC OK?')  
 print(m)  
 # re.Match object; span=(0, 9), match='ABCABCABC'
 print(m.group())  
-ABCABCABC  </pre>
+ABCABCABC  </code></pre>
 <h3 class="doc-subheader">grouping index</h3>
-<pre>group(0)    매치된 전체 문자열
+<pre><code class="language-python">group(0)    매치된 전체 문자열
 group(1)    첫 번째 그룹에 해당되는 문자열
 group(2)    두 번째 그룹에 해당되는 문자열
-group(n)    n 번째 그룹에 해당되는 문자열</pre>
-<pre>p = re.compile(r"(\w+)\s+\d+[-]\d+[-]\d+")  
+group(n)    n 번째 그룹에 해당되는 문자열</code></pre>
+<pre><code class="language-python">p = re.compile(r"(\w+)\s+\d+[-]\d+[-]\d+")  
 m = p.search("park 010-1234-1234")  
 print(m.group(1))  
 # park  
@@ -137,9 +137,9 @@ print(m.group(2))
 p = re.compile(r"(\w+)\s+((\d+)[-]\d+[-]\d+)")
 m = p.search("park 010-1234-1234")
 print(m.group(3))
-# 010  </pre>
+# 010  </code></pre>
 <h3 class="doc-subheader">문자열 소비가 없는 메타 문자</h3>
-<pre>| or  
+<pre><code class="language-python">| or  
 ^ 맨 처음  
 $ 맨 끝  
 \A 맨 처음(Multiline에서 전체 문자열)  
@@ -152,17 +152,17 @@ p = re.compile(r'\Bclass\B')
 print(p.search('no class at all'))  
 None
 print(p.search('one subclass is'))
-None</pre>
+None</code></pre>
 <h3 class="doc-subheader">그룹핑된 문자열 재참조</h3>
-<pre>p = re.compile(r'(\w+)\s+\1') # 1번째 그롭을 리턴  
-m = p.search('Paris in the the spring').group() </pre>
+<pre><code class="language-python">p = re.compile(r'(\w+)\s+\1') # 1번째 그롭을 리턴  
+m = p.search('Paris in the the spring').group() </code></pre>
 <h3 class="doc-subheader">그룹핑된 문자열에 이름 붙이기</h3>
-<pre>p = re.compile(r"(?P<<name>\w+)\s+((\d+)[-]\d+[-]\d+)")
+<pre><code class="language-python">p = re.compile(r"(?P<<name>\w+)\s+((\d+)[-]\d+[-]\d+)")
 m = p.search("park 010-1234-1234")
 print(m.group("name"))
-# park  </pre>
+# park  </code></pre>
 <h3 class="doc-subheader">전방 탐색</h3>
-<pre>p = re.compile(".+:")
+<pre><code class="language-python">p = re.compile(".+:")
 m = p.search("http://google.com")
 print(m.group())
 # http:
@@ -178,26 +178,26 @@ autoexec.bat
 autoexec.jpg
 ''')
 print(m)
-# ['autoexec.exe', 'autoexec.jpg']</pre>
+# ['autoexec.exe', 'autoexec.jpg']</code></pre>
 <h3 class="doc-subheader">문자열 바꾸기</h3>
-<pre>p = re.compile('(blue|white|red)')
+<pre><code class="language-python">p = re.compile('(blue|white|red)')
 p.sub('colour', 'blue socks and red shoes')
 # colour socks and colour shoes
 p.sub('colour', 'blue socks and red shoes', count=1)
-# colour socks and red shoes</pre>
+# colour socks and red shoes</code></pre>
 <h3 class="doc-subheader">sub 메서드 사용 시 참조 구문 사용하기</h3>
 <xmp>p = re.compile(r"(?P<name>\w+)\s+(?P<phone>\d+[-]\d+[-]\d+)")
 print(p.sub("\g<phone> \g<name>", "park 010-1234-1234"))
 print(p.sub("\g<2> \g<1>", "park 010-1234-1234"))
 # 010-1234-1234 park</xmp>
 <h3 class="doc-subheader">sub 메서드의 매개변수로 함수 넣기</h3>
-<pre>
+<pre><code class="language-python">
 def hexrepl(match):
   value = int(match.group())
   return hex(value)
 p = re.compile(r'\d+')
 p.sub(hexrepl, 'Call 65490 for printing, 49152 for user code.')
-'Call 0xffd2 for printing, 0xc000 for user code.'</pre>
+'Call 0xffd2 for printing, 0xc000 for user code.'</code></pre>
 <h3 class="doc-subheader">greedy vs non-greedy</h3>
 <p>.* greedy<br />
 .*? non-greedy</p>

@@ -5,11 +5,14 @@ __pycache__/
 *.pyo
 *.egg
 *.egg-info/
+*.log
 
 # Virtual environment
 venv/
 env/
 .venv/
+logs/
+logs_backup/
 
 # Database files
 *.sqlite3

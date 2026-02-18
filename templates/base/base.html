@@ -18,7 +18,7 @@
 </head>
 
 <body>
-<main role="main" class="container-lg mb-3">
+<main role="main" class="container-fluid mb-3">
 {% include 'base/navbar.html' %}
 
     <div class="offcanvas offcanvas-start w-25" tabindex="-1" id="sidebarCol" aria-labelledby="sidebarLabel" data-bs-backdrop="true">
@@ -30,7 +30,7 @@
             {% include 'base/sidebar.html' %}
         </div>
     </div>
-    <div id="mainContentCol" class="mt-5">
+    <div id="container" class="w-100 mt-5">
         {% if messages %}
             {% for message in messages %}
             <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
@@ -39,7 +39,7 @@
             </div>
             {% endfor %}
         {% endif %}
-        <div class="container pt-3">
+        <div class="pt-2 w-100">
             {% block content %}{% endblock %}
         </div>
     </div>

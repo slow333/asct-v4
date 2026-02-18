@@ -1,13 +1,13 @@
-{% extends 'base/base.html' %}
+{% extends 'docs/base_docs.html' %}
 {% block title %} Python {% endblock %}
 
-{% block content %}
+{% block doc_content %}
 {% include 'docs/python/sub_nav.html' %}
 <h1 class="doc-title">closer, decorator</h1>
 <section class="doc-section">
 <h2 class="doc-header">closer</h2>
 <h3 class="doc-subheader">함수 내부에 함수를 정의하고, 내부에 정의된 함수를 return 하는 함수</h3>
-<pre># wrapper.py
+<pre><code class="language-python"># wrapper.py
 def mul(m):
   def wrapper(n):
     return m * n
@@ -17,9 +17,9 @@ if __name__ == "__main__":
   mul3 = mul(3)(10)
   mul5 = mul(5)(10)
   print(mul3)  # 30
-  print(mul5)  # 50</pre>
+  print(mul5)  # 50</code></pre>
 <h2 class="doc-header">decorator</h2>
-<pre>import time
+<pre><code class="language-python">import time
 
 def elapsed(original_func):   # 기존 함수를 인수로 받는다.
     def wrapper(*args, **kwargs):   # *args, **kwargs 매개변수 추가
@@ -35,11 +35,11 @@ def myfunc(msg):
     """ 데코레이터 확인 함수 """
     print("'%s'을 출력합니다." % msg)
 
-myfunc("You need python")</pre>
+myfunc("You need python")</code></pre>
 <h2 class="doc-header">iterator</h2>
 <p>이터레이터는 next 함수 호출 시 계속 그다음 값을 리턴하는 객체<br />
 list는 반복가능하나 이터레이터는 아님</p>
-<pre>a = [1, 2, 3]  
+<pre><code class="language-python">a = [1, 2, 3]  
 ia = iter(a)  
 next(ia)  
 1  
@@ -50,9 +50,9 @@ next(ia)
 next(ia)  
 Traceback (most recent call last):  
   File "&lt;stdin&gt;", line 1, in &lt;module&gt;  
-StopIteration  </pre>
+StopIteration  </code></pre>
 <h3 class="doc-subheader">iterator class</h3>
-<pre>class MyIterator:
+<pre><code class="language-python">class MyIterator:
     def __init__(self, data):
         self.data = data
         self.position = 0
@@ -70,10 +70,10 @@ StopIteration  </pre>
 if __name__ == "__main__":
     i = MyIterator([1,2,3])
     for item in i:
-        print(item)</pre>
+        print(item)</code></pre>
 <h3 class="doc-subheader">generator</h3>
 <p>제너레이터(generator)는 이터레이터를 생성해 주는 함수</p>
-<pre>def mygen():
+<pre><code class="language-python">def mygen():
   for i in range(1, 1000):
     result = i * i
     yield result
@@ -82,6 +82,6 @@ gen = mygen()
 
 print(next(gen))
 print(next(gen))
-print(next(gen))</pre>
+print(next(gen))</code></pre>
 </section>
 {% endblock %}

@@ -28,5 +28,8 @@
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'django-datetime' %}active fw-bold{% endif %}" href="{% url 'django-datetime' %}">Datetime</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'log_rotate' %}active fw-bold{% endif %}" href="{% url 'log-rotate' %}">Log Rotate</a>
+        </li>
     </ul>
 </div>

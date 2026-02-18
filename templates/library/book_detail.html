@@ -5,7 +5,7 @@
 {% block content %}
 {% include 'library/_nav.html' %}
 <!-- Book Info Card -->
-<div class="card shadow-sm mb-3">
+<div class="card glass-card shadow-sm mb-3">
     <div class="card-header bg-white p-4">
         <div class="flex-start">
             <h1 class="display-6 fw-bold mb-2 text-secondary">{{ book.title }}</h1>
@@ -57,7 +57,7 @@
     {% if book.bookinstance_set.all %}
         {% for copy in book.bookinstance_set.all %}
         <div class="col">
-            <div class="card h-100 border-start border-4 {% if copy.status == 'a' %}border-success{% elif copy.status == 'm' %}border-danger{% else %}border-warning{% endif %} shadow-sm">
+            <div class="card glass-card h-100 border-start border-4 {% if copy.status == 'a' %}border-success{% elif copy.status == 'm' %}border-danger{% else %}border-warning{% endif %} shadow-sm">
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
                         <span class="badge {% if copy.status == 'a' %}bg-success{% elif copy.status == 'm' %}bg-danger{% else %}bg-warning text-dark{% endif %}">

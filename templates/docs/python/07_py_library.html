@@ -1,7 +1,7 @@
-{% extends 'base/base.html' %}
+{% extends 'docs/base_docs.html' %}
 {% block title %} Python {% endblock %}
 
-{% block content %}
+{% block doc_content %}
 {% include 'docs/python/sub_nav.html' %}
 <h1 class="doc-title">표준 라이브러리</h1>
 <section class="doc-section">
@@ -91,7 +91,7 @@ pip install –upgrade package_name<br />
 pip list<br />
 ## pip install Faker 가짜 데이터를 만드는 라이브러리<br />
 test_data = [(fake.name(), fake.address()) for i in range(30)]</p>
-<pre>fake.name() 이름
+<pre><code class="language-python">fake.name() 이름
 fake.address()  주소
 fake.postcode() 우편 번호
 fake.country()  국가명
@@ -103,7 +103,7 @@ fake.user_name()    사용자명
 fake.pyint(min_value=0, max_value=100)  0부터 100 사이의 임의의 숫자  
 fake.ipv4_private() IP 주소
 fake.text() 임의의 문장 (한글 임의의 문장은 fake.catch_phrase() 사용)
-fake.color_name()   색상명</pre>
+fake.color_name()   색상명</code></pre>
 <h3 class="doc-subheader">pip install sympy</h3>
 <p>방정식 기호를 사용하게 해주는 라이브러리<br />
 from fractions import Fraction<br />

@@ -1,11 +1,11 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/events-style.css' %}">
 
-<nav class="navbar navbar-expand-lg navbar-light mb-4 rounded-3 shadow-sm p-2 position-relative z-3 nav_custom">
+<nav class="navbar navbar-expand navbar-light mb-3 rounded-3 shadow-sm p-2 position-relative z-3 nav_custom">
     <div class="container-fluid">
         <a class="navbar-brand fw-bold text-primary" href="{% url 'events:index' %}">
             <i class="bi bi-calendar-check me-2"></i>달력</a>
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 flex-wrap">
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     Events
@@ -37,15 +37,15 @@
             </li>
         </ul>
 
-        <form class="d-flex mb-0 ms-3" role="search" action="{% url 'events:events-list' %}">
-            <input class="form-control me-2 py-1" type="search" 
-                placeholder="events..." name='searched' />
-            <button class="btn btn-outline-success btn-sm me-3" type="submit">Search</button>
+        <form class="d-flex mb-0 ms-3 gap-2" role="search" action="{% url 'events:events-list' %}">
+            <input class="form-control form-control-sm rounded-pill px-3 py-0" type="search" 
+                placeholder="Events" name='searched' />
+            <button class="btn btn-outline-success btn-sm rounded-pill px-3 py-0" type="submit"><i class="bi bi-search"></i></button>
         </form>
-        <form class="d-flex mb-0" role="search" action="{% url 'events:favorites-list' %}">
-            <input class="form-control me-2 py-1" type="search" 
-                placeholder="photos..." name='searched' />
-            <button class="btn btn-outline-info btn-sm" type="submit">Search</button>
+        <form class="d-flex mb-0 ms-2 gap-2" role="search" action="{% url 'events:favorites-list' %}">
+            <input class="form-control form-control-sm rounded-pill px-3 py-0" type="search" 
+                placeholder="Photos" name='searched' />
+            <button class="btn btn-outline-info btn-sm rounded-pill px-3 py-0" type="submit"><i class="bi bi-search"></i></button>
         </form>
     </div>
 </nav>

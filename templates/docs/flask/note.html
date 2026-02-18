@@ -1,7 +1,7 @@
-{% extends 'base/base.html' %}
+{% extends 'docs/base_docs.html' %}
 {% block title %} Flask {% endblock %}
 
-{% block content %}
+{% block doc_content %}
 {% include 'docs/flask/sub_nav.html' %}
 <h1 class="doc-title">Note for Flask</h1>
 <section class="doc-section">
@@ -12,7 +12,7 @@
 
 <h3 class="doc-subheader">app과 Blueprint 간 순환 참조 에러</h3>
 <p>별도의 파일을 만들어서 import 해야 함</p>
-<pre># extensions.py
+<pre><code class="language-python"># extensions.py
 from flask_mail import Mail # type: ignore
 
 mail = Mail()
@@ -22,11 +22,10 @@ from bp.myapp.extensions import mail
 mail.init_app(app)
 
 # auth.py
-from bp.myapp.extensions import mail
-</pre>
+from bp.myapp.extensions import mail</code></pre>
 
 <h2 class="doc-header">암호 변경 기능 </h2>
-<pre>
+<pre><code class="language-python">
 def reset_token(id, expiration=1300):
     s = Serializer(app.config.get('SECRET_KEY'), expiration)
     return s.dumps({'reset': id}).decode('utf-8')
@@ -93,7 +92,6 @@ def reset_with_token(token):
                     (hashed_password, user['id']))
         db.commit()
         flash('Your password has been reset.')
-        return redirect('/auth/login')
-</pre>
+        return redirect('/auth/login')</code></pre>
 </section>
 {% endblock %}

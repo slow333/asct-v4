@@ -1,13 +1,13 @@
-{% extends 'base/base.html' %}
+{% extends 'docs/base_docs.html' %}
 {% block title %} Linux {% endblock %}
 
-{% block content %}
+{% block doc_content %}
 {% include 'docs/others/sub_nav.html' %}
 <h1 class="doc-title">Linux</h1>
 <section class="doc-section">
   
   <h2 class="doc-header">환경 변수 설정</h2>
-  <pre>
+  <pre><code class="language-bash">
     $ env ==> 시스템에서 사용하는 변수를 보여줌
     $ echo $PATH => env 중에서 PATH변수를 보여줌
     ## PATH에 추가된 directory는 시스템에서 자동으로 불러와서 수행함
@@ -16,13 +16,13 @@
     ## 추가하기
     # export PATH=/usr/local/somedirectory:$PATH ==> PATH에 추가함
     
-    # echo '${ENV}' >> ./out.txt
+    # echo '${ENV}' >> ./out.txt</code>
   </pre>
 </section>
 <section class="doc-section">
   <h2 class="doc-header">grep 명령어</h2>
   <p>잠조사이트 :https://recipes4dev.tistory.com/157 </p>
-  <pre>
+  <pre><code class="language-bash">
 grep [OPTION...] PATTERN [FILE...]
   -E    : PATTERN을 확장 정규 표현식(Extended RegEx)으로 해석.
   -F    : PATTERN을 정규 표현식(RegEx)이 아닌 일반 문자열로 해석.
@@ -50,10 +50,10 @@ grep [OPTION...] PATTERN [FILE...]
   -R    : 심볼릭 링크를 따라가며 모든 하위 디렉토리 탐색.
   -L    : PATTERN이 존재하지 않는 파일 이름만 표시.
   -l    : 패턴이 존재하는 파일 이름만 표시.
-  -c    : 파일 당 패턴이 일치하는 라인의 갯수 출력.
+  -c    : 파일 당 패턴이 일치하는 라인의 갯수 출력.</code>
 </pre>
-<h3 class="doc-subheader">3. grep 명령 사용 예제</h3>
-<pre>
+<h3 class="doc-subheader">grep 명령 사용 예제</h3>
+<pre><code class="language-bash">
 grep 사용 예				명령어 옵션
 대상 파일에서 문자열 검색	   grep "STR" [FILE]
 현재 디렉토리 모든 파일에서 문자열 검색	  grep "STR" *
@@ -96,12 +96,11 @@ echo $sa
 sleep 1
 done
 
-echo "Done for loop about for .. in .."
-  </pre>
+echo "Done for loop about for .. in .."</code>  </pre>
 </section>
 <section class="doc-section">
   <h2 class="doc-header">rhel 7 install with register</h2>
-  <pre>
+  <pre><code class="language-bash">
 rhel 7 there are no enabled repos
 sudo subscription-manager register
 id, password
@@ -110,13 +109,12 @@ sudo subscription-manager refresh
 sudo yum update -y
 sudo yum groupinstall "Server with GUI"
 sudo systemctl set-default graphical.target
-reboot
-  </pre>
+reboot</code>  </pre>
 </section>
 <section class="doc-section">
   <h2 class="doc-header">RHEL8 APACHE SERVER INSTALLATION</h2>
   <p>출처: https://easyitwanner.tistory.com/120</p>
-  <pre>
+  <pre><code class="language-bash">
 이전 1편에서 설명했던 것과 마찬가지로 Apache라고 하는 Apache HTTP Server는 
 웹 사이트 및 웹 응용 프로그램을 제공하는 데 널리 사용되는 오픈 소스 웹 서버 
 소프트웨어이며 견고성, 유연성 및 확장성으로 유명하다. Apache는 Linux뿐만 아니라 
@@ -171,7 +169,7 @@ vi /var/www/example-site/index.html
 5. 가상 호스트 구성 파일을 만든다. Apache는 가상 호스트 파일을 사용하여 개별 웹 사이트에 대한 설정을 정의한다. 
 예제 사이트에 대한 새 가상 호스트 구성 파일을 만든다.
 sudo nano /etc/httpd/conf.d/example-site.conf
-sudo vi /etc/httpd/conf.d/example-site.conf
+sudo vi /etc/httpd/conf.d/example-site.conf</code>
 </pre>
 <xmp>
   6. 파일에 다음 콘텐츠를 추가한다.
@@ -195,7 +193,7 @@ sudo vi /etc/httpd/conf.d/example-site.conf
 
 <section class="doc-section">
   <h2 class="doc-header">NFS Server</h2>
-  <pre
+  <pre><code class="language-bash">
 install  nfs-utils
 firewall open nfs 
 
@@ -208,7 +206,7 @@ client
 install  nfs-utils
 showmount -e ip-addr
 mount -t nfs -o sync ipaddr:/nas /nas   // 원격지nas의 /nas 폴더에 접근해서 option으로 sync하고 로컬 /nas에 마운트함
-/etc/fstab > ipaddr:/nas /nas nfs defaults 0 0
+/etc/fstab > ipaddr:/nas /nas nfs defaults 0 0</code>
   </pre>
 </section>
 
@@ -223,12 +221,12 @@ mount -t nfs -o sync ipaddr:/nas /nas   // 원격지nas의 /nas 폴더에 접근
 기본적으로 sysstat 패키지는 설치되지 않음에 유의한다.</p>
 <ol>
   <li>설치 방법 
-    <pre># yum install sysstat (repository가 연결되었을때)
+    <pre><code class="language-bash"># yum install sysstat (repository가 연결되었을때)
 or
-# rpm -ivh sysstat (RPM 패키지 있을때)</pre>
+# rpm -ivh sysstat (RPM 패키지 있을때)</code></pre>
   </li>
   <li>설정파일
-<pre>
+<pre><code class="language-bash">
 1)  /etc/sysconfig/sysstat
 ------------------------------------------------------------------------
 # How long to keep log files (in days).
@@ -267,11 +265,11 @@ WantedBy=sysstat.service
 
 - 설정이 변경한 후에는 데몬을 재시작해줘야합니다. 
 # systemctl daemon-reload
-</pre>
+</code></pre>
   </li>
   <li>사용법
     <p> SAR를 통해 현재 상태를 모니터링 할수도 있고, 과거 내역을 볼수도있다는 것이 장점입니다.</p>
-    <pre>
+    <pre><code class="language-bash">
 1) 현재 상태 확인 
   - 현재 CPU 상태를 1 초간격으로 10번 출력 
 # sar 1 10   
@@ -315,7 +313,7 @@ sar## - 시스템 활동 보고서 파일입니다.
 그리고 보통 지난날의 성능데이터는 sar파일을 보는것이 편합니다.
 근데 여기서 너무 숫자로만 보는것이 불편하다고 하시는 분이 있습니다. 그래서 오픈소스에 
 SAR데이터를 GUI 로 변형해서 보여주는 Tool이 있습니다. 그 이름은 Ksar입니다. 
-다운로드 사이트 (https://sourceforge.net/projects/ksar/)
+다운로드 사이트 (https://sourceforge.net/projects/ksar/)</code>
     </pre>
   </li>
 </ol>

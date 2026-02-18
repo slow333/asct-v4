@@ -23,11 +23,11 @@ def common_sftp_result(request, client, ssh_obj, default_script_name, remote_scr
 
     if request and request.method == 'POST' and request.FILES.get('script_file'):
         script_file = request.FILES['script_file']
-        sftp.putfo(script_file, remote_script)
+        sftp.putfo(script_file, remote_script, confirm=False)
     else:
         script_path = os.path.join(settings.BASE_DIR, 'asct', 'script_files', default_script_name)
         if os.path.exists(script_path):
-            sftp.put(script_path, remote_script)
+            sftp.put(script_path, remote_script, confirm=False)
         else:
             raise FileNotFoundError("Default script file not found.")
     
@@ -50,14 +50,14 @@ def common_sftp_result(request, client, ssh_obj, default_script_name, remote_scr
     return output, error_msg, remote_script
 
 def common_ssh_usage_collector(request, ssh_obj, default_script_name, remote_script_prefix, row_processor):
-    error_msg = ""
+    # error_msg = ""
     try:
         client = get_ssh_connection(ssh_obj)
         # 4. 명령어 실행
-        output, error_msg, remote_script = common_sftp_result(request, client, ssh_obj, default_script_name, remote_script_prefix) # type: ignore
+        output, script_error, remote_script = common_sftp_result(request, client, ssh_obj, default_script_name, remote_script_prefix) # type: ignore
         
         if output is None:
-            return None, False, {}, error_msg
+            return None, False, {}, script_error
         csv_file_path = ""
         for line in output.splitlines(): # type: ignore
             if "Successfully generated CSV:" in line:
@@ -72,36 +72,48 @@ def common_ssh_usage_collector(request, ssh_obj, default_script_name, remote_scr
         # Read CSV content
         stdin, stdout, stderr = client.exec_command(f"cat {csv_file_path}")
         csv_content = stdout.read().decode('utf-8')
+        cat_error = stderr.read().decode('utf-8')
         
         # Cleanup remote files
         client.exec_command(f"rm {remote_script} {csv_file_path}")
         client.close()
 
+        if cat_error:
+            return None, False, {}, f"Failed to read CSV: {cat_error}. Script stderr: {script_error}"
+
         # Parse CSV and Save to DB
         f = io.StringIO(csv_content)
-        reader = csv.DictReader(f)
-        
         saved_count = 0
-        for row in reader:
-            try:
-                aware_dt = ''
-                if row['Date']:
-                    date_str = row['Date'].strip().replace('"', '').replace("'", "").replace('T', ' ')[:19]
-                    dt_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
-                    aware_dt = make_aware(dt_obj)
-                
-                if row_processor(row, ssh_obj, aware_dt):
-                    saved_count += 1
-            except ValueError as e:
-                print(f"Date parse error: {e}")
-                continue
-            
-        return None, False, {'count': saved_count}, error_msg
+        try:
+            reader = csv.DictReader(f)
+            if not reader.fieldnames:
+                return None, False, {}, f"CSV header is missing or empty. Script stderr: {script_error}"
+
+            for row in reader:
+                try:
+                    aware_dt = None
+                    if row.get('Date'):
+                        date_str = row['Date'].strip().replace('"', '').replace("'", "").replace('T', ' ')[:19]
+                        dt_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+                        aware_dt = make_aware(dt_obj)
+                    
+                    if row_processor(row, ssh_obj, aware_dt):
+                        saved_count += 1
+                except ValueError as e:
+                    print(f"Date parse error: {e}")
+                    continue
+                except Exception as e:
+                    print(f"Row processing error: {e}")
+                    continue
+        except csv.Error as e:
+            return None, False, {}, f"CSV parsing error: {str(e)}"
+
+        return None, False, {'count': saved_count}, script_error
         
     except Exception as e:
         return None, False, {}, f"## 연결실패: {str(e)} ##"
 
-# ========= Paramiko 실행:  파일이용 disk usage 수집 ==========
+# ========= 파일이용 disk usage 수집 ==========
 def run_ssh_disk_usage(request, ssh_obj):
     
     client = get_ssh_connection(ssh_obj)
@@ -158,8 +170,9 @@ def run_ssh_traffic_usage(request, ssh_obj):
 
     return common_ssh_usage_collector(request, ssh_obj, 'get_month_traffic_usage.sh', 'month_traffic_usage', processor)
 
-# ========= Paramiko 실행:  파일이용 cpu usage 수집 ==========
+# ========= 파일이용 cpu usage 수집 ==========
 def run_ssh_cpu_usage(request, ssh_obj):
+    
     def processor(row, ssh_obj, aware_dt):
         CPUUsage.objects.update_or_create(
             hostname=row['hostname'].strip(),
@@ -176,11 +189,12 @@ def run_ssh_cpu_usage(request, ssh_obj):
 
     return common_ssh_usage_collector(request, ssh_obj, 'get_month_cpu_usage.sh', 'month_cpu_usage', processor)
 
-# ========= Paramiko 실행:  파일이용 memory usage 수집 ==========
+# ========= 파일이용 memory usage 수집 ==========
 def run_ssh_memory_usage(request, ssh_obj):
+    # hostname,IP,Date,Total_Mem,Usage(%)
     def processor(row, ssh_obj, aware_dt):
         MemoryUsage.objects.update_or_create(
-            hostname=row['Hostname'].strip(),
+            hostname=row['hostname'].strip(),
             ip=row['IP'].strip(),
             data_time=aware_dt,
             defaults={

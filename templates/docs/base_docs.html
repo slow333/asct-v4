@@ -1,0 +1,172 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<!-- PrismJS CSS (Syntax Highlighting) -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+<!-- PrismJS Toolbar CSS (Required for Copy Button) -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.css" rel="stylesheet" />
+
+<style>
+    /* 문서 레이아웃: 좌측 TOC + 우측 본문 */
+    .docs-layout {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 2rem;
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 1rem;
+        position: relative;
+    }
+
+    /* 좌측 사이드바 (TOC) */
+    .docs-sidebar {
+        width: 250px;
+        flex-shrink: 0;
+        display: none; /* 모바일에서는 숨김 */
+    }
+
+    @media (min-width: 992px) {
+        .docs-sidebar {
+            display: block;
+        }
+    }
+
+    .docs-toc {
+        position: sticky;
+        top: 80px; /* 상단 네비게이션 바 높이에 맞춰 조정 */
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+        padding-right: 10px;
+        border-right: 1px solid #e9ecef;
+        font-size: 0.9rem;
+    }
+
+    .docs-toc ul {
+        list-style: none;
+        padding-left: 0;
+        margin-bottom: 0;
+    }
+
+    .docs-toc li {
+        margin-bottom: 0.4rem;
+    }
+
+    .docs-toc a {
+        text-decoration: none;
+        color: #fafafa;
+        display: block;
+        padding: 2px 0;
+        transition: all 0.2s;
+        border-left: 2px solid transparent;
+        padding-left: 10px;
+    }
+
+    .docs-toc a:hover, .docs-toc a.active {
+        color: #0d6efd;
+        border-left-color: #0d6efd;
+        background-color: #f8f9fa;
+    }
+
+    .docs-toc .toc-h3 {
+        padding-left: 20px;
+        font-size: 0.85rem;
+    }
+
+    /* 우측 본문 영역 */
+    .docs-main {
+        flex-grow: 1;
+        min-width: 0; /* Flex item overflow 방지 */
+    }
+</style>
+
+<div class="docs-layout">
+    <!-- 좌측 TOC 영역 -->
+    <aside class="docs-sidebar">
+        <div class="mb-2 fw-bold text-white">페이지 내용</div>
+        <nav id="doc-toc" class="docs-toc">
+            <!-- JS로 자동 생성됨 -->
+        </nav>
+    </aside>
+
+    <!-- 우측 본문 영역 -->
+    <main class="docs-main">
+        <div class="docs-container">
+            {% block doc_content %}{% endblock %}
+        </div>
+    </main>
+</div>
+
+<!-- PrismJS JS & Autoloader -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<!-- PrismJS Toolbar & Copy to Clipboard Plugins -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+
+<!-- TOC Auto Generator Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tocContainer = document.getElementById('doc-toc');
+        const contentContainer = document.querySelector('.docs-main');
+        
+        // 본문 내의 h2, h3 태그 수집
+        const headers = contentContainer.querySelectorAll('h2, h3');
+        
+        if (headers.length > 0) {
+            const ul = document.createElement('ul');
+            
+            headers.forEach((header, index) => {
+                // ID가 없으면 자동 생성
+                if (!header.id) {
+                    header.id = 'header-' + index;
+                }
+
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                
+                a.href = '#' + header.id;
+                a.textContent = header.textContent.trim(); // 텍스트만 추출
+                
+                // 태그 레벨에 따른 스타일 클래스 적용
+                if (header.tagName.toLowerCase() === 'h3') {
+                    li.classList.add('toc-h3');
+                } else {
+                    li.classList.add('toc-h2');
+                }
+
+                // 클릭 시 부드러운 스크롤 이동
+                a.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                });
+
+                li.appendChild(a);
+                ul.appendChild(li);
+            });
+
+            tocContainer.appendChild(ul);
+        }
+
+        // 스크롤 시 현재 위치 하이라이팅 (Scroll Spy)
+        window.addEventListener('scroll', function() {
+            let current = '';
+            headers.forEach(header => {
+                const sectionTop = header.offsetTop;
+                if (scrollY >= sectionTop - 150) { // 상단 여백 보정
+                    current = header.getAttribute('id');
+                }
+            });
+
+            document.querySelectorAll('.docs-toc a').forEach(a => {
+                a.classList.remove('active');
+                if (a.getAttribute('href').includes(current) && current !== '') {
+                    a.classList.add('active');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

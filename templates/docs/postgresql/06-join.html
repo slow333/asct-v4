@@ -1,15 +1,15 @@
-{% extends 'base/base.html' %}
+{% extends 'docs/base_docs.html' %}
 {% block title %} PostgreSQL {% endblock %}
 
-{% block content %}
+{% block doc_content %}
 {% include 'docs/postgresql/sub_nav.html' %}
 <h1 class="doc-title">JOIN</h1>
 <section class="doc-section">
 <p>product의 supplierID와 order_detail의 id를 비교하여 같으면
   product의 name, order_detail의 price, product의 Unit, order_detail의 created_at을 가져온다.</p>
-<pre> SELECT p.name, o.price, p.Unit, o.created_at<br/>
+<pre><code class="language-sql"> SELECT p.name, o.price, p.Unit, o.created_at<br/>
 from product p<br/>
-JOIN order_detail o ON p.supplierID = o.id;</pre>
+JOIN order_detail o ON p.supplierID = o.id;</code></pre>
 <h2 class="doc-header">Different Types of SQL JOINs</h2>
 <ul>
   <li>INNER JOIN: 두 테이블에서 공통되는 것만(교집합)</li>
@@ -30,74 +30,74 @@ JOIN order_detail o ON p.supplierID = o.id;</pre>
 </table>
 <!-- ############## inner join #########################--> 
 <h2 class="doc-header">INNER JOIN: 교집합, JOIN하면 기본으로 적용됨</h2>
-<pre>SELECT p.id, p.name, c.name, od.price<br/>
+<pre><code class="language-sql">SELECT p.id, p.name, c.name, od.price<br/>
 FROM product p<br/>
 INNER JOIN customer c ON p.id = c.id<br/>
-INNER JOIN order_detail od ON p.supplierID = od.order_id;</pre>
+INNER JOIN order_detail od ON p.supplierID = od.order_id;</code></pre>
 <!-- ############## left join #########################--> 
 <h2 class="doc-header">LEFT JOIN; FROM table을 갖다 놓고, 조건에 맞는 LEFT JOIN table 값을 우측에 놓음</h2>
-<pre>SELECT column_names FROM table1<br/>
+<pre><code class="language-sql">SELECT column_names FROM table1<br/>
 LEFT JOIN table2<br/>
-ON table1.column_name = table2.column_name;</pre>
-<pre>SELECT p.id, p.name, c.name<br/>
+ON table1.column_name = table2.column_name;</code></pre>
+<pre><code class="language-sql">SELECT p.id, p.name, c.name<br/>
 FROM product p<br/>
 LEFT JOIN customer c <br/>
-ON p.supplierID = c.id ORDER BY c.name;</pre>
+ON p.supplierID = c.id ORDER BY c.name;</code></pre>
 <!-- ############## right join #########################--> 
 <h2 class="doc-header">RIGHT JOIN = RIGHT OUTER JOIN; 기본적으로 table2를 갖다 놓고 조건에 맞는 T1값을 놓음</h2>
-<pre>SELECT column_names FROM table1<br/>
+<pre><code class="language-sql">SELECT column_names FROM table1<br/>
 RIGHT JOIN table2 <br/>
-ON table1.column_name = table2.column_name</pre>
-<pre>SELECT p.id, p.name, c.name<br/>
+ON table1.column_name = table2.column_name</code></pre>
+<pre><code class="language-sql">SELECT p.id, p.name, c.name<br/>
 FROM product p<br/>
 RIGHT JOIN customer c <br/>
-ON p.supplierID = c.id ORDER BY p.id;</pre>
+ON p.supplierID = c.id ORDER BY p.id;</code></pre>
 <!-- ############## full join #########################--> 
 <h2 class="doc-header">mariadb 미지원, FULL JOIN = FULL OUTER JOIN; LEFT JOIN과 RIGHT JOIN을 합친 것</h2>
-<pre>SELECT column_name(s)<br/>
+<pre><code class="language-sql">SELECT column_name(s)<br/>
 FROM table1<br/>
 FULL OUTER JOIN table2<br/>
-ON table1.column_name = table2.column_name WHERE condition; </pre>
+ON table1.column_name = table2.column_name WHERE condition; </code></pre>
 
 <!-- ############## self join #########################--> 
 <h2 class="doc-header">SELF JOINS: 자기 테이블에서 자신을 참조해서 JOIN</h2>
-<pre>SELECT A.Customer_id, A.first_name, A.last_name,<br/>
+<pre><code class="language-sql">SELECT A.Customer_id, A.first_name, A.last_name,<br/>
   CONCAT(B.first_name, ' ', B.last_name) AS refered_by<br/>
   FROM Customers A<br/>
   INNER JOIN Customers B<br/>
-  ON A.referaal_id = b.Customer_id;</pre>
-<pre>SELECT A.employee_id, A.first_name, B.last_name,<br/>
+  ON A.referaal_id = b.Customer_id;</code></pre>
+<pre><code class="language-sql">SELECT A.employee_id, A.first_name, B.last_name,<br/>
     concat(B.first_name,' ',B.last_name) as supervisor<br/>
   FROM employees A
   INNER JOIN employees B
-  ON A.supervisor_id = B.employee_id;</pre>
+  ON A.supervisor_id = B.employee_id;</code></pre>
 <!-- ############## union #########################--> 
 <h2 class="doc-header">UNION</h2>
 <h3 class="doc-subheader">두 테이블을 아래로 나란히 보여줌, select 값이 둘다 같아야함</h3>
-<pre>-- column 수를 맞추어야 함<br/>
+<pre><code class="language-sql">-- column 수를 맞추어야 함<br/>
 SELECT column1, column2 FROM table1<br/>
 UNION<br/>
-SELECT column1, column2 FROM table2;</pre>
+SELECT column1, column2 FROM table2;</code></pre>
 
 <h3 class="doc-subheader">"Customers", "Suppliers" 테이블에서 cities를 중복제거 해서 보여줌</h3>
-<pre>SELECT column_name(s) FROM table1<br/>
+<pre><code class="language-sql">SELECT column_name(s) FROM table1<br/>
 UNION<br/>
-SELECT column_name(s) FROM table2; </pre>
-<pre>SELECT City FROM Customers<br/>
+SELECT column_name(s) FROM table2; </code></pre>
+<pre><code class="language-sql">SELECT City FROM Customers<br/>
 UNION<br/>
 SELECT City FROM Suppliers<br/>
-ORDER BY City;</pre>
+ORDER BY City;</code></pre>
 
 <h2 class="doc-header">UNION ALL</h2>
-<pre>SELECT City, Country FROM Customers<br/>
+<pre><code class="language-sql">SELECT City, Country FROM Customers<br/>
 WHERE Country='Germany'<br/>
 UNION ALL<br/>
 SELECT City, Country FROM Suppliers<br/>
 WHERE Country='Germany'<br/>
-ORDER BY City;</pre>
-<pre>-- 그냥 UNION 하면 중복제거 피하기 위해 UNION ALL 사용<br/>
+ORDER BY City;</code></pre>
+<pre><code class="language-sql">-- 그냥 UNION 하면 중복제거 피하기 위해 UNION ALL 사용<br/>
 SELECT CustomerName, City FROM Customers<br/>
 UNION ALL<br/>
-SELECT SupplierName, City FROM Suppliers;</pre>
+SELECT SupplierName, City FROM Suppliers;</code></pre>
 </section>
 {% endblock %}

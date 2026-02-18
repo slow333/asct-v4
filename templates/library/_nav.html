@@ -1,8 +1,8 @@
 {% load static %}
-<nav class="navbar navbar-expand-lg navbar-light mb-4 rounded-3 shadow-sm p-2  custom-nav-bg z-3 nav_custom">
+<nav class="navbar navbar-expand navbar-light mb-3 rounded-3 shadow-sm p-2  custom-nav-bg z-3 nav_custom">
     <div class="container-fluid d-flex align-items-center">
-        <a class="navbar-brand" href="{% url 'library:index' %}">Library</a>
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <a class="navbar-brand fw-bold text-primary" href="{% url 'library:index' %}"><i class="bi bi-journal-code me-2"></i>Library</a>
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 flex-wrap">
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Book </a>
                 <ul class="dropdown-menu">
@@ -27,10 +27,10 @@
             </li>
         </ul>
         <span class="me-3 text-info">{{page_obj.paginator.count}}</span>
-        <form class="d-flex rounded-3 mb-0" role="search" action="{% url 'library:books' %}">
-            <input class="form-control me-2 py-1" type="search" placeholder="Search books" name='searched' value="{{ searched|default:'' }}"/>
-            <button class="btn btn-outline-success btn-sm py-1 me-2" type="submit">Search</button>
-            <a href="{% url 'library:books' %}" class="btn btn-outline-secondary btn-sm py-1">Cancel</a>
+        <form class="d-flex mb-0 gap-2" role="search" action="{% url 'library:books' %}">
+            <input class="form-control form-control-sm rounded-pill px-3 py-0" type="search" placeholder="Search" name='searched' value="{{ searched|default:'' }}"/>
+            <button class="btn btn-outline-success btn-sm rounded-pill px-3 py-0" type="submit"><i class="bi bi-search"></i></button>
+            <a href="{% url 'library:books' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-0 pt-1">X</a>
         </form>
     </div>
 </nav>

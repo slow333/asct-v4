@@ -1,7 +1,7 @@
-{% extends 'base/base.html' %}
+{% extends 'docs/base_docs.html' %}
 {% block title %} Project Home {% endblock %}
 
-{% block content %}
+{% block doc_content %}
 {% include 'docs/django/sub_nav.html' %}
 <h1 class="doc-title">Project 개요</h1>
 <section class="doc-section">
@@ -31,7 +31,7 @@
 </section>
 <section class="doc-section">
   <h2 class="doc-header">etc backup</h2>
-  <pre># backup for server info models
+  <pre><code class="language-python"># backup for server info models
 ip_management = models.GenericIPAddressField(null=True, blank=True)
 ip_virtual = models.GenericIPAddressField(null=True, blank=True) # nat, vip 등 가상아이피
 # backup for network models
@@ -63,6 +63,6 @@ storage_san_usage_percent = models.DecimalField(max_digits=4, decimal_places=2, 
 
 storage_nfs_total = models.IntegerField(null=True, blank=True)
 storage_nfs_usage_percent = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
-</pre>
+</code></pre>
 </section>
 {% endblock %}

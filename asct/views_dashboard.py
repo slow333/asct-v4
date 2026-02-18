@@ -8,6 +8,8 @@ from django.shortcuts import render
 from .models import ServerInfo
 from django.db.models import Count
 from .views_common import buffered_img
+from django.http import JsonResponse
+from config.celery import app
 
 def dashboard(request):
     servers = ServerInfo.objects.all()
@@ -25,7 +27,10 @@ def dashboard(request):
     
     # 차트 생성을 위한 데이터 (뷰에서 이 데이터를 준비해야 합니다)
     os_labels = list(os_dist.values_list('os_version', flat=True))
-    labels_replace = [ re.sub(r'\s*\([^)]*\)', '', l).strip() for l in os_labels ]
+    labels_replace = [ re.sub(r'\s*\([^)]*\)', '', l)
+                    .strip().replace('Red Hat Enterprise Linux', 'RHEL')
+                    .replace('Server ', '')
+                    .replace(' release', '') for l in os_labels ]
     os_data = list(os_dist.values_list('count', flat=True))
     mem_labels = [s.hostname for s in top_memory]
     mem_data = [s.memory for s in top_memory]
@@ -36,7 +41,7 @@ def dashboard(request):
     # 1. OS 분포 차트 (파이 차트)
     os_chart = None
     if os_data:
-        fig_os, ax_os = plt.subplots(figsize=(6, 5))
+        fig_os, ax_os = plt.subplots(figsize=(6, 6))
         ax_os.pie(os_data, labels=labels_replace, autopct='%1.1f%%', startangle=90, textprops={'fontsize': 16})
         ax_os.axis('equal')  # 파이 차트를 원형으로 만듭니다.
         os_chart = buffered_img(fig_os)
@@ -76,3 +81,32 @@ def dashboard(request):
     }
     
     return render(request, 'asct/dashboard.html', context)
+
+def check_celery_status(request):
+    try:
+        # Celery Worker 상태 확인 (Timeout 1.0초)
+        inspector = app.control.inspect(timeout=1.0)
+        
+        # Worker Ping (응답 없으면 None)
+        workers = inspector.ping()
+        
+        if not workers:
+            return JsonResponse({
+                'status': 'error', 
+                'message': 'No Celery Workers found.'
+            }, status=503)
+        
+        # 현재 실행 중인 태스크 정보 조회
+        active_tasks = inspector.active()
+        
+        return JsonResponse({
+            'status': 'running',
+            'workers': list(workers.keys()),
+            'active_tasks': active_tasks
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error', 
+            'message': str(e)
+        }, status=500)

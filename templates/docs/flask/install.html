@@ -1,7 +1,7 @@
-{% extends 'base/base.html' %}
+{% extends 'docs/base_docs.html' %}
 {% block title %} Flask {% endblock %}
 
-{% block content %}
+{% block doc_content %}
 {% include 'docs/flask/sub_nav.html' %}
 <h1 class="doc-title">Flask 설치하기</h1>
 <section class="doc-section">
@@ -31,16 +31,16 @@
   <li>가상환경을 윈도우 path에 지정 : win+r > <code>sysdm.cpl</code> > <code>환경 변수</code> > <code>Path 편집</code> > <code>venvs/myvenv</code> 추가</li>
   <li>가상환경을 macOS/Linux path에 지정 : <code>~/.bash_profile</code> 또는 <code>~/.bashrc</code>에 <code>export PATH="$PATH:$(pwd)/venvs/myvenv/bin"</code> 추가</li>
   <li>window는 cmd 파일 생성
-    <pre> // run_flask.cmd
+    <pre><code class="language-batch"> // run_flask.cmd
 @echo off
 cd b:/python/flask_app
 set FLASK_APP=pybo
 set FLASK_DEBUG=true
-b:/python/venvs/flask_app/Scripts/activate  </pre>
-    <pre>// stop_flask.cmd
+b:/python/venvs/flask_app/Scripts/activate  </code></pre>
+    <pre><code class="language-batch">// stop_flask.cmd
 @echo off
 cd b:/python/flask_app
-b:/python/venvs/flask_app/Scripts/deactivate.bat   </pre>
+b:/python/venvs/flask_app/Scripts/deactivate.bat   </code></pre>
   </li>
 </ol>
 <h2 class="doc-header">프로젝트 디렉토리 생성</h2>
@@ -55,7 +55,7 @@ b:/python/venvs/flask_app/Scripts/deactivate.bat   </pre>
   </li>
   <li>pybo.py 파일을 pybo/__init__.py로 이동, 이렇게 하면 패키지로 인식됩니다.</li>
   <li>__init__.py 파일을 생성하여 패키지로 인식되도록 합니다.
-    <pre>// 전체 구조를 create_app() 함수로 변경
+    <pre><code class="language-python">// 전체 구조를 create_app() 함수로 변경
 def create_app():
   app = Flask(__name__)
 
@@ -68,7 +68,7 @@ def create_app():
       return render_template("install.html")
 
   return app
-    </pre>
+    </code></pre>
   </li>
 </ol>
 <h2 class="doc-header">블루프린트(route 관리)</h2>
@@ -76,7 +76,7 @@ def create_app():
 <ol>
   <li>블루프린트 파일 생성: <code>mkdir pybo/main</code> 및 <code>pybo/main/routes.py</code></li>
   <li>블루프린트 routes 생성: 
-    <pre>// routes.py
+    <pre><code class="language-python">// routes.py
 from flask import Blueprint, render_template
 
 bp = Blueprint("main", __name__, url_prefix="/")
@@ -87,11 +87,10 @@ def hello():
 
 @bp.route("/install")
 def install():
-    return render_template("install.html")
-    </pre>
+    return render_template("install.html")</code></pre>
   </li>
   <li>블루프린트 등록(__init__.py): 
-    <pre>
+    <pre><code class="language-python">
 from flask import Flask # type: ignore
 
 def create_app():
@@ -104,7 +103,7 @@ def create_app():
 
 if __name__ == "__main__":
   app = create_app()
-  app.run(debug=True, host='0.0.0.0', port=5000)      </pre>
+  app.run(debug=True, host='0.0.0.0', port=5000)      </code></pre>
   </li>
 </ol>
 </section>

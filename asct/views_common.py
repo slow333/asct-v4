@@ -36,9 +36,9 @@ def filter_by_q_and_hostlist(request, model_obj):
         queryset = queryset.filter(hostname=query)
 
     if hasattr(model_obj, 'data_time'):
-        queryset = queryset.order_by('data_time')
+        queryset = queryset.order_by('-data_time')
     elif hasattr(model_obj, 'checked_at'):
-        queryset = queryset.order_by('checked_at')
+        queryset = queryset.order_by('-checked_at')
 
     return queryset, query, host_list
 
